@@ -1,0 +1,56 @@
+body {
+    margin: 0px;
+    overflow: hidden;
+    background-color: #222222;
+}
+
+path {
+    stroke: white;
+    stroke-opacity: 0.4;
+}
+
+/* https://css-tricks.com/snippets/css/complete-guide-grid/ */
+/* Grid Container */
+.container{                     
+    display: grid;
+    grid-template-columns: [first-column] 2vw [line1] 10vw [line2] auto [line3] 10vw [line4] 2vw [last-column];
+    grid-template-rows: [first-row] auto [mid] 25vh [last-row];
+}
+
+/* Grid Item */
+.test {
+    grid-column-start: line1;
+    grid-column-end: line2;
+    grid-row-start: first-row;
+    grid-row-end: mid;
+}
+
+.map-div {
+    grid-column-start: line2;
+    grid-column-end: line3;
+    grid-row-start: first-row;
+    grid-row-end: mid;
+}
+
+.legend-div {
+    grid-column-start: line3;
+    grid-column-end: line4;
+    grid-row-start: first-row;
+    grid-row-end: mid;
+    /* justify-self: center;
+    align-self: center; */
+}
+
+.filter-div {
+    grid-column-start: line1;
+    grid-column-end: line4;
+    grid-row-start: mid;
+    grid-row-end: last-row;
+    display: blocks;
+}
+
+/* SVGs
+#worldMap{
+    width: 70vw;
+    height: 54vh;
+} */

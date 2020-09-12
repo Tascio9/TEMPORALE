@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Map test</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="DataTables/datatables.min.css" />
+  <script type="text/javascript" src="DataTables/datatables.min.js"></script>
+  <script type="text/javascript"
+    src="https://cdn.datatables.net/plug-ins/1.10.21/features/scrollResize/dataTables.scrollResize.min.js"></script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v3.min.js"></script>
+  <script defer src="index.js"></script>
+  <script src="paperTable.js"></script>
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="test">
+      <h1 id="state">Hello!</h1>
+    </div>
+
+    <div class="map-div">
+      <svg id="worldMap"></svg>
+      <!-- <svg width="1100" height="600"></svg> -->
+    </div>
+
+    <div class="legend-div">
+      <svg id="chart">
+        <!-- <rect id="rectScaleColor" x="10" y="10" rx="15" ry="15" width="100" height="74%" /> -->
+      </svg>
+    </div>
+
+    <div class="filter-div">
+      <table id="paperTable">
+        <thead>
+          <tr>
+            <th>Index</th>
+            <th>Cord UID</th>
+            <th>Paper ID</th>
+            <th>Nation</th>
+            <th>Title</th>
+            <th>Publish Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</body>
+
+</html>
