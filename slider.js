@@ -7,15 +7,16 @@ Promise.all([
     const minPublishTime = d3.min(data[1], d => d.Publish_time);
     const maxPublishTime = d3.max(data[1], d => d.Publish_time);
 
-    const marginSlider = { top: 50, right: 20, bottom: 0, left: 0 }
+    const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
     const widthSlider = "140";
     const heightSlider = "300";
     // const formatDate = d3.timeFormat('%Y-%m-%d');
+    const rectWidth = Number(widthSlider) + marginSlider.left + marginSlider.right
+    const rectHeight = Number(heightSlider) + marginSlider.top + marginSlider.bottom
 
     const svgSlider1 = d3.select("#slider")
-        .attr("width", widthSlider + marginSlider.left + marginSlider.right)
-        .attr("height", heightSlider + marginSlider.top + marginSlider.bottom)
-        .append("g")
+        .attr("width", rectWidth)
+        .attr("height", rectHeight).append("g")
         // classic transform to position g
         .attr("transform", "translate(" + marginSlider.left + "," + marginSlider.top + ")");
 
@@ -36,13 +37,14 @@ Promise.all([
     // add the X gridlines
     svgSlider1.append("g")
         .attr("class", "grid")
-        .attr("transform", "translate(" + widthSlider + ",0)")
+        .attr("transform", "translate(" + widthSlider / 4 + ",0)")
         .call(d3.axisRight(dateScale)
             .ticks(d3.timeYear.every(1))
-            .tickSize(-widthSlider + 4)
+            .tickSize((widthSlider / 2))
             .tickFormat("")
             .tickSizeOuter(0)
-        );
+        )
+        .select("path").style("opacity", "0");
 
     svgSlider1.append("g")
         .attr("class", "numbers")
@@ -50,15 +52,15 @@ Promise.all([
         // put in middle of screen
         //.attr("transform", "translate(0," + heightSlider / 2 + ")")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-        // inroduce axis
+        // introduce axis
         .call(d3.axisRight()
             .scale(dateScale)
-            .tickFormat(function (d) {
-                return formatDate(d);
-            })
-            .ticks(6)
+            .tickFormat(d => formatDate(d))
+            .tickValues(dateScale.ticks(6).concat(dateScale.domain()))
+            // .ticks(10)
             .tickSize(0)
-            .tickPadding(45))
+            .tickPadding(45)
+        )
         .select(".domain")
         .select(function () {
             return this.parentNode.appendChild(this.cloneNode(true));
@@ -82,27 +84,26 @@ Promise.all([
     handle1.append("path")
         // .attr("transform", "translate(0," + heightSlider / 2 + ")") --> Original one
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-        .attr("d", "M -35 -0 H 35");
+        .attr("d", "M -60 0 H 60 60");
     const text1 = handle1.append('text')
         .text(formatDate(dateScale.domain()[0]))
         // .attr("transform", "translate(" + (-12) + " ," + (heightSlider / 2 - 45) + ")"); --> Original one
-        .attr("transform", "translate(" + (widthSlider / 2 - 45) + " ," + (-2) + ")");
+        .attr("transform", "translate(" + (Number(widthSlider) + 2) + " ," + (+5) + ")");
     const handle2 = svgSlider1.append("g")
         .attr("class", "handle2");
     handle2.append("path")
         // .attr("transform", "translate(0," + heightSlider / 2 + ")") --> Origianl one
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-        .attr("d", "M -35 0 H 35 35");
+        .attr("d", "M -60 0 H 60 60");
     const text2 = handle2.append('text')
         .text(formatDate(dateScale.domain()[1]))
         // .attr("transform", "translate(" + (-14) + " ," + (heightSlider / 2 - 45) + ")"); --> Original one
-        .attr("transform", "translate(" + (widthSlider / 2 - 45) + " ," + (-2) + ")");
+        .attr("transform", "translate(" + (Number(widthSlider) + 2) + " ," + (+5) + ")");
     handle1.attr('transform', 'translate(0,0)');
     // handle2.attr('transform', 'translate(' + widthSlider + ",0)");
     handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
 
     function drawScatterPlotPaper() {
-
         // Compute summary statistics used for the box: outlier == paper
         const paper = data[1].filter(function (d) {
             return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(0)
@@ -174,10 +175,25 @@ Promise.all([
         text1.text(formatDate(dateScale.invert(selection1[0])));
         handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
         text2.text(formatDate(dateScale.invert(selection1[1])));
+
+        colorMap(data[1])
     }
 
-    function filterPaperByDate() {
-        selection1 = d3.brushSelection(d3.select(".brush1").node());
+    function filterPaperByDate(event) {
+        const selection1 = d3.brushSelection(d3.select(".brush1").node());
+        if (!event.sourceEvent || !selection1) return;
         console.log({ selection1 })
+        const [x0, x1] = selection1.map(d => d3.timeYear.every(1).round(dateScale.invert(d)));
+        d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
+
+        const newData = data[1].filter(function (d) {
+            return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(selection1[0])
+                && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
+        })
+
+        console.log({ newData })
+
+        colorMap(newData)
+
     }
 })

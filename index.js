@@ -26,6 +26,7 @@ projection.scale([200])
   .translate([width / 2, height / 2]);
 const pathGenerator = d3.geoPath().projection(projection);
 
+
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   d3.json("myFirstDatasetCleaned.json")
@@ -69,12 +70,16 @@ Promise.all([
     })
 
   // Container CHART --------------------------------------------------------
+  const marginChart = { top: 50, right: 40, bottom: 10, left: 0 }
   const widthChart = 30;
   const heightChart = 150;
+  // const formatDate = d3.timeFormat('%Y-%m-%d');
+  const chartWidth = widthChart + marginChart.left + marginChart.right
+  const chartHeight = heightChart + marginChart.top + marginChart.bottom
 
   const svgChart = d3.select('#chart')
-    .attr('width', widthChart)
-    .attr('height', heightChart)
+    .attr('width', chartWidth)
+    .attr('height', chartHeight)
     .append('g')
 
   const colorScale = d3.scaleSequential(d3.interpolateViridis)
@@ -90,19 +95,17 @@ Promise.all([
     .attr('height', 1)
     .attr('width', widthChart)
     .style('fill', (d, i) => colorScale(d));
-  // -------------------------------------------------------------------------
-
-  const marginSlider = { top: 50, right: 20, bottom: 0, left: 5 }
-  const widthSlider = "140";
-  const heightSlider = "300";
+  // Container SLIDER -------------------------------------------------------------------------
+  const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
+  const widthSlider = 140;
+  const heightSlider = 600;
   // const formatDate = d3.timeFormat('%Y-%m-%d');
-  const rectWidth = Number(widthSlider) + marginSlider.left + marginSlider.right
-  const rectHeight = Number(heightSlider) + marginSlider.top + marginSlider.bottom
+  const sliderWidth = widthSlider + marginSlider.left + marginSlider.right
+  const sliderHeight = heightSlider + marginSlider.top + marginSlider.bottom
 
   const svgSlider1 = d3.select("#slider")
-    .attr("width", rectWidth)
-    .attr("height", rectHeight)
-    .append("g")
+    .attr("width", sliderWidth)
+    .attr("height", sliderHeight).append("g")
     // classic transform to position g
     .attr("transform", "translate(" + marginSlider.left + "," + marginSlider.top + ")");
 
@@ -123,12 +126,14 @@ Promise.all([
   // add the X gridlines
   svgSlider1.append("g")
     .attr("class", "grid")
-    .attr("transform", "translate(" + widthSlider + ",0)")
-    .call(make_x_gridlines(dateScale)
-      .tickSize(-widthSlider + 4)
+    .attr("transform", "translate(" + widthSlider / 4 + ",0)")
+    .call(d3.axisRight(dateScale)
+      .ticks(d3.timeYear.every(1))
+      .tickSize((widthSlider / 2))
       .tickFormat("")
       .tickSizeOuter(0)
-    );
+    )
+    .select("path").style("opacity", "0");
 
   svgSlider1.append("g")
     .attr("class", "numbers")
@@ -136,28 +141,28 @@ Promise.all([
     // put in middle of screen
     //.attr("transform", "translate(0," + heightSlider / 2 + ")")
     .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-    // inroduce axis
+    // introduce axis
     .call(d3.axisRight()
       .scale(dateScale)
-      .tickFormat(function (d) {
-        return formatDate(d);
-      })
-      .ticks(6)
+      .tickFormat(d => formatDate(d))
+      .tickValues(dateScale.ticks(6).concat(dateScale.domain()))
+      // .ticks(10)
       .tickSize(0)
-      .tickPadding(45))
+      .tickPadding(45)
+    )
     .select(".domain")
     .select(function () {
       return this.parentNode.appendChild(this.cloneNode(true));
     })
     .attr("class", "halo");
 
-  //drawScatterPlotPaper();
+  drawScatterPlotPaper();
   const brush1 = d3.brushY()
     // .extent([[0, 0], [widthSlider, heightSlider]]) --> Original one
     // .extent([[widthSlider, heightSlider], [0, 0]])
     .extent([[0, 0], [widthSlider, heightSlider]])
     .on("brush", upgradePaper)
-  // .on("end", update);
+    .on("end", filterPaperByDate);
   svgSlider1.append("g")
     .attr("class", "brush1")
     .style("opacity", "0")
@@ -168,39 +173,26 @@ Promise.all([
   handle1.append("path")
     // .attr("transform", "translate(0," + heightSlider / 2 + ")") --> Original one
     .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-    .attr("d", "M -35 -0 H 35");
+    .attr("d", "M -60 0 H 60 60");
   const text1 = handle1.append('text')
     .text(formatDate(dateScale.domain()[0]))
     // .attr("transform", "translate(" + (-12) + " ," + (heightSlider / 2 - 45) + ")"); --> Original one
-    .attr("transform", "translate(" + (widthSlider / 2 - 45) + " ," + (-2) + ")");
+    .attr("transform", "translate(" + (Number(widthSlider) + 2) + " ," + (+5) + ")");
   const handle2 = svgSlider1.append("g")
     .attr("class", "handle2");
   handle2.append("path")
     // .attr("transform", "translate(0," + heightSlider / 2 + ")") --> Origianl one
     .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-    .attr("d", "M -35 0 H 35 35");
+    .attr("d", "M -60 0 H 60 60");
   const text2 = handle2.append('text')
     .text(formatDate(dateScale.domain()[1]))
     // .attr("transform", "translate(" + (-14) + " ," + (heightSlider / 2 - 45) + ")"); --> Original one
-    .attr("transform", "translate(" + (widthSlider / 2 - 45) + " ," + (-2) + ")");
+    .attr("transform", "translate(" + (Number(widthSlider) + 2) + " ," + (+5) + ")");
   handle1.attr('transform', 'translate(0,0)');
   // handle2.attr('transform', 'translate(' + widthSlider + ",0)");
   handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
 
-  function make_x_gridlines(xAxis) {
-    return d3.axisRight(xAxis)
-  }
 
-  function drawScatterPlotPaper() {
-
-    // Compute summary statistics used for the box: outlier == paper
-    const paper = data[1].filter(function (d) {
-      return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(0)
-        && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(heightSlider))
-    })
-  };
-
-  // console.log({ paper })
 
   function upgradePaper() {
     // EVENT LISTENER SLIDER 1 DATA 4/7/2017
@@ -214,6 +206,8 @@ Promise.all([
     text1.text(formatDate(dateScale.invert(selection1[0])));
     handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
     text2.text(formatDate(dateScale.invert(selection1[1])));
+
+    // APPLY THE FILTER ON THE DATES:    colorMap(data[1])
   }
 
   function resetPaper() {
@@ -228,34 +222,25 @@ Promise.all([
     text1.text(formatDate(dateScale.invert(selection1[0])));
     handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
     text2.text(formatDate(dateScale.invert(selection1[1])));
+
+    colorMap(data[1])
   }
 
-  // drawScatterPlotDay1();
-  // var brush1 = d3.brushX()
-  //     .extent([[0, 0], [widthSlider, heightSlider]])
-  //     .on("brush", upgradeDay1)
-  //     .on("end", update);
-  // svgSlider1.append("g")
-  //     .attr("class", "brush1")
-  //     .style("opacity", "0")
-  //     .on('dblclick', resetDay1)
-  //     .call(brush1);
-  // var handle1 = svgSlider1.append("g")
-  //     .attr("class", "handle");
-  // handle1.append("path")
-  //     .attr("transform", "translate(0," + heightSlider / 2 + ")")
-  //     .attr("d", "M 0 -40 V 35");
-  // var text1 = handle1.append('text')
-  //     .text(formatDate(timeScale1.domain()[0]))
-  //     .attr("transform", "translate(" + (-12) + " ," + (heightSlider / 2 - 45) + ")");
-  // var handle2 = svgSlider1.append("g")
-  //     .attr("class", "handle");
-  // handle2.append("path")
-  //     .attr("transform", "translate(0," + heightSlider / 2 + ")")
-  //     .attr("d", "M 0 -40 V 35");
-  // var text2 = handle2.append('text')
-  //     .text(formatDate(timeScale1.domain()[1]))
-  //     .attr("transform", "translate(" + (-14) + " ," + (heightSlider / 2 - 45) + ")");
-  // handle1.attr('transform', 'translate(0,0)');
-  // handle2.attr('transform', 'translate(' + widthSlider + ",0)");
+  function filterPaperByDate(event) {
+    const selection1 = d3.brushSelection(d3.select(".brush1").node());
+    if (!event.sourceEvent || !selection1) return;
+    console.log({ selection1 })
+    const [x0, x1] = selection1.map(d => d3.timeYear.every(1).round(dateScale.invert(d)));
+    d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
+
+    const newData = data[1].filter(function (d) {
+      return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(selection1[0])
+        && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
+    })
+
+    console.log({ newData })
+
+    colorMap(newData)
+
+  }
 });
