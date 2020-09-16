@@ -156,7 +156,6 @@ Promise.all([
     })
     .attr("class", "halo");
 
-  drawScatterPlotPaper();
   const brush1 = d3.brushY()
     // .extent([[0, 0], [widthSlider, heightSlider]]) --> Original one
     // .extent([[widthSlider, heightSlider], [0, 0]])
@@ -177,7 +176,7 @@ Promise.all([
   const text1 = handle1.append('text')
     .text(formatDate(dateScale.domain()[0]))
     // .attr("transform", "translate(" + (-12) + " ," + (heightSlider / 2 - 45) + ")"); --> Original one
-    .attr("transform", "translate(" + (Number(widthSlider) + 2) + " ," + (+5) + ")");
+    .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
   const handle2 = svgSlider1.append("g")
     .attr("class", "handle2");
   handle2.append("path")
@@ -187,7 +186,7 @@ Promise.all([
   const text2 = handle2.append('text')
     .text(formatDate(dateScale.domain()[1]))
     // .attr("transform", "translate(" + (-14) + " ," + (heightSlider / 2 - 45) + ")"); --> Original one
-    .attr("transform", "translate(" + (Number(widthSlider) + 2) + " ," + (+5) + ")");
+    .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
   handle1.attr('transform', 'translate(0,0)');
   // handle2.attr('transform', 'translate(' + widthSlider + ",0)");
   handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
