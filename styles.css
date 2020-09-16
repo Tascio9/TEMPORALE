@@ -49,6 +49,14 @@ path {
     display: blocks;
 }
 
+.numbers {
+    color: white;
+}
+
+.grid {
+    opacity: 0.4;
+}
+
 /* SVGs
 #worldMap{
     width: 70vw;
