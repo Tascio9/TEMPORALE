@@ -1,7 +1,6 @@
 /* import { select, json, geoPath, geoMercator } from 'd3';
 import { feature } from 'topojson'; */
 
-const svg = d3.select('#worldMap');
 //d3.select('#worldMap').attr("transform", "scale(0.5)");
 
 // const width = + svg.attr('width');
@@ -16,15 +15,10 @@ const heightWindow = window.innerHeight
 
 const height = heightWindow - 250;
 const width = widthWindow - 500;
-svg.attr('height', height)
-  .attr('width', width)
 
 
 // const projection = d3.geoNaturalEarth1();
-const projection = d3.geoPatterson();
-projection.scale([200])
-  .translate([width / 2, height / 2]);
-const pathGenerator = d3.geoPath().projection(projection);
+
 
 
 Promise.all([
@@ -33,41 +27,10 @@ Promise.all([
 ]).then(data => {
   // data[0] is the first dataset "world"
   // data[1] is the second dataset by me
-  const countries = topojson.feature(data[0], data[0].objects.countries);
-  const datasetState = d3.group(data[1], d => d.Nation);
-  const minDatasetState = d3.min(Array.from(datasetState.values())).length;
-  const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
   const minPublishTime = d3.min(data[1], d => d.Publish_time);
   const maxPublishTime = d3.max(data[1], d => d.Publish_time);
 
-
-  const linearScale = d3.scaleLog()
-    .domain([minDatasetState, maxDatasetState])
-    .range([0, 1]);
-
-  svg.selectAll('path')
-    .data(countries.features)
-    .enter()
-    .append('path')
-    .attr('d', pathGenerator)
-    .attr('id', d => d.properties.name)
-    .style('fill', function (d) {
-      return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
-    })
-    .on('mouseover', function (d) {
-      d3.select(this).style('stroke', 'orange');
-      d3.select(this).style('stroke-opacity', '1');
-      d3.select('#state').text(this.id);
-      d3.select(this).style('fill', function (d) {
-        return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
-      })
-    })
-    .on('mouseout', function (d) {
-      console.log(this)
-      // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
-      d3.select(this).style('stroke', 'white')
-      d3.select(this).style('stroke-opacity', '0.4');
-    })
+  colorMap(data[1])
 
   // Container CHART --------------------------------------------------------
   const marginChart = { top: 50, right: 40, bottom: 10, left: 0 }
@@ -192,6 +155,85 @@ Promise.all([
   handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
 
 
+  // function colorMap() {
+  //   const linearScale = d3.scaleLog()
+  //     .domain([minDatasetState, maxDatasetState])
+  //     .range([0, 1]);
+
+  //   svg.selectAll('path')
+  //     .data(countries.features)
+  //     .enter()
+  //     .append('path')
+  //     .attr('d', pathGenerator)
+  //     .attr('id', d => d.properties.name)
+  //     .style('fill', function (d) {
+  //       return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+  //     })
+  //     .on('mouseover', function (d) {
+  //       d3.select(this).style('stroke', 'orange');
+  //       d3.select(this).style('stroke-opacity', '1');
+  //       d3.select('#state').text(this.id);
+  //       d3.select(this).style('fill', function (d) {
+  //         return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+  //       })
+  //     })
+  //     .on('mouseout', function (d) {
+  //       console.log(this)
+  //       // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
+  //       d3.select(this).style('stroke', 'white')
+  //       d3.select(this).style('stroke-opacity', '0.4');
+  //     })
+  // }
+
+  function colorMap(dataset) {
+    const svg = d3.select('#worldMap');
+    svg.attr('height', height)
+      .attr('width', width)
+    svg.selectAll('path').remove()
+    const projection = d3.geoPatterson();
+    projection.scale([200])
+      .translate([width / 2, height / 2]);
+    const pathGenerator = d3.geoPath().projection(projection);
+
+    const countries = topojson.feature(data[0], data[0].objects.countries);
+    console.log({ svg })
+    console.log({ dataset })
+    const datasetState = d3.group(dataset, d => d.Nation);
+    const minDatasetState = d3.min(Array.from(datasetState.values())).length;
+    const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+
+    const linearScale = d3.scaleLog()
+      .domain([minDatasetState, maxDatasetState])
+      .range([0, 1]);
+
+    // console.log(d3.interpolateViridis(linearScale(datasetState.get('China').length)))
+
+    svg.selectAll('path')
+      .data(countries.features)
+      .enter()
+      .append('path')
+      .attr('d', pathGenerator)
+      .attr('id', d => d.properties.name)
+      .style('fill', function (d) {
+        return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+      })
+      .on('mouseover', function (d) {
+        d3.select(this).style('stroke', 'orange');
+        d3.select(this).style('stroke-opacity', '1');
+        d3.select('#state').text(this.id);
+        // d3.select(this).style('fill', function (d) {
+        //   return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+        // })
+      })
+      .on('mouseout', function (d) {
+        console.log(this)
+        // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
+        d3.select(this).style('stroke', 'white')
+        d3.select(this).style('stroke-opacity', '0.4');
+      })
+
+    Table(dataset)
+  }
 
   function upgradePaper() {
     // EVENT LISTENER SLIDER 1 DATA 4/7/2017
@@ -205,8 +247,6 @@ Promise.all([
     text1.text(formatDate(dateScale.invert(selection1[0])));
     handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
     text2.text(formatDate(dateScale.invert(selection1[1])));
-
-    // APPLY THE FILTER ON THE DATES:    colorMap(data[1])
   }
 
   function resetPaper() {
