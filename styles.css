@@ -14,7 +14,7 @@ path {
 .container{                     
     display: grid;
     grid-template-columns: [first-column] 2vw [line1] 10vw [line2] auto [line3] 10vw [line4] 2vw [last-column];
-    grid-template-rows: [first-row] auto [mid1] auto [mid2] 25vh [last-row];
+    grid-template-rows: [first-row] auto [mid1] 15vh [mid2] 25vh [last-row];
 }
 
 /* Grid Item */
@@ -23,6 +23,8 @@ path {
     grid-column-end: line2;
     grid-row-start: first-row;
     grid-row-end: mid1;
+    justify-self: center;
+    /* align-self: center; */
 }
 
 .map-div {

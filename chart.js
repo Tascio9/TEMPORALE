@@ -9,33 +9,33 @@ Promise.all([
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
 
-    var legendheight = 300,
+    const legendheight = 700,
         legendwidth = 180,
         margin = { top: 10, right: 60, bottom: 10, left: 8 };
 
-    var canvas = d3.select('.map-div')
+    const canvas = d3.select('.map-div').append('g')
+        .attr('class', 'canbru')
         .append("canvas")
-        .attr("height", legendheight - margin.top - margin.bottom)
+        .attr("height", legendheight)
         .attr("width", 1)
-        .style("height", (legendheight - margin.top - margin.bottom) + "px")
+        .style("height", (legendheight) + "px")
         .style("width", (legendwidth - margin.left - margin.right) + "px")
         .style("border", "1px solid #000")
         .style("position", "absolute")
-        .style("top", (10) + "px")
-        .style("left", (200) + "px")
         .node();
 
-    var ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
     const colorscale = d3.scaleSequential(d3.interpolateViridis)
-        .domain([0, legendheight - 150])
-
-    var legendscale = d3.scaleLinear()
         .domain([minDatasetState, maxDatasetState])
-        .range([0, legendheight - margin.top - margin.bottom])
+
+    const legendscale = d3.scaleLinear()
+        .domain(colorscale.domain())
+        .range([0, legendheight])
         .clamp(true)
 
-    var image = ctx.createImageData(1, legendheight);
+    const image = ctx.createImageData(1, legendheight);
+
     d3.range(legendheight).forEach(function (i) {
         var c = d3.rgb(colorscale(legendscale.invert(i)));
         image.data[4 * i] = c.r;
@@ -45,32 +45,23 @@ Promise.all([
     });
     ctx.putImageData(image, 0, 0);
 
-    legendaxis = d3.axisRight()
+    const legendaxis = d3.axisRight()
         .scale(legendscale)
-        .tickValues(legendscale.ticks(3).concat(legendscale.domain())).tickSize(4);
+        .tickValues(legendscale.ticks(3).concat(legendscale.domain()))
+        .tickSize(4);
 
-    tooltipLegendDay = d3.select('body').append('div')
-        .style('display', "none")
-        .attr('class', 'd3-tip');
-
-    var svg = d3.select('#chart')
-        .attr("height", (legendheight) + "px")
-        .attr("width", (legendwidth) + "px")
+    const svg = d3.select('#chart')
+        .attr("height", (legendheight + margin.top + margin.bottom) + "px")
+        .attr("width", (legendwidth + margin.left + margin.right) + "px")
         .style("position", "absolute")
-        .on("mouseover", function () {
-            tooltipLegendDay.style("left", d3.event.pageX + 30 + "px")
-                .style("top", d3.event.pageY - 70 + "px")
-                .style('display', "block")
-                .html("N° Mlicious Packages");
-        })
-        .on("mouseout", function () {
-            tooltipLegendDay.style('display', "none")
-        });
+
+    svg.append('rect')
+        .attr('height', legendheight)
+        .attr('width', legendwidth)
+        .style('fill', 'none')
 
     svg.append("g")
         .attr("class", "axis")
-        .attr("transform", "translate(" + (legendwidth - margin.left - margin.right + 3) + "," + (margin.top) + ")")
-        .call(d3.axisRight()
-            .scale(legendscale)
-            .tickValues(legendscale.ticks(3).concat(legendscale.domain())).tickSize(4))
+        .attr("transform", "translate(" + (legendwidth - 70) + "," + (0) + ")")
+        .call(legendaxis)
 })

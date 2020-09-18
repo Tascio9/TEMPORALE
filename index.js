@@ -22,33 +22,94 @@ Promise.all([
   // data[0] is the first dataset "world"
   // data[1] is the second dataset by me
 
+  const datasetState = d3.group(data[1], d => d.Nation);
+  const minDatasetState = d3.min(Array.from(datasetState.values())).length;
+  const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+
+
   colorMap(data[1])
 
   // Container CHART --------------------------------------------------------
-  const marginChart = { top: 50, right: 40, bottom: 10, left: 0 }
-  const widthChart = 30;
-  const heightChart = 500;
-  const chartWidth = widthChart + marginChart.left + marginChart.right
-  const chartHeight = heightChart + marginChart.top + marginChart.bottom
+  // const marginChart = { top: 50, right: 40, bottom: 10, left: 0 }
+  // const widthChart = 30;
+  // const heightChart = 500;
+  // const chartWidth = widthChart + marginChart.left + marginChart.right
+  // const chartHeight = heightChart + marginChart.top + marginChart.bottom
+
+  // const svgChart = d3.select('#chart')
+  //   .attr('width', chartWidth)
+  //   .attr('height', chartHeight)
+  //   .append('g')
+
+  // const colorScale = d3.scaleSequential(d3.interpolateViridis)
+  //   .domain([heightChart, 0])
+
+  // svgChart.selectAll(".bars")
+  //   .data(d3.range(heightChart), d => d)
+  //   .enter()
+  //   .append('rect')
+  //   .attr('class', 'bars')
+  //   .attr('x', 0)
+  //   .attr('y', (d, i) => i)
+  //   .attr('height', 1)
+  //   .attr('width', widthChart)
+  //   .style('fill', (d, i) => colorScale(d));
+
+  const legendheight = 300,
+    legendwidth = 180,
+    margin = { top: 10, right: 60, bottom: 10, left: 8 };
+
+  const canvas = d3.select('.chart-div').append('g')
+    .attr('class', 'canbru')
+    .append("canvas")
+    .attr("height", legendheight)
+    .attr("width", 1)
+    .style("height", (legendheight) + "px")
+    .style("width", (legendwidth - margin.left - margin.right) + "px")
+    .style("border", "1px solid #000")
+    .style("position", "absolute")
+    .node();
+
+  const ctx = canvas.getContext("2d");
+
+  const colorscale = d3.scaleSequential(d3.interpolateViridis)
+    .domain([minDatasetState, maxDatasetState])
+
+  const legendscale = d3.scaleLinear()
+    .domain(colorscale.domain())
+    .range([0, legendheight])
+    .clamp(true)
+
+  const image = ctx.createImageData(1, legendheight);
+
+  d3.range(legendheight).forEach(function (i) {
+    var c = d3.rgb(colorscale(legendscale.invert(i)));
+    image.data[4 * i] = c.r;
+    image.data[4 * i + 1] = c.g;
+    image.data[4 * i + 2] = c.b;
+    image.data[4 * i + 3] = 255;
+  });
+  ctx.putImageData(image, 0, 0);
+
+  const legendaxis = d3.axisRight()
+    .scale(legendscale)
+    .tickValues(legendscale.ticks(3).concat(legendscale.domain()))
+    .tickSize(4);
 
   const svgChart = d3.select('#chart')
-    .attr('width', chartWidth)
-    .attr('height', chartHeight)
-    .append('g')
+    .attr("height", (legendheight + margin.top + margin.bottom) + "px")
+    .attr("width", (legendwidth + margin.left + margin.right) + "px")
+    .style("position", "absolute")
 
-  const colorScale = d3.scaleSequential(d3.interpolateViridis)
-    .domain([heightChart, 0])
+  svgChart.append('rect')
+    .attr('height', legendheight)
+    .attr('width', legendwidth)
+    .style('fill', 'none')
 
-  svgChart.selectAll(".bars")
-    .data(d3.range(heightChart), d => d)
-    .enter()
-    .append('rect')
-    .attr('class', 'bars')
-    .attr('x', 0)
-    .attr('y', (d, i) => i)
-    .attr('height', 1)
-    .attr('width', widthChart)
-    .style('fill', (d, i) => colorScale(d));
+  svgChart.append("g")
+    .attr("class", "axis")
+    .attr("transform", "translate(" + (legendwidth - 70) + "," + (0) + ")")
+    .call(legendaxis)
 
   // Container SLIDER -------------------------------------------------------------------------
   const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
