@@ -97,8 +97,8 @@ Promise.all([
     .tickSize(4);
 
   const svgChart = d3.select('#chart')
-    .attr("height", (legendheight + margin.top + margin.bottom) + "px")
-    .attr("width", (legendwidth + margin.left + margin.right) + "px")
+    .attr("height", (legendheight + margin.top + margin.bottom + 10) + "px")
+    .attr("width", (legendwidth + margin.left + margin.right + 10) + "px")
     .style("position", "absolute")
 
   svgChart.append('rect')
@@ -108,7 +108,7 @@ Promise.all([
 
   svgChart.append("g")
     .attr("class", "axis")
-    .attr("transform", "translate(" + (legendwidth - 70) + "," + (0) + ")")
+    .attr("transform", "translate(" + (legendwidth - 68) + "," + (0) + ")")
     .call(legendaxis)
 
   // Container SLIDER -------------------------------------------------------------------------
