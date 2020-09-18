@@ -24,7 +24,7 @@ path {
     grid-row-start: first-row;
     grid-row-end: mid1;
     justify-self: center;
-    /* align-self: center; */
+    align-self: center;
 }
 
 .map-div {
