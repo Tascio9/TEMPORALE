@@ -22,11 +22,9 @@ Promise.all([
   // data[0] is the first dataset "world"
   // data[1] is the second dataset by me
 
-  const datasetState = d3.group(data[1], d => d.Nation);
-  const minDatasetState = d3.min(Array.from(datasetState.values())).length;
-  const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
-
-
+  // Draw the left chart bar for the colors
+  colorChart(data[1])
+  // Draw the map with the respective colors
   colorMap(data[1])
 
   // Container CHART --------------------------------------------------------
@@ -54,62 +52,6 @@ Promise.all([
   //   .attr('height', 1)
   //   .attr('width', widthChart)
   //   .style('fill', (d, i) => colorScale(d));
-
-  const legendheight = 300,
-    legendwidth = 180,
-    margin = { top: 10, right: 60, bottom: 10, left: 8 };
-
-  const canvas = d3.select('.chart-div').append('g')
-    .attr('class', 'canbru')
-    .append("canvas")
-    .attr("height", legendheight)
-    .attr("width", 1)
-    .style("height", (legendheight) + "px")
-    .style("width", (legendwidth - margin.left - margin.right) + "px")
-    .style("border", "1px solid #000")
-    .style("position", "absolute")
-    .node();
-
-  const ctx = canvas.getContext("2d");
-
-  const colorscale = d3.scaleSequential(d3.interpolateViridis)
-    .domain([minDatasetState, maxDatasetState])
-
-  const legendscale = d3.scaleLinear()
-    .domain(colorscale.domain())
-    .range([0, legendheight])
-    .clamp(true)
-
-  const image = ctx.createImageData(1, legendheight);
-
-  d3.range(legendheight).forEach(function (i) {
-    var c = d3.rgb(colorscale(legendscale.invert(i)));
-    image.data[4 * i] = c.r;
-    image.data[4 * i + 1] = c.g;
-    image.data[4 * i + 2] = c.b;
-    image.data[4 * i + 3] = 255;
-  });
-  ctx.putImageData(image, 0, 0);
-
-  const legendaxis = d3.axisRight()
-    .scale(legendscale)
-    .tickValues(legendscale.ticks(3).concat(legendscale.domain()))
-    .tickSize(4);
-
-  const svgChart = d3.select('#chart')
-    .attr("height", (legendheight + margin.top + margin.bottom + 10) + "px")
-    .attr("width", (legendwidth + margin.left + margin.right + 10) + "px")
-    .style("position", "absolute")
-
-  svgChart.append('rect')
-    .attr('height', legendheight)
-    .attr('width', legendwidth)
-    .style('fill', 'none')
-
-  svgChart.append("g")
-    .attr("class", "axis")
-    .attr("transform", "translate(" + (legendwidth - 68) + "," + (0) + ")")
-    .call(legendaxis)
 
   // Container SLIDER -------------------------------------------------------------------------
   const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
@@ -229,6 +171,86 @@ Promise.all([
   //     })
   // }
 
+  function colorChart(dataset) {
+    const datasetState = d3.group(dataset, d => d.Nation);
+    const minDatasetState = d3.min(Array.from(datasetState.values())).length;
+    const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+
+    const legendheight = 400,
+      legendwidth = 180,
+      margin = { top: 10, right: 60, bottom: 10, left: 8 };
+
+    const canvas = d3.select('.chart-div').append('g')
+      .attr('class', 'canbru')
+      .append("canvas")
+      .attr("height", legendheight)
+      .attr("width", 1)
+      .style("height", (legendheight) + "px")
+      .style("width", (legendwidth - margin.left - margin.right) + "px")
+      .style("border", "1px solid #000")
+      .style("position", "absolute")
+      .node();
+
+    const ctx = canvas.getContext("2d");
+
+    const colorscale = d3.scaleSequential(d3.interpolateViridis)
+      .domain([minDatasetState, maxDatasetState])
+
+    const legendscale = d3.scaleLog()
+      .domain(colorscale.domain())
+      .range([0, legendheight])
+      .clamp(true)
+
+    const image = ctx.createImageData(1, legendheight);
+
+    d3.range(legendheight).forEach(function (i) {
+      var c = d3.rgb(colorscale(legendscale.invert(i)));
+      image.data[4 * i] = c.r;
+      image.data[4 * i + 1] = c.g;
+      image.data[4 * i + 2] = c.b;
+      image.data[4 * i + 3] = 255;
+    });
+
+    ctx.translate(10, 10)
+    ctx.putImageData(image, 0, 0);
+
+    // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
+    const formatNumber = d3.format('.0f')
+
+    const legendaxis = d3.axisRight()
+      .scale(legendscale)
+      .tickFormat(d => formatNumber(d))
+      .tickValues(legendscale
+        .ticks(...legendscale.domain())
+        .concat(legendscale.domain())
+      )
+      .tickSize(4);
+
+    // const legendaxis = d3.axisRight()
+    // .scale(legendscale)
+    // .tickFormat(d => d3.format(d))
+    // .tickValues(legendscale.ticks(2).concat(legendscale.domain()))
+    // .tickSize(4);
+
+    const svgChart = d3.select('#chart')
+      .attr("height", (legendheight + margin.top + margin.bottom + 10) + "px")
+      .attr("width", (legendwidth + margin.left + margin.right + 10) + "px")
+      .style("position", "absolute")
+
+    svgChart.selectAll('rect').remove()      // Necessary to update the mapcolors
+    svgChart.selectAll('g').remove()
+
+    svgChart.append('rect')
+      .attr('height', legendheight)
+      .attr('width', legendwidth)
+      .style('fill', 'none')
+
+    svgChart.append("g")
+      .attr("class", "axis")
+      .attr("transform", "translate(" + (legendwidth - 68) + "," + (0) + ")")
+      .call(legendaxis)
+  }
+
   function colorMap(dataset) {
     const svg = d3.select('#worldMap');
     svg.attr('height', height)
@@ -305,6 +327,7 @@ Promise.all([
     handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
     text2.text(formatDate(dateScale.invert(selection1[1])));
 
+    colorChart(data[1])
     colorMap(data[1])
   }
 
@@ -319,6 +342,7 @@ Promise.all([
         && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
     })
 
+    colorChart(newData)
     colorMap(newData)
   }
 });
