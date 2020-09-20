@@ -9,7 +9,7 @@ Promise.all([
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
 
-    const legendheight = 700,
+    const legendheight = 300,
         legendwidth = 180,
         margin = { top: 10, right: 60, bottom: 10, left: 8 };
 
@@ -43,8 +43,6 @@ Promise.all([
         image.data[4 * i + 3] = 255;
     });
 
-    ctx.setTransform(1, 0, 0, 2, 0, 0)
-    ctx.translate(50, 50);
     ctx.putImageData(image, 0, 0);
 
     const legendaxis = d3.axisRight()
@@ -55,7 +53,6 @@ Promise.all([
     const svg = d3.select('#chart')
         .attr("height", (legendheight + margin.top + margin.bottom) + "px")
         .attr("width", (legendwidth + margin.left + margin.right) + "px")
-        .style("position", "absolute")
 
     const brush = d3.brushY()
         .extent([[0, 0], [legendwidth, legendheight]])
@@ -63,21 +60,25 @@ Promise.all([
     // .on("end", filterPaperByDate);
 
     svg.append('rect')
+        // .data(legendheight).enter()
+        .attr('id', 'rectnone')
         .attr('height', legendheight)
         .attr('width', legendwidth)
         .style('fill', 'none')
         .style('opacity', '0.4')
         .style("cursor", "crosshair")
-        .style("position", "absolute")
-        .call(brush)
+    // .call(brush)
+    // .style("position", "absolute")
 
     svg.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(" + (legendwidth - 70) + "," + (0) + ")")
         .call(legendaxis)
+        .call(brush)
+    // .on('end', upgradePaper)
 
     function upgradePaper() {
-        selection1 = d3.brushSelection(d3.select(".brush").node());
+        selection1 = d3.brushSelection(d3.select(".rectnone").node());
         handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
         handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
     }

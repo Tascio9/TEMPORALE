@@ -22,36 +22,13 @@ Promise.all([
   // data[0] is the first dataset "world"
   // data[1] is the second dataset by me
 
+  // Container CHART --------------------------------------------------------------------------
   // Draw the left chart bar for the colors
   colorChart(data[1])
+
+  // Container MAP ----------------------------------------------------------------------------
   // Draw the map with the respective colors
   colorMap(data[1])
-
-  // Container CHART --------------------------------------------------------
-  // const marginChart = { top: 50, right: 40, bottom: 10, left: 0 }
-  // const widthChart = 30;
-  // const heightChart = 500;
-  // const chartWidth = widthChart + marginChart.left + marginChart.right
-  // const chartHeight = heightChart + marginChart.top + marginChart.bottom
-
-  // const svgChart = d3.select('#chart')
-  //   .attr('width', chartWidth)
-  //   .attr('height', chartHeight)
-  //   .append('g')
-
-  // const colorScale = d3.scaleSequential(d3.interpolateViridis)
-  //   .domain([heightChart, 0])
-
-  // svgChart.selectAll(".bars")
-  //   .data(d3.range(heightChart), d => d)
-  //   .enter()
-  //   .append('rect')
-  //   .attr('class', 'bars')
-  //   .attr('x', 0)
-  //   .attr('y', (d, i) => i)
-  //   .attr('height', 1)
-  //   .attr('width', widthChart)
-  //   .style('fill', (d, i) => colorScale(d));
 
   // Container SLIDER -------------------------------------------------------------------------
   const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
@@ -170,50 +147,93 @@ Promise.all([
   //       d3.select(this).style('stroke-opacity', '0.4');
   //     })
   // }
+  function upgradePaper() {
+    selection1 = d3.brushSelection(d3.select(".brush1").node());
+    handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
+    text1.text(formatDate(dateScale.invert(selection1[0])));
+    handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
+    text2.text(formatDate(dateScale.invert(selection1[1])));
+  }
 
+  function resetPaper() {
+    selection1[0] = 0;
+    // selection1[1] = widthSlider;
+    selection1[1] = heightSlider;
+    // handle1.attr('transform', 'translate(' + selection1[0] + ",0)");
+    // text1.text(formatDate(timeScale1.invert(selection1[0])));
+    // handle2.attr('transform', 'translate(' + selection1[1] + ",0)");
+    // text2.text(formatDate(timeScale1.invert(selection1[1])));
+    handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
+    text1.text(formatDate(dateScale.invert(selection1[0])));
+    handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
+    text2.text(formatDate(dateScale.invert(selection1[1])));
+
+    colorChart(data[1])
+    colorMap(data[1])
+  }
+
+  function filterPaperByDate(event) {
+    const selection1 = d3.brushSelection(d3.select(".brush1").node());
+    if (!event.sourceEvent || !selection1) return;
+    const [x0, x1] = selection1.map(d => d3.timeYear.every(1).round(dateScale.invert(d)));
+    d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
+
+    const newData = data[1].filter(function (d) {
+      return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(selection1[0])
+        && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
+    })
+
+    colorChart(newData)
+    colorMap(newData)
+  }
+
+  // Draw the chart on the left according to the dataset
   function colorChart(dataset) {
     const datasetState = d3.group(dataset, d => d.Nation);
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
 
-    const legendheight = 400,
-      legendwidth = 180,
-      margin = { top: 10, right: 60, bottom: 10, left: 8 };
+    const heightLegend = 500;
+    const widthLegend = 130;
+    const marginLegend = { top: 20, right: 80, bottom: 60, left: 2 };
 
-    d3.select('.canbru').remove()
+    d3.selectAll(".legendScale").remove();
+    d3.selectAll(".canvas").remove();
 
-    const canvas = d3.select('.chart-div').append('g')
-      .attr('class', 'canbru')
+    const canvas = d3.select(".chart-div")
+      .style("height", heightLegend + "px")
+      .style("width", widthLegend + "px")
+      .style("position", "relative")
       .append("canvas")
-      .attr("height", legendheight)
+      .attr("height", heightLegend - marginLegend.top - marginLegend.bottom)
       .attr("width", 1)
-      .style("height", (legendheight) + "px")
-      .style("width", (legendwidth - margin.left - margin.right) + "px")
+      .attr("class", "canvas")
+      .style("height", (heightLegend - marginLegend.top - marginLegend.bottom) + "px")
+      .style("width", (widthLegend - marginLegend.left - marginLegend.right) + "px")
       .style("border", "1px solid #000")
-      // .style("position", "absolute")
+      .style("position", "absolute")
+      .style("top", "25px")
+      .style("left", "30px")
       .node();
-
-    const ctx = canvas.getContext("2d");
 
     const colorscale = d3.scaleSequential(d3.interpolateViridis)
       .domain([minDatasetState, maxDatasetState])
 
+    const ctx = canvas.getContext("2d");
+
     const legendscale = d3.scaleLog()
-      .domain(colorscale.domain())
-      .range([0, legendheight])
-      .clamp(true)
+      .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
+      .domain(colorscale.domain());
 
-    const image = ctx.createImageData(1, legendheight);
+    const image = ctx.createImageData(1, heightLegend);
 
-    d3.range(legendheight).forEach(function (i) {
-      var c = d3.rgb(colorscale(legendscale.invert(i)));
+    d3.range(heightLegend).forEach(function (i) {
+      c = d3.rgb(colorscale(legendscale.invert(i)));
       image.data[4 * i] = c.r;
       image.data[4 * i + 1] = c.g;
       image.data[4 * i + 2] = c.b;
       image.data[4 * i + 3] = 255;
     });
-
-    // ctx.translate(10, 10)
     ctx.putImageData(image, 0, 0);
 
     // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
@@ -222,37 +242,125 @@ Promise.all([
     const legendaxis = d3.axisRight()
       .scale(legendscale)
       .tickFormat(d => formatNumber(d))
-      .tickValues(legendscale
-        .ticks(...legendscale.domain())
-        .concat(legendscale.domain())
-      )
-      .tickSize(4);
+      .tickValues(legendscale.ticks(10).concat(legendscale.domain()));
+
+    const svgLegend = d3.select(".chart-div")
+      .append("svg")
+      .attr("class", "legendScale")
+      .attr("height", (heightLegend) + "px")
+      .attr("width", (widthLegend) + "px")
+      .style("position", "absolute")
+      .style("left", "30px")
+      .style("top", "5px")
+      .on("dblclick", function () {
+        // filterChart();
+      });
+
+    const brushLegend = d3.brushY()
+      .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - 60]])
+    // .on("brush", filterChart);
+
+    svgLegend.append("g")
+      .attr("class", "brushLegend")
+      .attr("transform", "translate(" + (0) + "," + (marginLegend.top) + ")")
+      .call(brushLegend);
+
+    svgLegend.append("g")
+      .attr("transform", "translate(" + (widthLegend - marginLegend.left - marginLegend.right + 1) + "," + (marginLegend.top) + ")")
+      .attr("class", "y axis")
+      .call(legendaxis);
+
+    svgLegend.append("g")
+      .append("text")
+      .attr("class", "label")
+      .attr("x", widthLegend / 2 - 15)
+      .attr("y", 12)
+      .style("text-anchor", "end")
+      .style("font-size", "13px")
+      .text("N° Paper");
+
+    // const legendheight = 400,
+    //   legendwidth = 180,
+    //   margin = { top: 10, right: 60, bottom: 10, left: 8 };
+
+    // d3.select('.canbru').remove()
+
+    // const canvas = d3.select('.chart-div').append('g')
+    //   .attr('class', 'canbru')
+    //   .append("canvas")
+    //   .attr("height", legendheight)
+    //   .attr("width", 1)
+    //   .style("height", (legendheight) + "px")
+    //   .style("width", (legendwidth - margin.left - margin.right) + "px")
+    //   .style("border", "1px solid #000")
+    //   // .style("position", "absolute")
+    //   .node();
+
+    // const ctx = canvas.getContext("2d");
+
+    // const colorscale = d3.scaleSequential(d3.interpolateViridis)
+    //   .domain([minDatasetState, maxDatasetState])
+
+    // const legendscale = d3.scaleLog()
+    //   .domain(colorscale.domain())
+    //   .range([0, legendheight])
+    //   .clamp(true)
+
+    // const image = ctx.createImageData(1, legendheight);
+
+    // d3.range(legendheight).forEach(function (i) {
+    //   var c = d3.rgb(colorscale(legendscale.invert(i)));
+    //   image.data[4 * i] = c.r;
+    //   image.data[4 * i + 1] = c.g;
+    //   image.data[4 * i + 2] = c.b;
+    //   image.data[4 * i + 3] = 255;
+    // });
+
+    // // ctx.translate(10, 10)
+    // ctx.putImageData(image, 0, 0);
+
+    // // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
+    // const formatNumber = d3.format('.0f')
 
     // const legendaxis = d3.axisRight()
-    // .scale(legendscale)
-    // .tickFormat(d => d3.formatNumber(d))
-    // .tickValues(legendscale.ticks(2).concat(legendscale.domain()))
-    // .tickSize(4);
+    //   .scale(legendscale)
+    //   .tickFormat(d => formatNumber(d))
+    //   .tickValues(legendscale
+    //     .ticks(...legendscale.domain())
+    //     .concat(legendscale.domain())
+    //   )
+    //   .tickSize(4);
 
-    const svgChart = d3.select('#chart')
-      .attr("height", (legendheight + margin.top + margin.bottom + 10) + "px")
-      .attr("width", (legendwidth + margin.left + margin.right + 10) + "px")
-      .style("position", "absolute")
+    // // const legendaxis = d3.axisRight()
+    // // .scale(legendscale)
+    // // .tickFormat(d => d3.formatNumber(d))
+    // // .tickValues(legendscale.ticks(2).concat(legendscale.domain()))
+    // // .tickSize(4);
 
-    svgChart.selectAll('rect').remove()      // Necessary to update the mapcolors
-    svgChart.selectAll('g').remove()
+    // const svgChart = d3.select('#chart')
+    //   .attr("height", (legendheight + margin.top + margin.bottom + 10) + "px")
+    //   .attr("width", (legendwidth + margin.left + margin.right + 10) + "px")
+    //   .style("position", "absolute")
 
-    svgChart.append('rect')
-      .attr('height', legendheight)
-      .attr('width', legendwidth)
-      .style('fill', 'none')
+    // svgChart.selectAll('rect').remove()      // Necessary to update the mapcolors
+    // svgChart.selectAll('g').remove()
 
-    svgChart.append("g")
-      .attr("class", "axis")
-      .attr("transform", "translate(" + (legendwidth - 68) + "," + (0) + ")")
-      .call(legendaxis)
+    // svgChart.append('rect')
+    //   .attr('height', legendheight)
+    //   .attr('width', legendwidth)
+    //   .style('fill', 'none')
+
+    // svgChart.append("g")
+    //   .attr("class", "axis")
+    //   .attr("transform", "translate(" + (legendwidth - 68) + "," + (0) + ")")
+    //   .call(legendaxis)
   }
 
+  function filterChart() {
+    // TODO
+  }
+
+  // Draw the map according to the dataset passed
   function colorMap(dataset) {
     const svg = d3.select('#worldMap');
     svg.attr('height', height)
@@ -332,7 +440,7 @@ Promise.all([
     Table(dataset)
   }
 
-  // content of the windows on link mouse over su grafo
+  // Show additional information on the country (div that show/hide)
   function contentCountryTip(dataset, d) {
     console.log(d)
     const nPaper = (dataset.get(d.target.id)) ? dataset.get(d.target.id).length : "0"
@@ -344,7 +452,7 @@ Promise.all([
       "</table>"
     return content;
   }
-
+  // Effect to highlight the country which you pass over
   function handleMouseMoveCountry(country) {
     d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", function (d) {
       if (this.id === country.target.id)
@@ -353,48 +461,8 @@ Promise.all([
         return "0.4";
     });
   }
-
+  // Reset of the "handleMouseMoveCountry"
   function handleMouseOutCountry() {
     d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
-  }
-
-  function upgradePaper() {
-    selection1 = d3.brushSelection(d3.select(".brush1").node());
-    handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
-    text1.text(formatDate(dateScale.invert(selection1[0])));
-    handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
-    text2.text(formatDate(dateScale.invert(selection1[1])));
-  }
-
-  function resetPaper() {
-    selection1[0] = 0;
-    // selection1[1] = widthSlider;
-    selection1[1] = heightSlider;
-    // handle1.attr('transform', 'translate(' + selection1[0] + ",0)");
-    // text1.text(formatDate(timeScale1.invert(selection1[0])));
-    // handle2.attr('transform', 'translate(' + selection1[1] + ",0)");
-    // text2.text(formatDate(timeScale1.invert(selection1[1])));
-    handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
-    text1.text(formatDate(dateScale.invert(selection1[0])));
-    handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
-    text2.text(formatDate(dateScale.invert(selection1[1])));
-
-    colorChart(data[1])
-    colorMap(data[1])
-  }
-
-  function filterPaperByDate(event) {
-    const selection1 = d3.brushSelection(d3.select(".brush1").node());
-    if (!event.sourceEvent || !selection1) return;
-    const [x0, x1] = selection1.map(d => d3.timeYear.every(1).round(dateScale.invert(d)));
-    d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
-
-    const newData = data[1].filter(function (d) {
-      return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(selection1[0])
-        && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
-    })
-
-    colorChart(newData)
-    colorMap(newData)
   }
 });
