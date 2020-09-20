@@ -180,6 +180,8 @@ Promise.all([
       legendwidth = 180,
       margin = { top: 10, right: 60, bottom: 10, left: 8 };
 
+    d3.select('.canbru').remove()
+
     const canvas = d3.select('.chart-div').append('g')
       .attr('class', 'canbru')
       .append("canvas")
@@ -188,7 +190,7 @@ Promise.all([
       .style("height", (legendheight) + "px")
       .style("width", (legendwidth - margin.left - margin.right) + "px")
       .style("border", "1px solid #000")
-      .style("position", "absolute")
+      // .style("position", "absolute")
       .node();
 
     const ctx = canvas.getContext("2d");
@@ -211,7 +213,7 @@ Promise.all([
       image.data[4 * i + 3] = 255;
     });
 
-    ctx.translate(10, 10)
+    // ctx.translate(10, 10)
     ctx.putImageData(image, 0, 0);
 
     // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
@@ -228,7 +230,7 @@ Promise.all([
 
     // const legendaxis = d3.axisRight()
     // .scale(legendscale)
-    // .tickFormat(d => d3.format(d))
+    // .tickFormat(d => d3.formatNumber(d))
     // .tickValues(legendscale.ticks(2).concat(legendscale.domain()))
     // .tickSize(4);
 
@@ -275,6 +277,11 @@ Promise.all([
       .domain([minDatasetState, maxDatasetState])
       .range([0, 1]);
 
+    //declaration of the tooltipCountry (extra info on over)
+    const tooltipCountry = d3.select('body').append('div')
+      .style('display', "none")
+      .attr('class', 'd3-tip');
+
     svg.selectAll('path')
       .data(countries.features)
       .enter()
@@ -284,26 +291,71 @@ Promise.all([
       .style('fill', function (d) {
         return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
       })
-      .on('mouseover', function (d) {
-        d3.select(this).style('stroke', 'orange');
+      // .on('mouseover', function (d) {
+      //   d3.select(this).style('stroke', 'orange');
+      //   d3.select(this).style('stroke-opacity', '1');
+      //   if (datasetState.get(this.id)) {
+      //     d3.select('#state').text(this.id + ": " + datasetState.get(this.id).length);
+      //   } else {
+      //     d3.select('#state').text(this.id + ": 0");
+      //   }
+      //   // d3.select(this).style('fill', function (d) {
+      //   //   return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+      //   // })
+      // })
+      .on('mousemove', function (d) {
+        // const pageX = event.pageX
+        // const pageY = event.pageY
+        // console.log({ pageX })
+        // console.log({ pageY })
+        console.log("TestX: " + d.clientX)
+        console.log("TestY: " + d.clientY)
+        d3.select(this).style('stroke', 'coral');
         d3.select(this).style('stroke-opacity', '1');
-        if (datasetState.get(this.id)) {
-          d3.select('#state').text(this.id + ": " + datasetState.get(this.id).length);
-        } else {
-          d3.select('#state').text(this.id + ": 0");
-        }
-        // d3.select(this).style('fill', function (d) {
-        //   return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
-        // })
+        tooltipCountry.transition().duration(150)
+          .style('display', "block");
+        tooltipCountry.html(contentCountryTip(datasetState, d))
+          .style('left', (d.clientX + 50) + 'px')
+          .style('top', (d.clientY) + 'px');
+        handleMouseMoveCountry(d);
       })
       .on('mouseout', function (d) {
         console.log(this)
+        tooltipCountry.transition().duration(150)
+          .style('display', "none");
+        handleMouseOutCountry()
         // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
         d3.select(this).style('stroke', 'white')
         d3.select(this).style('stroke-opacity', '0.4');
       })
 
     Table(dataset)
+  }
+
+  // content of the windows on link mouse over su grafo
+  function contentCountryTip(dataset, d) {
+    console.log(d)
+    const nPaper = (dataset.get(d.target.id)) ? dataset.get(d.target.id).length : "0"
+    console.log({ nPaper })
+    var content = "<h5 align='center'>Country</h5>";
+    content += "<table align='center' id='tooltip'>" +
+      "<tr><td>Name:</td> <td>" + d.target.id + "</td></tr>" +
+      "<tr><td>Number of paper:</td><td align='left'>" + nPaper + "</td></tr>" +
+      "</table>"
+    return content;
+  }
+
+  function handleMouseMoveCountry(country) {
+    d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", function (d) {
+      if (this.id === country.target.id)
+        return "1";
+      else
+        return "0.4";
+    });
+  }
+
+  function handleMouseOutCountry() {
+    d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
   }
 
   function upgradePaper() {
