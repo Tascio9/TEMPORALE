@@ -27,12 +27,16 @@
 
 <body>
   <div class="container">
+    <div class="test">
+      <h1 id="state">Hello!</h1>
+    </div>
+
     <div class="chart-div">
       <!-- <svg id="chart"></svg> -->
     </div>
 
-    <div class="test">
-      <h1 id="state">Hello!</h1>
+    <div class="title">
+      <h1 id="titleThesis">Viz this Thesis</h1>
     </div>
 
     <div class="map-div">
@@ -41,6 +45,10 @@
     </div>
 
     <div class="legend-div">
+      <label>Year: </label>
+      <select id="selectYear">
+        <option value="All">All</option>
+      </select>
       <svg id="slider"></svg>
     </div>
 

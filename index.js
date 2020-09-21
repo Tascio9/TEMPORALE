@@ -12,7 +12,7 @@ import { feature } from 'topojson'; */
 
 const widthWindow = window.innerWidth
 const heightWindow = window.innerHeight
-const height = heightWindow - 250;
+const height = heightWindow - 338;
 const width = widthWindow - 500;
 
 Promise.all([
@@ -38,6 +38,33 @@ Promise.all([
   const sliderHeight = heightSlider + marginSlider.top + marginSlider.bottom
   const minPublishTime = d3.min(data[1], d => d.Publish_time);
   const maxPublishTime = d3.max(data[1], d => d.Publish_time);
+  const formatDate = d3.timeFormat('%Y');
+
+  const groupByYear = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 1).join('-'))
+  const groupByMonth = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 2).join('-'))
+
+  console.log({ groupByYear })
+  console.log({ groupByMonth })
+
+  const sortedGroupByYear = Array.from(groupByYear.keys()).sort((a, b) => d3.descending(a, b))
+
+  for (let d of sortedGroupByYear) {
+    d3.select('#selectYear')
+      .append('option')
+      .attr('value', d)
+      .text(d)
+  }
+
+  d3.select('#selectYear').on('change', function (d) {
+    if (this.value == "All") {
+      colorMap(data[1])
+      colorMap(data[1])
+    } else {
+      const yearDataset = groupByYear.get(this.value)
+      colorMap(yearDataset)
+      colorChart(yearDataset)
+    }
+  })
 
   const svgSlider1 = d3.select("#slider")
     .attr("width", sliderWidth)
@@ -45,7 +72,6 @@ Promise.all([
     // classic transform to position g
     .attr("transform", "translate(" + marginSlider.left + "," + marginSlider.top + ")");
 
-  const formatDate = d3.timeFormat('%Y');
   const dateScale = d3.scaleTime()
     .domain([new Date(minPublishTime), new Date(maxPublishTime)])
     .range([0, heightSlider])
@@ -147,6 +173,10 @@ Promise.all([
   //       d3.select(this).style('stroke-opacity', '0.4');
   //     })
   // }
+  function updateDataset(year) {
+    console.log(year)
+  }
+
   function upgradePaper() {
     selection1 = d3.brushSelection(d3.select(".brush1").node());
     handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
@@ -216,12 +246,13 @@ Promise.all([
       .style("left", "30px")
       .node();
 
+    // https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
     const colorscale = d3.scaleSequential(d3.interpolateViridis)
       .domain([minDatasetState, maxDatasetState])
 
     const ctx = canvas.getContext("2d");
 
-    const legendscale = d3.scaleLog()
+    const legendscale = d3.scaleLinear()
       .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
       .domain(colorscale.domain());
 
@@ -239,10 +270,14 @@ Promise.all([
     // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
     const formatNumber = d3.format('.0f')
 
+    const legendscaleaxis = d3.scaleLog()
+      .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
+      .domain(colorscale.domain());
+
     const legendaxis = d3.axisRight()
-      .scale(legendscale)
+      .scale(legendscaleaxis)
       .tickFormat(d => formatNumber(d))
-      .tickValues(legendscale.ticks(10).concat(legendscale.domain()));
+      .tickValues(legendscaleaxis.ticks(10).concat(legendscaleaxis.domain()));
 
     const svgLegend = d3.select(".chart-div")
       .append("svg")
@@ -365,17 +400,17 @@ Promise.all([
     const svg = d3.select('#worldMap');
     svg.attr('height', height)
       .attr('width', width)
+    // .attr('transform', 'translate(0,40)')
 
     svg.selectAll('path').remove()      // Necessary to update the mapcolors
 
     // const projection = d3.geoNaturalEarth1();
     const projection = d3.geoPatterson();
     projection.scale([200])
-      .translate([width / 2, height / 2]);
+      .translate([width / 2, height / 1.7]);
     const pathGenerator = d3.geoPath().projection(projection);
 
     const countries = topojson.feature(data[0], data[0].objects.countries);
-    console.log({ svg })
     console.log({ dataset })
     const datasetState = d3.group(dataset, d => d.Nation);
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
@@ -412,12 +447,6 @@ Promise.all([
       //   // })
       // })
       .on('mousemove', function (d) {
-        // const pageX = event.pageX
-        // const pageY = event.pageY
-        // console.log({ pageX })
-        // console.log({ pageY })
-        console.log("TestX: " + d.clientX)
-        console.log("TestY: " + d.clientY)
         d3.select(this).style('stroke', 'coral');
         d3.select(this).style('stroke-opacity', '1');
         tooltipCountry.transition().duration(150)
@@ -436,15 +465,18 @@ Promise.all([
         d3.select(this).style('stroke', 'white')
         d3.select(this).style('stroke-opacity', '0.4');
       })
+      .on('click', function (d) {
+        Table(datasetState.get(this.id))
+      })
 
+    // Remove the Antarctica State
+    svg.select('#Antarctica').remove()
     Table(dataset)
   }
 
   // Show additional information on the country (div that show/hide)
   function contentCountryTip(dataset, d) {
-    console.log(d)
     const nPaper = (dataset.get(d.target.id)) ? dataset.get(d.target.id).length : "0"
-    console.log({ nPaper })
     var content = "<h5 align='center'>Country</h5>";
     content += "<table align='center' id='tooltip'>" +
       "<tr><td>Name:</td> <td>" + d.target.id + "</td></tr>" +

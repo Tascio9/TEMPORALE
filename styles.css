@@ -14,13 +14,31 @@ path {
 .container{                     
     display: grid;
     grid-template-columns: [first-column] 2vw [line1] 10vw [line2] auto [line3] 10vw [line4] 2vw [last-column];
-    grid-template-rows: [first-row] auto [mid1] 15vh [mid2] 25vh [last-row];
+    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 25vh [last-row];
 }
 
 /* Grid Item */
+.test {
+  grid-column-start: line1;
+  grid-column-end: line2;
+  grid-row-start: first-row;
+  grid-row-end: mid1;
+  justify-self: center;
+  align-self: center;
+}
+
 .chart-div{
     grid-column-start: line1;
     grid-column-end: line2;
+    grid-row-start: first-row;
+    grid-row-end: mid2;
+    justify-self: center;
+    align-self: center;
+}
+
+.title{
+    grid-column-start: line2;
+    grid-column-end: line3;
     grid-row-start: first-row;
     grid-row-end: mid1;
     justify-self: center;
@@ -30,7 +48,7 @@ path {
 .map-div {
     grid-column-start: line2;
     grid-column-end: line3;
-    grid-row-start: first-row;
+    grid-row-start: mid1;
     grid-row-end: mid2;
 }
 
@@ -43,12 +61,6 @@ path {
     align-self: center; */
 }
 
-.test {
-    grid-column-start: line1;
-    grid-column-end: line2;
-    grid-row-start: mid1;
-    grid-row-end: mid2;
-}
 
 .filter-div {
     grid-column-start: first-column;
