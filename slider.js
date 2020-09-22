@@ -20,9 +20,11 @@ Promise.all([
         // classic transform to position g
         .attr("transform", "translate(" + marginSlider.left + "," + marginSlider.top + ")");
 
-    const formatDate = d3.timeFormat('%Y');
+    const yearSelected = 2000
+
+    const formatDate = d3.timeFormat('%B');
     const dateScale = d3.scaleTime()
-        .domain([new Date(minPublishTime), new Date(maxPublishTime)])
+        .domain([new Date(yearSelected, 0, 1), new Date(yearSelected, 11, 31)])
         .range([0, heightSlider])
         .clamp(true);
 
@@ -39,7 +41,7 @@ Promise.all([
         .attr("class", "grid")
         .attr("transform", "translate(" + widthSlider / 4 + ",0)")
         .call(d3.axisRight(dateScale)
-            .ticks(d3.timeYear.every(1))
+            .ticks(d3.timeMonth.every(1))
             .tickSize((widthSlider / 2))
             .tickFormat("")
             .tickSizeOuter(0)
@@ -67,7 +69,6 @@ Promise.all([
         })
         .attr("class", "halo");
 
-    drawScatterPlotPaper();
     const brush1 = d3.brushY()
         // .extent([[0, 0], [widthSlider, heightSlider]]) --> Original one
         // .extent([[widthSlider, heightSlider], [0, 0]])
@@ -151,11 +152,6 @@ Promise.all([
 
     function upgradePaper() {
         // EVENT LISTENER SLIDER 1 DATA 4/7/2017
-        // selection1 = d3.brushSelection(d3.select(".brush1").node());
-        // handle1.attr('transform', 'translate(' + selection1[0] + ",0)");
-        // text1.text(formatDate(dateScale.invert(selection1[0])));
-        // handle2.attr('transform', 'translate(' + selection1[1] + ",0)");
-        // text2.text(formatDate(dateScale.invert(selection1[1])));
         selection1 = d3.brushSelection(d3.select(".brush1").node());
         handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
         text1.text(formatDate(dateScale.invert(selection1[0])));
@@ -175,15 +171,13 @@ Promise.all([
         text1.text(formatDate(dateScale.invert(selection1[0])));
         handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
         text2.text(formatDate(dateScale.invert(selection1[1])));
-
-        colorMap(data[1])
     }
 
     function filterPaperByDate(event) {
         const selection1 = d3.brushSelection(d3.select(".brush1").node());
         if (!event.sourceEvent || !selection1) return;
-        console.log({ selection1 })
-        const [x0, x1] = selection1.map(d => d3.timeYear.every(1).round(dateScale.invert(d)));
+        // console.log({ selection1 })
+        const [x0, x1] = selection1.map(d => d3.timeMonth.every(1).round(dateScale.invert(d)));
         d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
 
         const newData = data[1].filter(function (d) {
@@ -192,8 +186,6 @@ Promise.all([
         })
 
         console.log({ newData })
-
-        colorMap(newData)
 
     }
 })
