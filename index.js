@@ -124,11 +124,33 @@ Promise.all([
       .style("top", "5px")
       .on("dblclick", function () {
         // filterChart();
+        d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", "1")
       });
 
     const brushLegend = d3.brushY()
       .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - 60]])
-    // .on("brush", filterChart);
+      .on("brush", function filterView(event) {
+        const selectionLegendBegin = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[0]));
+        const selectionLegendEnd = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[1]));
+        const selection1 = d3.brushSelection(d3.select(".brushLegend").node());
+
+        if (!event.sourceEvent || !selection1) return;
+        d3.select(this).transition().call(brushLegend.move, selectionLegendEnd > selectionLegendBegin ? [selectionLegendBegin, selectionLegendEnd].map(legendscaleaxis) : null);
+
+        const filterDataset = []
+        d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", "0.4")
+
+        Array.from(datasetState).filter(function (d) {
+          if (selectionLegendBegin <= d[1].length && d[1].length <= selectionLegendEnd) {
+            filterDataset.push(d[0])
+            d3.select("#worldMap").select('#' + d[0]).transition().duration(100).style("opacity", "1")
+          }
+        })
+        console.log({ filterDataset })
+        datasetState.filter(function (d) {
+
+        })
+      })
 
     svgLegend.append("g")
       .attr("class", "brushLegend")
@@ -148,82 +170,6 @@ Promise.all([
       .style("text-anchor", "end")
       .style("font-size", "13px")
       .text("N° Paper");
-
-    // const legendheight = 400,
-    //   legendwidth = 180,
-    //   margin = { top: 10, right: 60, bottom: 10, left: 8 };
-
-    // d3.select('.canbru').remove()
-
-    // const canvas = d3.select('.chart-div').append('g')
-    //   .attr('class', 'canbru')
-    //   .append("canvas")
-    //   .attr("height", legendheight)
-    //   .attr("width", 1)
-    //   .style("height", (legendheight) + "px")
-    //   .style("width", (legendwidth - margin.left - margin.right) + "px")
-    //   .style("border", "1px solid #000")
-    //   // .style("position", "absolute")
-    //   .node();
-
-    // const ctx = canvas.getContext("2d");
-
-    // const colorscale = d3.scaleSequential(d3.interpolateViridis)
-    //   .domain([minDatasetState, maxDatasetState])
-
-    // const legendscale = d3.scaleLog()
-    //   .domain(colorscale.domain())
-    //   .range([0, legendheight])
-    //   .clamp(true)
-
-    // const image = ctx.createImageData(1, legendheight);
-
-    // d3.range(legendheight).forEach(function (i) {
-    //   var c = d3.rgb(colorscale(legendscale.invert(i)));
-    //   image.data[4 * i] = c.r;
-    //   image.data[4 * i + 1] = c.g;
-    //   image.data[4 * i + 2] = c.b;
-    //   image.data[4 * i + 3] = 255;
-    // });
-
-    // // ctx.translate(10, 10)
-    // ctx.putImageData(image, 0, 0);
-
-    // // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
-    // const formatNumber = d3.format('.0f')
-
-    // const legendaxis = d3.axisRight()
-    //   .scale(legendscale)
-    //   .tickFormat(d => formatNumber(d))
-    //   .tickValues(legendscale
-    //     .ticks(...legendscale.domain())
-    //     .concat(legendscale.domain())
-    //   )
-    //   .tickSize(4);
-
-    // // const legendaxis = d3.axisRight()
-    // // .scale(legendscale)
-    // // .tickFormat(d => d3.formatNumber(d))
-    // // .tickValues(legendscale.ticks(2).concat(legendscale.domain()))
-    // // .tickSize(4);
-
-    // const svgChart = d3.select('#chart')
-    //   .attr("height", (legendheight + margin.top + margin.bottom + 10) + "px")
-    //   .attr("width", (legendwidth + margin.left + margin.right + 10) + "px")
-    //   .style("position", "absolute")
-
-    // svgChart.selectAll('rect').remove()      // Necessary to update the mapcolors
-    // svgChart.selectAll('g').remove()
-
-    // svgChart.append('rect')
-    //   .attr('height', legendheight)
-    //   .attr('width', legendwidth)
-    //   .style('fill', 'none')
-
-    // svgChart.append("g")
-    //   .attr("class", "axis")
-    //   .attr("transform", "translate(" + (legendwidth - 68) + "," + (0) + ")")
-    //   .call(legendaxis)
   }
 
   function filterChart() {
