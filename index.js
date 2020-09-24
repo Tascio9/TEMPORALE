@@ -133,23 +133,25 @@ Promise.all([
         const selectionLegendBegin = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[0]));
         const selectionLegendEnd = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[1]));
         const selection1 = d3.brushSelection(d3.select(".brushLegend").node());
+        const filterDataset = []
+        const countries = []
 
         if (!event.sourceEvent || !selection1) return;
         d3.select(this).transition().call(brushLegend.move, selectionLegendEnd > selectionLegendBegin ? [selectionLegendBegin, selectionLegendEnd].map(legendscaleaxis) : null);
 
-        const filterDataset = []
         d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", "0.4")
 
         Array.from(datasetState).filter(function (d) {
           if (selectionLegendBegin <= d[1].length && d[1].length <= selectionLegendEnd) {
-            filterDataset.push(d[0])
-            d3.select("#worldMap").select('#' + d[0]).transition().duration(100).style("opacity", "1")
+            d3.select("#worldMap").select(`path[id='${d[0]}']`).transition().duration(100).style("opacity", "1")
+            countries.push(d[0])
+            d[1].forEach(function (e) {
+              filterDataset.push(e)
+            })
           }
         })
-        console.log({ filterDataset })
-        datasetState.filter(function (d) {
-
-        })
+        console.log({ countries })
+        Table(filterDataset)
       })
 
     svgLegend.append("g")
@@ -279,6 +281,7 @@ Promise.all([
     d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
   }
 
+  // *IMPROVEMENT* take a look on this: https://www.d3-graph-gallery.com/graph/interactivity_zoom.html
   function sliderTime(dataset) {
     const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
     const widthSlider = 140;
