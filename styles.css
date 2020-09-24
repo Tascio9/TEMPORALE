@@ -15,7 +15,7 @@ path {
 .container{                     
     display: grid;
     grid-template-columns: [first-column] 2vw [line1] 10vw [line2] auto [line3] 10vw [line4] 2vw [last-column];
-    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 27vh [last-row];
+    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 24vh [last-row];
 }
 
 /* Grid Item */
@@ -53,6 +53,7 @@ path {
     grid-row-end: mid2;
     justify-self: center;
     align-self: center;
+    color: white;
 }
 
 .map-div {
@@ -67,10 +68,10 @@ path {
     grid-column-end: line4;
     grid-row-start: mid1;
     grid-row-end: mid2;
-    /* justify-self: center;
-    align-self: center; */
+    justify-self: center;
+    align-self: center;
+    color: white;
 }
-
 
 .filter-div {
     grid-column-start: first-column;

@@ -48,10 +48,6 @@ Promise.all([
     }
   })
 
-  function updateDataset(year) {
-    console.log(year)
-  }
-
   // Draw the chart on the left according to the dataset
   function colorChart(dataset) {
     const datasetState = d3.group(dataset, d => d.Nation);
@@ -123,7 +119,7 @@ Promise.all([
       .style("left", "30px")
       .style("top", "5px")
       .on("dblclick", function () {
-        // filterChart();
+        Table(dataset)
         d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", "1")
       });
 
@@ -174,10 +170,6 @@ Promise.all([
       .text("N° Paper");
   }
 
-  function filterChart() {
-    // TODO
-  }
-
   // Draw the map according to the dataset passed, which inside there are the papers.
   function colorMap(dataset) {
     // const projection = d3.geoNaturalEarth1();
@@ -207,9 +199,6 @@ Promise.all([
         );
       })
       .call(zoom)
-    // .call(d3.zoom().on("zoom", function (event) {
-    //   svg.attr("transform", event.transform)
-    // }))
 
     const g = svg.append("g")
 
@@ -500,8 +489,12 @@ Promise.all([
               && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
           })
 
-          colorChart(newData)
-          colorMap(newData)
+          if (newData.length != 0) {
+            colorChart(newData)
+            colorMap(newData)
+          } else {
+            alert('No papers available in this period')
+          }
         });
 
       svgSlider1.append("g")
