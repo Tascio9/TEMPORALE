@@ -178,26 +178,50 @@ Promise.all([
     // TODO
   }
 
-  // Draw the map according to the dataset passed
+  // Draw the map according to the dataset passed, which inside there are the papers.
   function colorMap(dataset) {
-    const svg = d3.select('#worldMap');
-    svg.attr('height', height)
-      .attr('width', width)
-    // .attr('transform', 'translate(0,40)')
-
-    svg.selectAll('path').remove()      // Necessary to update the mapcolors
-
     // const projection = d3.geoNaturalEarth1();
-    const projection = d3.geoPatterson();
-    projection.scale([200])
-      .translate([width / 2, height / 1.7]);
+    const projection = d3.geoPatterson().scale(1070)
+      .translate([width / 2, height / 2]);
     const pathGenerator = d3.geoPath().projection(projection);
-
+    const zoom = d3.zoom()
+      .scaleExtent([1, 8])
+      .on("zoom", function zoomed(event) {
+        const { transform } = event;
+        g.attr("transform", transform)
+      });
     const countries = topojson.feature(data[0], data[0].objects.countries);
     console.log({ dataset })
     const datasetState = d3.group(dataset, d => d.Nation);
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+    const svg = d3.select('#worldMap');
+
+    svg.attr('height', height)
+      .attr('width', width)
+      .on("click", function reset() {
+        svg.transition().duration(750).call(
+          zoom.transform,
+          d3.zoomIdentity,
+          d3.zoomTransform(svg.node()).invert([width / 2, height / 2])
+        );
+      })
+      .call(zoom)
+    // .call(d3.zoom().on("zoom", function (event) {
+    //   svg.attr("transform", event.transform)
+    // }))
+
+    const g = svg.append("g")
+
+    g.append('rect')
+      .attr('width', width)
+      .attr('height', height)
+      .style('fill', 'none')
+
+    svg.selectAll('path').remove()      // Necessary to update the mapcolors
+
+    projection.scale([200])
+      .translate([width / 2, height / 1.7]);
 
     const linearScale = d3.scaleLog()
       .domain([minDatasetState, maxDatasetState])
@@ -208,7 +232,9 @@ Promise.all([
       .style('display', "none")
       .attr('class', 'd3-tip');
 
-    svg.selectAll('path')
+    g.append('g')
+      .attr('id', 'states')
+      .selectAll('path')
       .data(countries.features)
       .enter()
       .append('path')
@@ -251,6 +277,10 @@ Promise.all([
       .on('click', function (d) {
         Table(datasetState.get(this.id))
       })
+    // .call(d3.zoom().on("zoom", function (event) {
+    //   projection.translate(event.translate).scale(event.scale);
+    //   svg.selectAll('path').attr("d", pathGenerator)
+    // }))
 
     // Remove the Antarctica State
     svg.select('#Antarctica').remove()

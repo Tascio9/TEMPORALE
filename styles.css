@@ -2,6 +2,7 @@ body {
     margin: 0px;
     overflow: hidden;
     background-color: #222222;
+    font-family: 'Oxygen', sans-serif;
 }
 
 path {
@@ -14,7 +15,7 @@ path {
 .container{                     
     display: grid;
     grid-template-columns: [first-column] 2vw [line1] 10vw [line2] auto [line3] 10vw [line4] 2vw [last-column];
-    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 25vh [last-row];
+    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 27vh [last-row];
 }
 
 /* Grid Item */
@@ -125,6 +126,7 @@ path {
     clear: both;
     border-collapse: separate;
     border-spacing: 0;
+    font-size: small;
     /*
      * Header and footer styles
      */
@@ -134,7 +136,8 @@ path {
     table.dataTable thead th,
     table.dataTable tfoot th {
       font-weight: bold;
-      background-color: grey; }
+      background-color: grey;
+      font-size: small; }
     table.dataTable thead th,
     table.dataTable thead td {
       padding: 10px 18px;
