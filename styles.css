@@ -10,6 +10,18 @@ path {
     stroke-opacity: 0.4;
 }
 
+.label {
+    fill: white;
+  }
+  
+  .handle1 {
+    fill: white;
+  }
+  
+  .handle2 {
+    fill: white;
+  }
+
 /* https://css-tricks.com/snippets/css/complete-guide-grid/ */
 /* Grid Container */
 .container{                     

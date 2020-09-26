@@ -12,6 +12,10 @@ Promise.all([
   const groupByYear = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 1).join('-'))
   const groupByMonth = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 2).join('-'))
 
+  let colorChartBoolean = false
+  let countriesChart = []                // Variable to st
+
+
   console.log({ groupByYear })
   console.log({ groupByMonth })
 
@@ -37,11 +41,13 @@ Promise.all([
 
   d3.select('#selectYear').on('change', function (d) {
     if (this.value === 'All') {
+      colorChartBoolean = false
       colorMap(data[1])
       colorChart(data[1])
       sliderTime(data[1])
     } else {
       const yearDataset = groupByYear.get(this.value)
+      colorChartBoolean = false
       colorMap(yearDataset)
       colorChart(yearDataset)
       sliderTime(yearDataset)
@@ -53,6 +59,8 @@ Promise.all([
     const datasetState = d3.group(dataset, d => d.Nation);
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+
+    let filterDataset = []
 
     const heightLegend = 500;
     const widthLegend = 130;
@@ -121,32 +129,40 @@ Promise.all([
       .on("dblclick", function () {
         Table(dataset)
         d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", "1")
+        colorChartBoolean = false
+        countriesChart = []
+        filterDataset = []
       });
 
     const brushLegend = d3.brushY()
       .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - 60]])
       .on("brush", function filterView(event) {
+        // const selection1 = d3.brushSelection(d3.select(".brush1").node());
+        // if (!event.sourceEvent || !selection1) return;
+        // const [x0, x1] = selection1.map(d => d3.timeMonth.every(1).round(dateScale.invert(d)));
+        // d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
+
+        const selection1 = d3.brushSelection(d3.select(".brushLegend").node());
+        if (!event.sourceEvent || !selection1) return;
         const selectionLegendBegin = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[0]));
         const selectionLegendEnd = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[1]));
-        const selection1 = d3.brushSelection(d3.select(".brushLegend").node());
-        const filterDataset = []
-        const countries = []
-
-        if (!event.sourceEvent || !selection1) return;
         d3.select(this).transition().call(brushLegend.move, selectionLegendEnd > selectionLegendBegin ? [selectionLegendBegin, selectionLegendEnd].map(legendscaleaxis) : null);
 
         d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", "0.4")
+        colorChartBoolean = true
+        countriesChart = []
+        filterDataset = []
 
         Array.from(datasetState).filter(function (d) {
           if (selectionLegendBegin <= d[1].length && d[1].length <= selectionLegendEnd) {
             d3.select("#worldMap").select(`path[id='${d[0]}']`).transition().duration(100).style("opacity", "1")
-            countries.push(d[0])
+            countriesChart.push(d[0])
             d[1].forEach(function (e) {
               filterDataset.push(e)
             })
           }
         })
-        console.log({ countries })
+        console.log({ countriesChart })
         Table(filterDataset)
       })
 
@@ -166,7 +182,7 @@ Promise.all([
       .attr("x", widthLegend / 2 - 15)
       .attr("y", 12)
       .style("text-anchor", "end")
-      .style("font-size", "13px")
+      .style("font-size", "12px")
       .text("N° Paper");
   }
 
@@ -258,7 +274,14 @@ Promise.all([
         console.log(this)
         tooltipCountry.transition().duration(150)
           .style('display', "none");
-        handleMouseOutCountry()
+        console.log({ colorChartBoolean })
+        if (!colorChartBoolean) {
+          console.log('IF')
+          handleMouseOutCountry()
+        } else {
+          console.log('ELSE')
+          handleMouseOutCountryChart(countriesChart)
+        }
         // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
         d3.select(this).style('stroke', 'white')
         d3.select(this).style('stroke-opacity', '0.4');
@@ -300,9 +323,18 @@ Promise.all([
     d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
   }
 
+  // Reset of the "handleMouseMoveCountry"
+  function handleMouseOutCountryChart(countries) {
+    console.log({ countries })
+    d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "0.4");
+    countries.forEach(function (d) {
+      d3.select("#worldMap").select(`path[id='${d}']`).transition().duration(100).style("opacity", "1")
+    })
+  }
+
   // *IMPROVEMENT* take a look on this: https://www.d3-graph-gallery.com/graph/interactivity_zoom.html
   function sliderTime(dataset) {
-    const marginSlider = { top: 50, right: 40, bottom: 10, left: 0 }
+    const marginSlider = { top: 10, right: 40, bottom: 10, left: 0 }
     const widthSlider = 140;
     const heightSlider = 600;
     const sliderWidth = widthSlider + marginSlider.left + marginSlider.right
@@ -311,6 +343,8 @@ Promise.all([
     const maxPublishTime = d3.max(dataset, d => d.Publish_time);
     const formatDate = d3.timeFormat('%Y');
     const formatMonth = d3.timeFormat('%B');
+    const formatMonthLabel = d3.timeFormat('%b');
+
 
     selectedYear = d3.select('#selectYear').node().value
     console.log({ selectedYear })
@@ -327,8 +361,9 @@ Promise.all([
     console.log(d3.select('#selectYear').node().value)
 
     if (selectedYear === 'All') {
+      // YEAR IS 'ALL'
       const dateScale = d3.scaleTime()
-        .domain([new Date(minPublishTime), new Date(maxPublishTime)])
+        .domain([new Date(moment(minPublishTime, 'YYYY').format('YYYY')), new Date(moment(maxPublishTime, 'YYYY').format('YYYY')) - 1])
         .range([0, heightSlider])
         .clamp(true);
 
@@ -346,6 +381,7 @@ Promise.all([
         .attr("transform", "translate(" + widthSlider / 4 + ",0)")
         .call(d3.axisRight(dateScale)
           .ticks(d3.timeYear.every(1))
+          .tickValues(dateScale.ticks(d3.timeYear.every(1)).concat(dateScale.domain()))
           .tickSize((widthSlider / 2))
           .tickFormat("")
           .tickSizeOuter(0)
@@ -386,9 +422,16 @@ Promise.all([
           d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
 
           const newData = dataset.filter(function (d) {
-            return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(selection1[0])
-              && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
+            return ((new Date(moment(d.Publish_time, 'YYYY').format('YYYY'))) >= new Date(moment(x0, 'YYYY-MM-DD').format('YYYY'))
+              && ((new Date(moment(d.Publish_time, 'YYYY').format('YYYY')))) <= new Date(moment(x1, 'YYYY-MM-DD').format('YYYY')))
           })
+
+          if (newData.length != 0) {
+            colorChart(newData)
+            colorMap(newData)
+          } else {
+            alert('No papers available in this period')
+          }
 
           colorChart(newData)
           colorMap(newData)
@@ -428,8 +471,9 @@ Promise.all([
       handle1.attr('transform', 'translate(0,0)');
       handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
     } else {
+      // YEAR IS SELECTED
       const dateScale = d3.scaleTime()
-        .domain([new Date(selectedYear, 0, 1), new Date(selectedYear, 11, 31)])
+        .domain([new Date(selectedYear, 0, 1), new Date(selectedYear, 10, 31)])
         .range([0, heightSlider])
         .clamp(true);
 
@@ -447,6 +491,7 @@ Promise.all([
         .attr("transform", "translate(" + widthSlider / 4 + ",0)")
         .call(d3.axisRight(dateScale)
           .ticks(d3.timeMonth.every(1))
+          .tickValues(dateScale.ticks(d3.timeMonth.every(1)).concat(dateScale.domain()))
           .tickSize((widthSlider / 2))
           .tickFormat("")
           .tickSizeOuter(0)
@@ -454,14 +499,14 @@ Promise.all([
         .select("path").style("opacity", "0");
 
       svgSlider1.append("g")
-        .attr("class", "numbers")
+        .attr("class", "months")
         .attr("width", "100")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
         // introduce axis
         .call(d3.axisRight()
           .scale(dateScale)
           .tickFormat(d => formatMonth(d))
-          .tickValues(dateScale.ticks(6).concat(dateScale.domain()))
+          .tickValues(dateScale.ticks(12).concat(dateScale.domain()))
           .tickSize(0)
           .tickPadding(45)
         )
@@ -476,7 +521,9 @@ Promise.all([
         .on("brush", function upgradePaper() {
           selection1 = d3.brushSelection(d3.select(".brush1").node());
           handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
+          // text1.text(formatMonthLabel(dateScale.invert(selection1[0])));
           handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
+          // text2.text(formatMonthLabel(dateScale.invert(selection1[1])));
         })
         .on("end", function filterPaperByMonth(event) {
           const selection1 = d3.brushSelection(d3.select(".brush1").node());
@@ -484,9 +531,14 @@ Promise.all([
           const [x0, x1] = selection1.map(d => d3.timeMonth.every(1).round(dateScale.invert(d)));
           d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
 
+          console.log(dateScale.invert(selection1[0]))
+          console.log(x0)
+          console.log(moment(dateScale.invert(selection1[1]), 'YYYY-MM-DD').format('YYYY-MM'))
+          console.log(x1)
+
           const newData = dataset.filter(function (d) {
-            return ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD'))) >= dateScale.invert(selection1[0])
-              && ((new Date(moment(d.Publish_time, 'YYYY-MM-DD').format('YYYY-MM-DD')))) <= dateScale.invert(selection1[1]))
+            return ((new Date(moment(d.Publish_time, 'YYYY-MM').format('YYYY-MM'))) >= new Date(moment(x0, 'YYYY-MM-DD').format('YYYY-MM'))
+              && ((new Date(moment(d.Publish_time, 'YYYY-MM').format('YYYY-MM')))) <= new Date(moment(x1, 'YYYY-MM-DD').format('YYYY-MM')))
           })
 
           if (newData.length != 0) {
@@ -504,7 +556,9 @@ Promise.all([
           selection1[0] = 0;
           selection1[1] = heightSlider;
           handle1.attr('transform', 'translate(0,' + selection1[0] + ')')
+          // text1.text(formatMonthLabel(dateScale.invert(selection1[0])));
           handle2.attr('transform', 'translate(0,' + selection1[1] + ')')
+          // text2.text(formatMonthLabel(dateScale.invert(selection1[1])));
 
           colorChart(dataset)
           colorMap(dataset)
@@ -515,15 +569,17 @@ Promise.all([
       handle1.append("path")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
         .attr("d", "M -60 0 H 60 60");
-      const text1 = handle1.append('text')
-        .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
+      // const text1 = handle1.append('text')
+      //   .text(formatMonthLabel(dateScale.domain()[0]))
+      //   .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
       const handle2 = svgSlider1.append("g")
         .attr("class", "handle2");
       handle2.append("path")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
         .attr("d", "M -60 0 H 60 60");
-      const text2 = handle2.append('text')
-        .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
+      // const text2 = handle2.append('text')
+      //   .text(formatMonthLabel(dateScale.domain()[1]))
+      //   .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
       handle1.attr('transform', 'translate(0,0)');
       handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
     }
