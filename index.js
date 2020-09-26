@@ -27,17 +27,23 @@ Promise.all([
       .attr('value', d)
       .text(d)
   }
+  d3.select('#selectYear').append('option').attr('value', 'All').text('*')
+
+  const dataset2020 = groupByYear.get('2020')
 
   // Container CHART --------------------------------------------------------------------------
   // Draw the left chart bar for the colors
-  colorChart(data[1])
+  // colorChart(data[1])
+  colorChart(dataset2020)
 
   // Container MAP ----------------------------------------------------------------------------
   // Draw the map with the respective colors
-  colorMap(data[1])
+  // colorMap(data[1])
+  colorMap(dataset2020)
 
   // Container SLIDER -------------------------------------------------------------------------
-  sliderTime(data[1])
+  // sliderTime(data[1])
+  sliderTime(dataset2020)
 
   d3.select('#selectYear').on('change', function (d) {
     if (this.value === 'All') {

@@ -12,13 +12,14 @@ path {
 
 .label {
     fill: white;
+    color: white;
   }
   
-  .handle1 {
+.handle1 {
     fill: white;
   }
   
-  .handle2 {
+.handle2 {
     fill: white;
   }
 
@@ -27,7 +28,7 @@ path {
 .container{                     
     display: grid;
     grid-template-columns: [first-column] 2vw [line1] 10vw [line2] auto [line3] 10vw [line4] 2vw [last-column];
-    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 24vh [last-row];
+    grid-template-rows: [first-row] 5vh [mid1] auto [mid2] 26.5vh [last-row];
 }
 
 /* Grid Item */
