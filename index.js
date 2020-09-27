@@ -12,10 +12,12 @@ Promise.all([
   const groupByYear = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 1).join('-'))
   const groupByMonth = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 2).join('-'))
 
-  let colorChartBoolean = false
-  let countriesChart = []                // Variable to st
+  let yearValue = '2020'
+  let colorChartBoolean = false           // Variable to set true whenn the brush on 'colorChart' happends
+  let countriesChart = []                 // Variable to store the countries obtained by the brush action on 'colorChart'
+  let colorPalette = d3.select('input[name="colorPalette"]:checked').property('value')
 
-
+  console.log({ colorPalette })
   console.log({ groupByYear })
   console.log({ groupByMonth })
 
@@ -29,7 +31,7 @@ Promise.all([
   }
   d3.select('#selectYear').append('option').attr('value', 'All').text('*')
 
-  const dataset2020 = groupByYear.get('2020')
+  const dataset2020 = groupByYear.get(yearValue)
 
   // Container CHART --------------------------------------------------------------------------
   // Draw the left chart bar for the colors
@@ -45,6 +47,8 @@ Promise.all([
   // sliderTime(data[1])
   sliderTime(dataset2020)
 
+  // Handling events on:
+  // - Dropdown selection
   d3.select('#selectYear').on('change', function (d) {
     if (this.value === 'All') {
       colorChartBoolean = false
@@ -52,7 +56,7 @@ Promise.all([
       colorChart(data[1])
       sliderTime(data[1])
     } else {
-      const yearDataset = groupByYear.get(this.value)
+      yearDataset = groupByYear.get(this.value)
       colorChartBoolean = false
       colorMap(yearDataset)
       colorChart(yearDataset)
@@ -60,12 +64,40 @@ Promise.all([
     }
   })
 
+  // - Radio button
+  d3.selectAll('input[name="colorPalette"]').on('change', function () {
+    colorPalette = this.value
+    yearValue = d3.select('#selectYear').property('value')
+    yearDataset = groupByYear.get(yearValue)
+    colorChart(yearDataset)
+    colorMap(yearDataset)
+  });
+
+  // -----------------------------------------------------------------------------------------------
+  // Given a dataset, it returns a color palette (Viridis/Magma) based on the radio button checked
+  function palette(dataset) {
+    const min = d3.min(Array.from(dataset.values())).length;
+    const max = d3.max(Array.from(dataset.values())).length;
+    console.log({ min })
+    console.log({ max })
+    if (colorPalette === 'Viridis') {
+      return d3.scaleSequential(d3.interpolateViridis)
+        .domain([min, max])
+    } else {
+      return d3.scaleSequential(d3.interpolateMagma)
+        .domain([min, max])
+    }
+  }
+
+
+  // ---------------------------------------------------
   // Draw the chart on the left according to the dataset
   function colorChart(dataset) {
     const datasetState = d3.group(dataset, d => d.Nation);
-    const minDatasetState = d3.min(Array.from(datasetState.values())).length;
-    const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+    // const minDatasetState = d3.min(Array.from(datasetState.values())).length;
+    // const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
 
+    let colorscale = palette(datasetState)
     let filterDataset = []
 
     const heightLegend = 500;
@@ -92,8 +124,8 @@ Promise.all([
       .node();
 
     // https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
-    const colorscale = d3.scaleSequential(d3.interpolateViridis)
-      .domain([minDatasetState, maxDatasetState])
+    // const colorscale = d3.scaleSequential(d3.interpolateViridis)
+    //   .domain([minDatasetState, maxDatasetState])
 
     const ctx = canvas.getContext("2d");
 
@@ -192,6 +224,8 @@ Promise.all([
       .text("N° Paper");
   }
 
+
+  // --------------------------------------------------------------------------------
   // Draw the map according to the dataset passed, which inside there are the papers.
   function colorMap(dataset) {
     // const projection = d3.geoNaturalEarth1();
@@ -210,6 +244,8 @@ Promise.all([
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
     const svg = d3.select('#worldMap');
+
+    // let colorscale = palette(datasetState)
 
     svg.attr('height', height)
       .attr('width', width)
@@ -234,7 +270,7 @@ Promise.all([
     projection.scale([200])
       .translate([width / 2, height / 1.7]);
 
-    const linearScale = d3.scaleLog()
+    const logScale = d3.scaleLog()
       .domain([minDatasetState, maxDatasetState])
       .range([0, 1]);
 
@@ -252,7 +288,14 @@ Promise.all([
       .attr('d', pathGenerator)
       .attr('id', d => d.properties.name)
       .style('fill', function (d) {
-        return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+        if (colorPalette === 'Viridis') {
+          return (datasetState.get(this.id)) ? d3.interpolateViridis(logScale(datasetState.get(this.id).length)) : '#222222'
+
+        } else {
+          return (datasetState.get(this.id)) ? d3.interpolateMagma(logScale(datasetState.get(this.id).length)) : '#222222'
+        }
+        // return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+        // return (datasetState.get(this.id)) ? colorscale(logScale(datasetState.get(this.id).length)) : colorscale(logScale(0))
       })
       // .on('mouseover', function (d) {
       //   d3.select(this).style('stroke', 'orange');
@@ -277,15 +320,11 @@ Promise.all([
         handleMouseMoveCountry(d);
       })
       .on('mouseout', function (d) {
-        console.log(this)
         tooltipCountry.transition().duration(150)
           .style('display', "none");
-        console.log({ colorChartBoolean })
         if (!colorChartBoolean) {
-          console.log('IF')
           handleMouseOutCountry()
         } else {
-          console.log('ELSE')
           handleMouseOutCountryChart(countriesChart)
         }
         // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
@@ -305,6 +344,8 @@ Promise.all([
     Table(dataset)
   }
 
+
+  // ---------------------------------------------------------------
   // Show additional information on the country (div that show/hide)
   function contentCountryTip(dataset, d) {
     const nPaper = (dataset.get(d.target.id)) ? dataset.get(d.target.id).length : "0"
@@ -315,6 +356,9 @@ Promise.all([
       "</table>"
     return content;
   }
+
+
+  // ---------------------------------------------------
   // Effect to highlight the country which you pass over
   function handleMouseMoveCountry(country) {
     d3.select("#worldMap").selectAll("path").transition().duration(100).style("opacity", function (d) {
@@ -324,11 +368,16 @@ Promise.all([
         return "0.4";
     });
   }
+
+
+  // -------------------------------------
   // Reset of the "handleMouseMoveCountry"
   function handleMouseOutCountry() {
     d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
   }
 
+
+  // -------------------------------------
   // Reset of the "handleMouseMoveCountry"
   function handleMouseOutCountryChart(countries) {
     console.log({ countries })
@@ -338,6 +387,8 @@ Promise.all([
     })
   }
 
+
+  // -------------------------------------------------------------------------------------------------
   // *IMPROVEMENT* take a look on this: https://www.d3-graph-gallery.com/graph/interactivity_zoom.html
   function sliderTime(dataset) {
     const marginSlider = { top: 10, right: 40, bottom: 10, left: 0 }
