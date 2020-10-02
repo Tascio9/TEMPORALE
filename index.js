@@ -68,9 +68,19 @@ Promise.all([
   d3.selectAll('input[name="colorPalette"]').on('change', function () {
     colorPalette = this.value
     yearValue = d3.select('#selectYear').property('value')
-    yearDataset = groupByYear.get(yearValue)
-    colorChart(yearDataset)
-    colorMap(yearDataset)
+    console.log({ yearValue })
+    if (yearValue === 'All') {
+      colorChartBoolean = false
+      colorMap(data[1])
+      colorChart(data[1])
+      sliderTime(data[1])
+    } else {
+      yearDataset = groupByYear.get(yearValue)
+      colorChartBoolean = false
+      colorMap(yearDataset)
+      colorChart(yearDataset)
+      sliderTime(yearDataset)
+    }
   });
 
   // -----------------------------------------------------------------------------------------------
@@ -147,7 +157,7 @@ Promise.all([
     // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
     const formatNumber = d3.format('.0f')
 
-    const legendscaleaxis = d3.scaleLog()
+    const legendscaleaxis = d3.scaleLinear()
       .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
       .domain(colorscale.domain());
 
@@ -270,7 +280,7 @@ Promise.all([
     projection.scale([200])
       .translate([width / 2, height / 1.7]);
 
-    const logScale = d3.scaleLog()
+    const logScale = d3.scaleLinear()
       .domain([minDatasetState, maxDatasetState])
       .range([0, 1]);
 
@@ -289,10 +299,10 @@ Promise.all([
       .attr('id', d => d.properties.name)
       .style('fill', function (d) {
         if (colorPalette === 'Viridis') {
-          return (datasetState.get(this.id)) ? d3.interpolateViridis(logScale(datasetState.get(this.id).length)) : '#222222'
+          return (datasetState.get(this.id)) ? d3.interpolateViridis(logScale(datasetState.get(this.id).length)) : '#333333'
 
         } else {
-          return (datasetState.get(this.id)) ? d3.interpolateMagma(logScale(datasetState.get(this.id).length)) : '#222222'
+          return (datasetState.get(this.id)) ? d3.interpolateMagma(logScale(datasetState.get(this.id).length)) : '#333333'
         }
         // return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
         // return (datasetState.get(this.id)) ? colorscale(logScale(datasetState.get(this.id).length)) : colorscale(logScale(0))
