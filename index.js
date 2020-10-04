@@ -110,9 +110,9 @@ Promise.all([
     let colorscale = palette(datasetState)
     let filterDataset = []
 
-    const heightLegend = 500;
+    const heightLegend = 300;
     const widthLegend = 130;
-    const marginLegend = { top: 20, right: 80, bottom: 60, left: 2 };
+    const marginLegend = { top: 20, right: 80, bottom: 10, left: 2 };
 
     d3.selectAll(".legendScale").remove();
     d3.selectAll(".canvas").remove();
@@ -295,14 +295,15 @@ Promise.all([
       .data(countries.features)
       .enter()
       .append('path')
+      .attr('class', 'boundary')
       .attr('d', pathGenerator)
       .attr('id', d => d.properties.name)
       .style('fill', function (d) {
         if (colorPalette === 'Viridis') {
-          return (datasetState.get(this.id)) ? d3.interpolateViridis(logScale(datasetState.get(this.id).length)) : '#333333'
+          return (datasetState.get(this.id)) ? d3.interpolateViridis(logScale(datasetState.get(this.id).length)) : '#444444'
 
         } else {
-          return (datasetState.get(this.id)) ? d3.interpolateMagma(logScale(datasetState.get(this.id).length)) : '#333333'
+          return (datasetState.get(this.id)) ? d3.interpolateMagma(logScale(datasetState.get(this.id).length)) : '#444444'
         }
         // return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
         // return (datasetState.get(this.id)) ? colorscale(logScale(datasetState.get(this.id).length)) : colorscale(logScale(0))

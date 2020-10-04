@@ -31,11 +31,21 @@
   <div class="container">
     <div class="test">
       <!-- <h1 id="state">Hello!</h1> -->
-      <label class="label">Choose your palette:</label>
-      <form id="radioPalette" class="label">
-        <input type="radio" name="colorPalette" value="Viridis" checked>Viridis</input>
-        <input type="radio" name="colorPalette" value="Magma">Magma</input>
-      </form>
+      <div class="formPalette">
+        <form id="radioPalette" class="label">
+          <label class="label">Color palette:</label>
+          <input type="radio" name="colorPalette" value="Viridis" checked>Viridis</input>
+          <input type="radio" name="colorPalette" value="Magma">Magma</input>
+        </form>
+      </div>
+
+      <div class="formScale">
+        <form id="radioScale" class="label">
+          <label class="label">Scale:</label>
+          <input type="radio" name="scale" value="Linear" checked>Linear</input>
+          <input type="radio" name="scale" value="Log">Logarithmic</input>
+        </form>
+      </div>
     </div>
 
     <div class="chart-div">
