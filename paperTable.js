@@ -34,7 +34,12 @@ function Table(dataset) {
             { data: 'Cord_UID' },
             { data: 'Paper_ID' },
             { data: 'Nation' },
-            { data: 'Title' },
+            {
+                data: 'Title',
+                render: function (data, type, row) {
+                    return `<a href="https://www.doi.org/10.1186/1471-2334-1-6/${row.Paper_ID}" >${data}</a>`
+                }
+            },
             { data: 'Publish_time' }
         ],
         scrollResize: true,
