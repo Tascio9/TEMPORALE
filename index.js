@@ -1,7 +1,9 @@
 const widthWindow = window.innerWidth
 const heightWindow = window.innerHeight
-const height = heightWindow - 338;
+const height = heightWindow - 388;
 const width = widthWindow - 500;
+// const height = 300
+// const width = 100
 
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
@@ -29,7 +31,7 @@ Promise.all([
       .attr('value', d)
       .text(d)
   }
-  d3.select('#selectYear').append('option').attr('value', 'All').text('*')
+  d3.select('#selectYear').append('option').attr('value', 'All').text('All')
 
   const dataset2020 = groupByYear.get(yearValue)
 
@@ -111,7 +113,7 @@ Promise.all([
     let filterDataset = []
 
     const heightLegend = 300;
-    const widthLegend = 130;
+    const widthLegend = 100;
     const marginLegend = { top: 20, right: 80, bottom: 10, left: 2 };
 
     d3.selectAll(".legendScale").remove();
@@ -183,7 +185,7 @@ Promise.all([
       });
 
     const brushLegend = d3.brushY()
-      .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - 60]])
+      .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - marginLegend.bottom]])
       .on("brush", function filterView(event) {
         // const selection1 = d3.brushSelection(d3.select(".brush1").node());
         // if (!event.sourceEvent || !selection1) return;
@@ -230,7 +232,7 @@ Promise.all([
       .attr("x", widthLegend / 2 - 15)
       .attr("y", 12)
       .style("text-anchor", "end")
-      .style("font-size", "12px")
+      .style("font-size", "8.5px")
       .text("N° Paper");
   }
 
@@ -257,8 +259,10 @@ Promise.all([
 
     // let colorscale = palette(datasetState)
 
-    svg.attr('height', height)
-      .attr('width', width)
+    svg
+      // .attr('height', height)
+      // .attr('width', width)
+      .attr("viewBox", [0, 0, width, height])
       .on("click", function reset() {
         svg.transition().duration(750).call(
           zoom.transform,
@@ -403,8 +407,8 @@ Promise.all([
   // *IMPROVEMENT* take a look on this: https://www.d3-graph-gallery.com/graph/interactivity_zoom.html
   function sliderTime(dataset) {
     const marginSlider = { top: 10, right: 40, bottom: 10, left: 0 }
-    const widthSlider = 140;
-    const heightSlider = 600;
+    const widthSlider = 100;
+    const heightSlider = 500;
     const sliderWidth = widthSlider + marginSlider.left + marginSlider.right
     const sliderHeight = heightSlider + marginSlider.top + marginSlider.bottom
     const minPublishTime = d3.min(dataset, d => d.Publish_time);
@@ -573,7 +577,7 @@ Promise.all([
         // introduce axis
         .call(d3.axisRight()
           .scale(dateScale)
-          .tickFormat(d => formatMonth(d))
+          .tickFormat(d => formatMonthLabel(d))
           .tickValues(dateScale.ticks(12).concat(dateScale.domain()))
           .tickSize(0)
           .tickPadding(45)

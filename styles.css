@@ -16,11 +16,13 @@ body {
 }
 
 .handle1 {
-  fill: white;
+  stroke: white;
+  stroke-opacity: 0.4;
 }
 
 .handle2 {
-  fill: white;
+  stroke: white;
+  stroke-opacity: 0.4;
 }
 
 /* https://css-tricks.com/snippets/css/complete-guide-grid/ */

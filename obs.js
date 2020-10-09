@@ -35,8 +35,8 @@ d3.json("CovidEuropean.json").then(function (data) {
     console.log({ test })
     console.log({ filter })
 
-    const width = 1000
-    const height = 300
+    const width = 600
+    const height = 200
     const margin = ({ top: 20, right: 30, bottom: 30, left: 40 })
     const svg = d3.select('#line-chart')
         .attr("viewBox", [0, 0, width, height])
@@ -113,26 +113,27 @@ d3.json("CovidEuropean.json").then(function (data) {
     const tooltip = svg.append("g");
 
     svg.on("touchmove mousemove", function (event) {
-        const { date, value } = bisect(d3.pointer(event, this)[0])
+        // console.log(d3.pointer(event, this)[0])
+        // const bisect = d3.bisector(d3.pointer(event, this)[0]).left
+        // const { date, value } = bisect(d3.pointer(event, this)[0])
+        const date = x.invert(d3.pointer(event, this)[0]);
+        const pippo = dayFormat(date)
+        const value = casesMap.get(pippo)
+        console.log({ pippo })
+        console.log({ value })
+        // const index = bisect(filter, d[0], 1);
+        // console.log({ index })
 
         tooltip
             .attr("transform", `translate(${x(date)},${y(value)})`)
-            // .call(callout, `Cases: ${value}\nDate: ${dayFormat(date)}`);
-            .call(callout, `${value}\n${dayFormat(date)}`);
-
+            .call(callout, `${formatValue(value)}
+      ${formatDate(date)}`);
     });
 
     svg.on("touchend mouseleave", () => tooltip.call(callout, null));
 
-    bisect = (point) => {
-        const date = x.invert(point)
-        const value = casesMap.get(dayFormat(date))
-
-        return { date, value }
-    }
-
     callout = (g, value) => {
-        if (value.split(/\n/)[0] === 'undefined') return g.style("display", "none");
+        if (!value) return g.style("display", "none");
 
         g
             .style("display", null)
@@ -162,6 +163,75 @@ d3.json("CovidEuropean.json").then(function (data) {
         text.attr("transform", `translate(${-w / 2},${15 - y})`);
         path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
     }
+
+    bisect = () => {
+        // var bisect = d3.bisector(function (d) { return d[0]; }).left;
+        // var mx = pippo()
+
+        // function pippo() {
+        //     const date = x.invert(mx);
+        //     console.log({ date })
+        //     const index = bisect(data, date, 1);
+        //     console.log({ index })
+        //     const a = data[index - 1];
+        //     const b = data[index];
+        //     return b && (date - a.date > b.date - date) ? b : a;
+        // }
+        // //     return mx => {
+        // //         const date = x.invert(mx);
+        // //         const index = bisect(data, date, 1);
+        // //         const a = data[index - 1];
+        // //         const b = data[index];
+        // //         return b && (date - a.date > b.date - date) ? b : a;
+        // //     }
+        // // }
+        // console.log(bisect)
+        const bisect = d3.bisector(d => d[0]).left;
+        console.log(bisect)
+        return mx => {
+            const date = x.invert(mx);
+            const index = bisect(filter, date, 1);
+
+            console.log({ date })
+            console.log({ index })
+
+            const a = filter[index - 1];
+            const b = filter[index];
+
+            console.log({ a })
+            console.log({ b })
+
+            return b && (date - a > b - date) ? b : a;
+        };
+    }
+
+    function formatValue(value) {
+        console.log({ value })
+        return value
+        // return value.toLocaleString("en", {
+        //     style: "currency",
+        //     currency: "USD"
+        // });
+    }
+
+    function formatDate(date) {
+        return date
+        // return date.toLocaleString("en", {
+        //     month: "short",
+        //     day: "numeric",
+        //     year: "numeric",
+        //     timeZone: "UTC"
+        // });
+    }
+
+    // svg.append("path")
+    //     .datum(deathsMap)
+    //     .attr("fill", "none")
+    //     .attr("stroke", "red")
+    //     .attr("stroke-width", 1.5)
+    //     .attr("stroke-linejoin", "round")
+    //     .attr("stroke-linecap", "round")
+    //     .attr("d", line);
 
 })
 
