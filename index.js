@@ -3,8 +3,10 @@
 
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
-  d3.json("myFirstDatasetCleaned.json"),
+  // d3.json("myFirstDatasetCleaned.json"),
+  d3.json("mySecondDataset.json"),
   d3.json("CovidEuropean.json")
+  // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json/")
 ]).then(data => {
   // data[0] is the first dataset "world"
   // data[1] is the second dataset by me
@@ -13,11 +15,15 @@ Promise.all([
   const groupByMonth = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 2).join('-'))
 
   let yearValue = '2020'
+  let yearDataset
   let colorChartBoolean = false           // Variable to set true when the brush on 'colorChart' happends
   let countriesChart = []                 // Variable to store the countries obtained by the brush action on 'colorChart'
   let colorPalette = d3.select('input[name="colorPalette"]:checked').property('value')
+  let scale = d3.select('input[name="scale"]:checked').property('value')
+
 
   console.log({ colorPalette })
+  console.log({ scale })
   console.log({ groupByYear })
   console.log({ groupByMonth })
 
@@ -35,7 +41,7 @@ Promise.all([
 
   // Container LINE-CHART ---------------------------------------------------------------------
   // Draw the left chart bar for the colors
-  chart(data[2])
+  chart(data[2], '')
 
   // Container CHART --------------------------------------------------------------------------
   // Draw the left chart bar for the colors
@@ -59,18 +65,18 @@ Promise.all([
       colorMap(data[1])
       colorChart(data[1])
       sliderTime(data[1])
-      chart(data[2])
+      chart(data[2], '')
     } else {
       yearDataset = groupByYear.get(this.value)
       colorChartBoolean = false
       colorMap(yearDataset)
       colorChart(yearDataset)
       sliderTime(yearDataset)
-      chart(data[2])
+      chart(data[2], '')
     }
   })
 
-  // - Radio button
+  // - Radio button on Palette
   d3.selectAll('input[name="colorPalette"]').on('change', function () {
     colorPalette = this.value
     yearValue = d3.select('#selectYear').property('value')
@@ -89,6 +95,23 @@ Promise.all([
     }
   });
 
+  // - Radio button on Scale
+  d3.selectAll('input[name="scale"]').on('change', function () {
+    scale = this.value
+    yearDataset = groupByYear.get(d3.select('#selectYear').property('value'))
+    colorChart(yearDataset)
+    colorMap(yearDataset)
+  });
+
+  // - Button RESET
+  d3.select('#buttonReset').on('click', function () {
+    d3.select('#selectYear').property('value', '2020')
+    chart(data[2], '')
+    colorChart(dataset2020)
+    colorMap(dataset2020)
+    sliderTime(dataset2020)
+  })
+
   // -----------------------------------------------------------------------------------------------
   // Given a dataset, it returns a color palette (Viridis/Magma) based on the radio button checked
   function palette(dataset) {
@@ -106,14 +129,16 @@ Promise.all([
   }
 
 
-  // ---------------------------------------------------
-  // Draw the chart on the left according to the dataset
+  // -----------------------------------------------------------------------------------------------
+  // Draw the chart on the left according to the dataset and the scale in the check
   function colorChart(dataset) {
     const datasetState = d3.group(dataset, d => d.Nation);
     // const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     // const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
 
     let colorscale = palette(datasetState)
+    let legendscale
+    let legendscaleaxis
     let filterDataset = []
 
     const heightLegend = 300;
@@ -145,9 +170,15 @@ Promise.all([
 
     const ctx = canvas.getContext("2d");
 
-    const legendscale = d3.scaleLinear()
-      .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
-      .domain(colorscale.domain());
+    if (scale === 'Linear') {
+      legendscale = d3.scaleLinear()
+        .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
+        .domain(colorscale.domain());
+    } else {
+      legendscale = d3.scaleLog()
+        .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
+        .domain(colorscale.domain());
+    }
 
     const image = ctx.createImageData(1, heightLegend);
 
@@ -163,9 +194,15 @@ Promise.all([
     // http://bl.ocks.org/zanarmstrong/05c1e95bf7aa16c4768e
     const formatNumber = d3.format('.0f')
 
-    const legendscaleaxis = d3.scaleLinear()
-      .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
-      .domain(colorscale.domain());
+    if (scale === 'Linear') {
+      legendscaleaxis = d3.scaleLinear()
+        .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
+        .domain(colorscale.domain());
+    } else {
+      legendscaleaxis = d3.scaleLog()
+        .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
+        .domain(colorscale.domain());
+    }
 
     const legendaxis = d3.axisRight()
       .scale(legendscaleaxis)
@@ -497,60 +534,80 @@ Promise.all([
 
 
   // -------------------------------------------------------------------------------------------------
-  // 
-  function chart(dataset) {
+  // Based on this (https://observablehq.com/@d3/line-chart-with-tooltip), draw a chart using the dataset
+  // CovidEuropean.json to see the cases and deaths
+  // IDEA: https://bl.ocks.org/d3noob/5d621a60e2d1d02086bf
+  function chart(dataset, nation) {
+    const dayFormat = d3.timeFormat("%Y-%m-%d")
+    const yearValue = d3.select('#selectYear').property('value')
     const formatMonthLabel = d3.timeFormat('%b');
     console.log('line-chart')
     console.log({ dataset })
-    const dayFormat = d3.timeFormat("%Y-%m-%d")
+
+    let casesMap
+    let deathsMap
+    let data = d3.group(dataset.records, d => d.countriesAndTerritories)
+
+    if (nation) {
+      nation = nation.split(" ").join("_")
+      console.log(nation)
+      data = data.get(nation)
+      console.log(data)
+      casesMap = d3.rollup(data, v => d3.sum(v, e => e.cases), function (k) {
+        return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+      })
+      deathsMap = d3.rollup(data, v => d3.sum(v, e => e.deaths), function (k) {
+        return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+      })
+    } else {
+      casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases), function (k) {
+        return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+      })
+      deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths), function (k) {
+        return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+      })
+    }
+
     // const x = d3.group(data.records, d => d.dateRep)
     // const casesMap = d3.rollup(data.records, v => d3.sum(v, e => e.cases), k => k.dateRep);
+    // const deathsMap = d3.rollup(data.records, v => d3.sum(v, e => e.deaths), k => k.dateRep);
+
+    // STANDARD
     // const casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases), function (k) {
     //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     // })
 
-    const casesMap = d3.rollup(dataset.records, function (v) {
-      console.log(v)
-      return { date: dayFormat(new Date(moment(v.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD"))), cases: d3.sum(v, e => e.cases) }
-    }, function (k) {
-      return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
-    })
-
-
-    // const deathsMap = d3.rollup(data.records, v => d3.sum(v, e => e.deaths), k => k.dateRep);
-    const deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths), function (k) {
-      return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
-    })
-
-    // d3.rollup(data.records, v => d3.sum(v.cases), d => d.dateRep);
-    // for (record in data.records) {
-    //     console.log(data.records[record].dateRep)
-    // }
-
-    // const groupByDate = Array.from(x)
-    // const casesMap = new Map()
-    // const deathsMap = new Map()
-
-    // groupByDate.forEach(function (d) {
-    //     casesMap.set(d[0], d3.sum(d[1], v => v.cases))
-    //     deathsMap.set(d[0], d3.sum(d[1], v => v.deaths))
+    // const deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths), function (k) {
+    //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     // })
 
-    // const test = Array.from(casesMap)
-    const test = Array.from(casesMap.values())
+
+    // const casesMap = d3.rollup(dataset.records, function (v) {
+    //   return { date: dayFormat(new Date(moment(v[0].dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD"))), cases: d3.sum(v, e => e.cases) }
+    // }, function (k) {
+    //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+    // })
+
+
+    const casesArray = Array.from(casesMap)
+    const deathsArray = Array.from(deathsMap)
+
+    // const test = Array.from(casesMap.values())
     console.log({ casesMap })
     console.log({ deathsMap })
 
-    test.sort((x, y) => d3.ascending(x[0], y[0]))
-    yearValue = d3.select('#selectYear').property('value')
-    console.log({ yearValue })
-    const filter = test.filter(d => new Date(d.date).getFullYear() == yearValue)
-    console.log({ test })
-    console.log({ filter })
+    casesArray.sort((x, y) => d3.ascending(x[0], y[0]))
+    deathsArray.sort((x, y) => d3.ascending(x[0], y[0]))
+    const casesFilteredByYear = casesArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
+    const deathsFilteredByYear = deathsArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
+
+
+    console.log({ casesArray })
+    console.log({ casesFilteredByYear })
 
     const width = 1000
     const height = 300
-    const margin = ({ top: 20, right: 40, bottom: 70, left: 150 })
+    const margin = ({ top: 20, right: 70, bottom: 70, left: 120 })
 
     d3.select('#line-chart').remove()
     d3.select('.chart').append('svg').attr('id', 'line-chart')
@@ -559,19 +616,17 @@ Promise.all([
       .attr("viewBox", [0, 0, width, height])
 
     const x = d3.scaleTime()
-      .domain([new Date(moment(d3.min(filter, d => d.date), 'YYYY-MM-DD')), new Date(moment(d3.max(filter, d => d.date), 'YYYY-MM-DD'))])
+      .domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
       .range([margin.left, width - margin.right])
 
-
     const y = d3.scaleLinear()
-      .domain([0, d3.max(Array.from(casesMap), d => d.cases)]).nice()
+      .domain([0, d3.max(Array.from(casesMap), d => d[1])]).nice()
       .range([height - margin.bottom, margin.top])
 
-
     const line = d3.line()
-      .defined(d => !isNaN(new Date(moment(d.date, 'YYYY-MM-DD').format('YYYY-MM-DD'))))
-      .defined(d => !isNaN(d.cases))
-      .x(d => x(new Date(moment(d.date, 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+      .defined(d => !isNaN(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+      .defined(d => !isNaN(d[1]))
+      .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
       .y(d => y(d[1]))
 
     const xAxis = g => g
@@ -579,11 +634,13 @@ Promise.all([
       .call(d3.axisBottom(x)
         .tickFormat(d => formatMonthLabel(d)).ticks(width / 80).tickSizeOuter(0))
       .attr("font-size", "2vh")
+      .attr("color", "white")
 
     const yAxis = g => g
       .attr("transform", `translate(${margin.left},0)`)
       .call(d3.axisLeft(y))
-      .attr("font-size", "2.5vh")
+      .attr("font-size", "2vh")
+      .attr("color", "white")
       .call(g => g.select(".domain").remove())                // Remove the y-axis line
       .call(g => g.select(".tick:last-of-type text").clone()
         .attr("x", 3)
@@ -599,37 +656,72 @@ Promise.all([
       .call(yAxis);
 
     svg.append("path")
-      .datum(filter)
+      .attr("id", "cases")
+      .datum(casesFilteredByYear)
       .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 1.5)
+      // .attr("stroke", "steelgreen")
+      .attr("stroke", "#45bd20")
+      .attr("stroke-width", 2)
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("d", line);
+
+    svg.append("path")
+      .attr("id", "deaths")
+      .datum(deathsFilteredByYear)
+      .attr("fill", "none")
+      .attr("stroke", "#fb1e05")
+      .attr("stroke-width", 2)
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("d", line);
 
     const tooltip = svg.append("g");
 
-    svg.on("touchmove mousemove", function (event) {
-      const { date, value } = bisect(d3.pointer(event, this)[0])
+    d3.select("#cases").on("touchmove mousemove", function (event) {
+      const { date, value } = bisectCases(d3.pointer(event, this)[0])
 
       tooltip
         .attr("transform", `translate(${x(date)},${y(value)})`)
-        // .call(callout, `Cases: ${value}\nDate: ${dayFormat(date)}`);
-        .call(callout, `${value}\n${dayFormat(date)}`);
+        .call(callout, `Cases: ${value}\nDate: ${dayFormat(date)}`);
+      // .call(callout, `${value}\n${dayFormat(date)}`);
+
+    });
+
+    d3.select("#deaths").on("touchmove mousemove", function (event) {
+      const { date, value } = bisectDeaths(d3.pointer(event, this)[0])
+
+      tooltip
+        .attr("transform", `translate(${x(date)},${y(value)})`)
+        .call(callout, `Deaths: ${value}\nDate: ${dayFormat(date)}`);
+      // .call(callout, `${value}\n${dayFormat(date)}`);
 
     });
 
     svg.on("touchend mouseleave", () => tooltip.call(callout, null));
 
-    bisect = (point) => {
+    bisectCases = (point) => {
       const date = x.invert(point)
       const value = casesMap.get(dayFormat(date))
+
+      // console.log(date)
+      // console.log(value)
+
+      return { date, value }
+    }
+
+    bisectDeaths = (point) => {
+      const date = x.invert(point)
+      const value = deathsMap.get(dayFormat(date))
+
+      // console.log(date)
+      // console.log(value)
 
       return { date, value }
     }
 
     callout = (g, value) => {
-      if (value.split(/\n/)[0] === 'undefined') return g.style("display", "none");
+      if (value == null) return g.style("display", "none");
 
       g
         .style("display", null)
@@ -680,13 +772,14 @@ Promise.all([
         g.attr("transform", transform)
       });
     const countries = topojson.feature(data[0], data[0].objects.countries);
-    console.log({ dataset })
     const datasetState = d3.group(dataset, d => d.Nation);
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
     const svg = d3.select('#worldMap');
+    let colorScale
 
     // let colorscale = palette(datasetState)
+    console.log({ datasetState })
 
     svg
       // .attr('height', height)
@@ -713,9 +806,15 @@ Promise.all([
     projection.scale([200])
       .translate([width / 2, height / 1.7]);
 
-    const logScale = d3.scaleLinear()
-      .domain([minDatasetState, maxDatasetState])
-      .range([0, 1]);
+    if (scale === 'Linear') {
+      colorScale = d3.scaleLinear()
+        .domain([minDatasetState, maxDatasetState])
+        .range([0, 1]);
+    } else {
+      colorScale = d3.scaleLog()
+        .domain([minDatasetState, maxDatasetState])
+        .range([0, 1]);
+    }
 
     //declaration of the tooltipCountry (extra info on over)
     const tooltipCountry = d3.select('body').append('div')
@@ -733,10 +832,10 @@ Promise.all([
       .attr('id', d => d.properties.name)
       .style('fill', function (d) {
         if (colorPalette === 'Viridis') {
-          return (datasetState.get(this.id)) ? d3.interpolateViridis(logScale(datasetState.get(this.id).length)) : '#444444'
+          return (datasetState.get(this.id)) ? d3.interpolateViridis(colorScale(datasetState.get(this.id).length)) : '#444444'
 
         } else {
-          return (datasetState.get(this.id)) ? d3.interpolateMagma(logScale(datasetState.get(this.id).length)) : '#444444'
+          return (datasetState.get(this.id)) ? d3.interpolateMagma(colorScale(datasetState.get(this.id).length)) : '#444444'
         }
         // return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
         // return (datasetState.get(this.id)) ? colorscale(logScale(datasetState.get(this.id).length)) : colorscale(logScale(0))
@@ -777,6 +876,7 @@ Promise.all([
       })
       .on('click', function (d) {
         Table(datasetState.get(this.id))
+        chart(data[2], this.id)
       })
     // .call(d3.zoom().on("zoom", function (event) {
     //   projection.translate(event.translate).scale(event.scale);

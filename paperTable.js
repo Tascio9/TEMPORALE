@@ -30,17 +30,17 @@ function Table(dataset) {
     $('#paperTable').DataTable({
         data: dataset,
         columns: [
-            { data: 'Index' },
             { data: 'Cord_UID' },
-            { data: 'Paper_ID' },
-            { data: 'Nation' },
             {
                 data: 'Title',
                 render: function (data, type, row) {
-                    return `<a href="https://www.doi.org/10.1186/1471-2334-1-6/${row.Paper_ID}" >${data}</a>`
+                    return `<a href="https://www.doi.org/${row.DOI}" target="_blank">${data}</a>`
                 }
             },
-            { data: 'Publish_time' }
+            { data: 'First_author' },
+            { data: 'Nation' },
+            { data: 'Publish_time' },
+            { data: 'Journal' }
         ],
         scrollResize: true,
         scrollY: 100,

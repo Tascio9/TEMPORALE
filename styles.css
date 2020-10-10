@@ -30,8 +30,8 @@ body {
 .container {
   display: grid;
   /* grid-template-columns: [first-column] 1vw [line1] 10vw [line2] auto [line3] 10vw [line4] 1vw [last-column]; */
-  grid-template-columns: [line1] 15% [line2] 15% [line3] auto [line4];
-  grid-template-rows: [first-row] 5vh [mid1] auto [mid2] auto [mid3] 30% [last-row];
+  grid-template-columns: [line1] 15% [line2] 15% [line3] auto [line4] auto [line5];
+  grid-template-rows: [first-row] 5vh [mid1] auto [mid2] auto [mid3] max-content [last-row];
   grid-column-gap: 0.5vw;
   padding-left: 0.2vw;
   padding-right: 0.2vw;
@@ -58,22 +58,30 @@ body {
   align-items: center;
 }
 
-.title {
-  grid-column-start: line1;
-  grid-column-end: line4;
-  grid-row-start: first-row;
-  grid-row-end: mid1;
-  justify-self: center;
-  align-self: center;
-}
-
 .yearSelect {
   grid-column-start: line2;
   grid-column-end: line3;
   grid-row-start: first-row;
   grid-row-end: mid1;
   align-self: center;
-  padding-left: 0.5vw;
+}
+
+.title {
+  grid-column-start: line1;
+  grid-column-end: line5;
+  grid-row-start: first-row;
+  grid-row-end: mid1;
+  justify-self: center;
+  align-self: center;
+}
+
+.reset {
+  grid-column-start: line4;
+  grid-column-end: line5;
+  grid-row-start: first-row;
+  grid-row-end: mid1;
+  justify-self: center;
+  align-self: center;
 }
 
 .chart-div {
@@ -92,8 +100,6 @@ body {
   grid-column-end: line3;
   grid-row-start: mid1;
   grid-row-end: mid2;
-  align-self: center;
-  padding-left: 0.5vw;
   /* justify-self: center;
   align-self: center; */
   color: white;
@@ -108,14 +114,14 @@ body {
 
 .map-div {
   grid-column-start: line3;
-  grid-column-end: line4;
+  grid-column-end: line5;
   grid-row-start: mid1;
   grid-row-end: mid3;
 }
 
 .filter-div {
   grid-column-start: line1;
-  grid-column-end: line4;
+  grid-column-end: line5;
   grid-row-start: mid3;
   grid-row-end: last-row;
   display: blocks;

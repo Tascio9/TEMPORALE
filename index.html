@@ -48,20 +48,25 @@
       </div>
     </div>
 
-    <div class="chart-div">
-      <!-- <svg id="chart"></svg> -->
-    </div>
-
-    <div class="title">
-      <h1 id="titleThesis">Lorem ipsum</h1>
-    </div>
-
     <div class="yearSelect">
       <label class="label">Year: </label>
       <select id="selectYear">
         <!-- <option value="All">All</option> -->
       </select>
     </div>
+
+
+    <div class="title">
+      <h1 id="titleThesis">Lorem ipsum</h1>
+    </div>
+
+    <div class="reset">
+      <button id="buttonReset">Reset</button>
+    </div>
+
+    <div class="chart-div"></div>
+
+    <div class="legend-div"></div>
 
     <div class="chart">
       <svg id="line-chart"></svg>
@@ -71,24 +76,16 @@
       <svg id="worldMap"></svg>
     </div>
 
-    <div class="legend-div">
-      <!-- <label>Year: </label>
-      <select id="selectYear">
-        <option value="All">All</option>
-      </select> -->
-      <!-- <svg id="slider"></svg> -->
-    </div>
-
     <div class="filter-div">
       <table id="paperTable">
         <thead>
           <tr>
-            <th>Index</th>
             <th>Cord UID</th>
-            <th>Paper ID</th>
-            <th>Nation</th>
             <th>Title</th>
+            <th>First Author</th>
+            <th>Nation</th>
             <th>Publish Time</th>
+            <th>Journal</th>
           </tr>
         </thead>
         <tbody>
