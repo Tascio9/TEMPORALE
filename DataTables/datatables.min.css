@@ -390,8 +390,7 @@ table.dataTable td {
 .dataTables_wrapper .dataTables_paginate {
     float: right;
     text-align: right;
-    padding-top: 0.25em;
-    padding-bottom: 0.25em
+    padding: 0.25em;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button {

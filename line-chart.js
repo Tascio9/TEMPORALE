@@ -82,11 +82,13 @@ d3.json("CovidEuropean.json").then(function (data) {
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0))
         .attr("font-size", 7)
+        .attr("color", "white")
 
     const yAxis = g => g
         .attr("transform", `translate(${margin.left},0)`)
         .call(d3.axisLeft(y))
         .attr("font-size", 7)
+        .attr("color", "white")
         .call(g => g.select(".domain").remove())                // Remove the y-axis line
         .call(g => g.select(".tick:last-of-type text").clone()
             .attr("x", 3)
@@ -110,6 +112,18 @@ d3.json("CovidEuropean.json").then(function (data) {
         .attr("stroke-linecap", "round")
         .attr("d", line);
 
+    const brush = d3.brushX()
+        .extent([[0, 0], [width, height]])
+
+    const scatter = svg.append('g')
+        .attr("clip-path", "url(#clip)")
+        .on("end", updateChart)
+
+    scatter
+        .append("g")
+        .attr("class", "brush")
+        .call(brush);
+
     const tooltip = svg.append("g");
 
     svg.on("touchmove mousemove", function (event) {
@@ -132,7 +146,7 @@ d3.json("CovidEuropean.json").then(function (data) {
     }
 
     callout = (g, value) => {
-        if (value.split(/\n/)[0] === 'undefined') return g.style("display", "none");
+        if (value.split(/\n/)[0] == null) return g.style("display", "none");
 
         g
             .style("display", null)
@@ -161,6 +175,29 @@ d3.json("CovidEuropean.json").then(function (data) {
 
         text.attr("transform", `translate(${-w / 2},${15 - y})`);
         path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
+    }
+
+    function updateChart() {
+
+        extent = d3.event.selection
+
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        if (!extent) {
+            if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+            x.domain([4, 8])
+        } else {
+            x.domain([x.invert(extent[0]), x.invert(extent[1])])
+            scatter.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+        }
+
+        // // Update axis and circle position
+        // xAxis.transition().duration(1000).call(d3.axisBottom(x))
+        // scatter
+        //   .selectAll("circle")
+        //   .transition().duration(1000)
+        //   .attr("cx", function (d) { return x(d.Sepal_Length); } )
+        //   .attr("cy", function (d) { return y(d.Petal_Length); } )
+
     }
 
 })
