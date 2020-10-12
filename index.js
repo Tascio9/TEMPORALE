@@ -4,7 +4,7 @@
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
-  d3.json("mySecondDatasetCleaned.json"),
+  d3.json("mySecondDataset.json"),
   d3.json("CovidEuropean.json")
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json")
 ]).then(data => {
@@ -517,6 +517,8 @@ Promise.all([
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
         .attr("d", "M -60 0 H 60 60");
       // const text1 = handle1.append('text')
+      //   .text("From")
+      // const text1 = handle1.append('text')
       //   .text(formatMonthLabel(dateScale.domain()[0]))
       //   .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
       const handle2 = svgSlider1.append("g")
@@ -524,6 +526,8 @@ Promise.all([
       handle2.append("path")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
         .attr("d", "M -60 0 H 60 60");
+      // const text2 = handle2.append('text')
+      //   .text("To")
       // const text2 = handle2.append('text')
       //   .text(formatMonthLabel(dateScale.domain()[1]))
       //   .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
@@ -629,12 +633,54 @@ Promise.all([
       .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
       .y(d => y(d[1]))
 
+    // A function that set idleTimeOut to null
+    var idleTimeout
+    function idled() { idleTimeout = null; }
+
+    const brush = d3.brushX()
+      // .extent([[0, 0], [width - margin.left - margin.right, height - margin.top - margin.bottom]])
+      // .extent([[0, 0], [width - margin.left - margin.right, 30]])
+      .extent([[margin.left, 0], [width - margin.right, 30]])
+      .on("end", function updateChart(event) {
+        extent = event.selection
+
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        if (!extent) {
+          if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+          x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))]).nice()
+        } else {
+          x.domain([x.invert(extent[0]), x.invert(extent[1])]).nice()
+          d3.select(this).call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+        }
+
+        // Update axis and line position
+        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0))
+        d3
+          .select('#cases')
+          .transition()
+          .duration(1000)
+          .attr('d', d3.line()
+            .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+            .y(d => y(d[1]))
+          )
+        d3
+          .select('#deaths')
+          .transition()
+          .duration(1000)
+          .attr('d', d3.line()
+            .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+            .y(d => y(d[1]))
+          )
+      })
+
     const xAxis = g => g
+      .attr("id", "xDate")
       .attr("transform", `translate(0,${height - margin.bottom})`)
       .call(d3.axisBottom(x)
         .tickFormat(d => formatMonthLabel(d)).ticks(width / 80).tickSizeOuter(0))
       .attr("font-size", "2vh")
       .attr("color", "white")
+      .call(brush)
 
     const yAxis = g => g
       .attr("transform", `translate(${margin.left},0)`)
@@ -675,6 +721,28 @@ Promise.all([
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("d", line);
+
+    svg.on('dblclick', function reset() {
+      x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
+      d3.select('#xDate').transition().duration(1000)
+        .call(d3.axisBottom(x).tickFormat(d => formatMonthLabel(d)).ticks(width / 80).tickSizeOuter(0))
+      d3
+        .select('#cases')
+        .transition()
+        .duration(1000)
+        .attr('d', d3.line()
+          .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+          .y(d => y(d[1]))
+        )
+      d3
+        .select('#deaths')
+        .transition()
+        .duration(1000)
+        .attr('d', d3.line()
+          .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+          .y(d => y(d[1]))
+        )
+    })
 
     const tooltip = svg.append("g");
 

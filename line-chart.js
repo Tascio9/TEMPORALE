@@ -48,6 +48,16 @@ d3.json("CovidEuropean.json").then(function (data) {
     //     .domain(d3.extent(Array.from(casesMap), d => d[0]))
     //     .range([margin.left, width - margin.right])
 
+    // Add a clipPath: everything out of this area won't be drawn.
+    var clip = svg.append("defs").append("svg:clipPath")
+        .attr("id", "clip")
+        .append("svg:rect")
+        .attr("fill", "red")
+        .attr("width", width - margin.left - margin.right)
+        .attr("height", height - margin.top - margin.bottom)
+        .attr("x", margin.left)
+        .attr("y", margin.top);
+
     const x = d3.scaleTime()
         .domain([new Date(moment(d3.min(filter, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(filter, d => d[0]), 'YYYY-MM-DD'))])
         // .domain([new Date("2020-01-01"), new Date("2020-12-31")])
@@ -78,11 +88,43 @@ d3.json("CovidEuropean.json").then(function (data) {
     // .x(Array.from(casesMap), d => x(d[0]))
     // .y(Array.from(casesMap), d => console.log(d[1]), y(d[1]))
 
+    // A function that set idleTimeOut to null
+    var idleTimeout
+    function idled() { idleTimeout = null; }
+
+    const brush = d3.brushX()
+        // .extent([[0, 0], [width - margin.left - margin.right, height - margin.top - margin.bottom]])
+        .extent([[margin.left, 0], [width - margin.right, 30]])
+        .on("end", function updateChart(event) {
+            extent = event.selection
+
+            // If no selection, back to initial coordinate. Otherwise, update X axis domain
+            if (!extent) {
+                if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
+                x.domain([new Date(moment(d3.min(filter, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(filter, d => d[0]), 'YYYY-MM-DD'))])
+            } else {
+                x.domain([x.invert(extent[0]), x.invert(extent[1])])
+                d3.select('#xDate').call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
+            }
+
+            console.log(x.domain()[0])
+            // Update axis and line position
+            d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x)
+                .ticks(width / 80).tickSizeOuter(0))
+            plan
+                .select('#chart-cases')
+                .transition()
+                .duration(1000)
+                .attr('d', line)
+        })
+
     const xAxis = g => g
+        .attr("id", "xDate")
         .attr("transform", `translate(0,${height - margin.bottom})`)
         .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0))
         .attr("font-size", 7)
         .attr("color", "white")
+        .call(brush)
 
     const yAxis = g => g
         .attr("transform", `translate(${margin.left},0)`)
@@ -103,8 +145,13 @@ d3.json("CovidEuropean.json").then(function (data) {
     svg.append("g")
         .call(yAxis);
 
-    svg.append("path")
+    var plan = svg.append('g')
+        .attr("id", "plan")
+        .attr("clip-path", "url(#clip)")
+
+    plan.append("path")
         .datum(filter)
+        .attr('id', 'chart-cases')
         .attr("fill", "none")
         .attr("stroke", "steelblue")
         .attr("stroke-width", 1.5)
@@ -112,21 +159,22 @@ d3.json("CovidEuropean.json").then(function (data) {
         .attr("stroke-linecap", "round")
         .attr("d", line);
 
-    const brush = d3.brushX()
-        .extent([[0, 0], [width, height]])
-
-    const scatter = svg.append('g')
-        .attr("clip-path", "url(#clip)")
-        .on("end", updateChart)
-
-    scatter
-        .append("g")
-        .attr("class", "brush")
-        .call(brush);
+    svg.on('dblclick', function reset() {
+        x.domain([new Date(moment(d3.min(filter, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(filter, d => d[0]), 'YYYY-MM-DD'))])
+        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0))
+        plan
+            .select('#chart-cases')
+            .transition()
+            .duration(1000)
+            .attr('d', d3.line()
+                .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+                .y(d => y(d[1]))
+            )
+    })
 
     const tooltip = svg.append("g");
 
-    svg.on("touchmove mousemove", function (event) {
+    d3.select('#chart-cases').on("touchmove mousemove", function (event) {
         const { date, value } = bisect(d3.pointer(event, this)[0])
 
         tooltip
@@ -146,10 +194,11 @@ d3.json("CovidEuropean.json").then(function (data) {
     }
 
     callout = (g, value) => {
-        if (value.split(/\n/)[0] == null) return g.style("display", "none");
+        if (value == null) return g.style("display", "none");
 
         g
             .style("display", null)
+            // .append("circle").attr("r", 3)
             .style("pointer-events", "none")
             .style("font", "10px sans-serif");
 
@@ -173,33 +222,12 @@ d3.json("CovidEuropean.json").then(function (data) {
 
         const { x, y, width: w, height: h } = text.node().getBBox();
 
-        text.attr("transform", `translate(${-w / 2},${15 - y})`);
-        path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
+        text.attr("transform", `translate(${-w / 2},${x - 25})`);
+        path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`)
+            .attr("transform", "rotate(180)");
+
+        // path.append("circle").attr("r", 10)
     }
-
-    function updateChart() {
-
-        extent = d3.event.selection
-
-        // If no selection, back to initial coordinate. Otherwise, update X axis domain
-        if (!extent) {
-            if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
-            x.domain([4, 8])
-        } else {
-            x.domain([x.invert(extent[0]), x.invert(extent[1])])
-            scatter.select(".brush").call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
-        }
-
-        // // Update axis and circle position
-        // xAxis.transition().duration(1000).call(d3.axisBottom(x))
-        // scatter
-        //   .selectAll("circle")
-        //   .transition().duration(1000)
-        //   .attr("cx", function (d) { return x(d.Sepal_Length); } )
-        //   .attr("cy", function (d) { return y(d.Petal_Length); } )
-
-    }
-
 })
 
 // Promise.all([
