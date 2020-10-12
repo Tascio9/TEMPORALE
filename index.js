@@ -281,7 +281,7 @@ Promise.all([
   // -------------------------------------------------------------------------------------------------
   // *IMPROVEMENT* take a look on this: https://www.d3-graph-gallery.com/graph/interactivity_zoom.html
   function sliderTime(dataset) {
-    const marginSlider = { top: 10, right: 40, bottom: 10, left: 0 }
+    const marginSlider = { top: 10, right: 40, bottom: 10, left: 30 }
     const widthSlider = 100;
     const heightSlider = 290;
     const sliderWidth = widthSlider + marginSlider.left + marginSlider.right
@@ -304,8 +304,6 @@ Promise.all([
       .attr("height", sliderHeight).append("g")
       // classic transform to position g
       .attr("transform", "translate(" + marginSlider.left + "," + marginSlider.top + ")");
-
-    console.log(d3.select('#selectYear').node().value)
 
     if (selectedYear === 'All') {
       // YEAR IS 'ALL'
@@ -511,26 +509,45 @@ Promise.all([
           colorMap(dataset)
         })
         .call(brush1);
+
+      svgSlider1.append("svg:defs").append("svg:marker")
+        .attr("id", "arrow")
+        .attr("refX", 6)
+        .attr("refY", 6)
+        .attr("markerWidth", 30)
+        .attr("markerHeight", 30)
+        .attr("markerUnits", "userSpaceOnUse")
+        .attr("orient", "auto")
+        .append("path")
+        .attr("d", "M 0 0 12 6 0 12 3 6")
+        .style("fill", "red");
+
       const handle1 = svgSlider1.append("g")
         .attr("class", "handle1");
       handle1.append("path")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-        .attr("d", "M -60 0 H 60 60");
-      // const text1 = handle1.append('text')
-      //   .text("From")
-      // const text1 = handle1.append('text')
-      //   .text(formatMonthLabel(dateScale.domain()[0]))
-      //   .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
+        .attr("d", "M -30 0 H -10 0")
+        .attr('marker-end', 'url(#arrow)')
+        .style("fill", "red")
+      const text1 = handle1.append('text')
+        .attr("class", "text")
+        .text("From")
+        // const text1 = handle1.append('text')
+        //   .text(formatMonthLabel(dateScale.domain()[0]))
+        .attr("transform", `translate(${-marginSlider.left},5)`);
       const handle2 = svgSlider1.append("g")
         .attr("class", "handle2");
       handle2.append("path")
         .attr("transform", "translate(" + widthSlider / 2 + ",0)")
-        .attr("d", "M -60 0 H 60 60");
-      // const text2 = handle2.append('text')
-      //   .text("To")
-      // const text2 = handle2.append('text')
-      //   .text(formatMonthLabel(dateScale.domain()[1]))
-      //   .attr("transform", "translate(" + (widthSlider + 2) + " ," + (+5) + ")");
+        .attr("d", "M -30 0 H -10 0")
+        .attr('marker-end', 'url(#arrow)')
+        .style("fill", "red")
+      const text2 = handle2.append('text')
+        .attr("class", "text")
+        .text("To")
+        // const text2 = handle2.append('text')
+        //   .text(formatMonthLabel(dateScale.domain()[1]))
+        .attr("transform", `translate(${-marginSlider.left / 2},5)`);
       handle1.attr('transform', 'translate(0,0)');
       handle2.attr('transform', 'translate(0, ' + heightSlider + ')');
     }
@@ -585,7 +602,7 @@ Promise.all([
     //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     // })
 
-
+    // OBJECT VERSION
     // const casesMap = d3.rollup(dataset.records, function (v) {
     //   return { date: dayFormat(new Date(moment(v[0].dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD"))), cases: d3.sum(v, e => e.cases) }
     // }, function (k) {
@@ -618,6 +635,16 @@ Promise.all([
 
     const svg = d3.select('#line-chart')
       .attr("viewBox", [0, 0, width, height])
+
+    // Add a clipPath: everything out of this area won't be drawn.
+    var clip = svg.append("defs").append("svg:clipPath")
+      .attr("id", "clip")
+      .append("svg:rect")
+      .attr("fill", "red")
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height - margin.top - margin.bottom)
+      .attr("x", margin.left)
+      .attr("y", margin.top);
 
     const x = d3.scaleTime()
       .domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
@@ -701,7 +728,11 @@ Promise.all([
     svg.append("g")
       .call(yAxis);
 
-    svg.append("path")
+    var plan = svg.append('g')
+      .attr("id", "plan")
+      .attr("clip-path", "url(#clip)")
+
+    plan.append("path")
       .attr("id", "cases")
       .datum(casesFilteredByYear)
       .attr("fill", "none")
@@ -712,7 +743,7 @@ Promise.all([
       .attr("stroke-linecap", "round")
       .attr("d", line);
 
-    svg.append("path")
+    plan.append("path")
       .attr("id", "deaths")
       .datum(deathsFilteredByYear)
       .attr("fill", "none")
@@ -724,9 +755,14 @@ Promise.all([
 
     svg.on('dblclick', function reset() {
       x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
-      d3.select('#xDate').transition().duration(1000)
-        .call(d3.axisBottom(x).tickFormat(d => formatMonthLabel(d)).ticks(width / 80).tickSizeOuter(0))
-      d3
+      d3.select('#xDate')
+        .transition()
+        .duration(1000)
+        .call(d3.axisBottom(x)
+          .tickFormat(d => formatMonthLabel(d))
+          .ticks(width / 80)
+          .tickSizeOuter(0))
+      plan
         .select('#cases')
         .transition()
         .duration(1000)
@@ -734,7 +770,7 @@ Promise.all([
           .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
           .y(d => y(d[1]))
         )
-      d3
+      plan
         .select('#deaths')
         .transition()
         .duration(1000)
@@ -816,8 +852,12 @@ Promise.all([
 
       const { x, y, width: w, height: h } = text.node().getBBox();
 
-      text.attr("transform", `translate(${-w / 2},${15 - y})`);
-      path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
+      // text.attr("transform", `translate(${-w / 2},${15 - y})`);
+      // path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
+
+      text.attr("transform", `translate(${-w / 2},${y - 15})`);
+      path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`)
+        .attr("transform", "rotate(180)");
     }
   }
 

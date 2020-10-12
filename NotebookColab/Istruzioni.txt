@@ -1,0 +1,15 @@
+File sciBERTSummirizer_covid -> Uso BERT per fare il summary di una frase (ci sono vari parametri per customizare le frasi).
+    Testa gli articoli e vedi cosa esce fuori.
+
+File covid_articles_extractor -> Estrae SOLO paper che trattano il COVID.
+
+File sciBERT_covid_embedder -> Fa embedding usando BERT
+
+File spectral_article_embedding -> NON USO BERT, ma uso tf-idf + SVD per trovare clusters
+
+File Clusters -> in input file spectral_article_embedding in output ottengo "immagini" con la word_cloud
+##################################################################################################################################
+
+ARTICOLO -> SUMMARY -> EMBEDDING(SPECTRAL or BERT or sciBERT or .....) -> CLUSTERING (TOPIC IDENTIFICATION)
+https://towardsdatascience.com/bert-explained-state-of-the-art-language-model-for-nlp-f8b21a9b6270
+https://arxiv.org/abs/1810.04805%C3%B

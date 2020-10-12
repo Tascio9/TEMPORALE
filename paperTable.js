@@ -37,7 +37,12 @@ function Table(dataset) {
                     return `<a href="https://www.doi.org/${row.DOI}" target="_blank">${data}</a>`
                 }
             },
-            { data: 'First_author' },
+            {
+                data: 'First_author',
+                render: function (data, type, row) {
+                    return `${data} et al .`
+                }
+            },
             { data: 'Nation' },
             { data: 'Publish_time' },
             { data: 'Journal' }
