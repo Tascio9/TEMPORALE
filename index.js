@@ -197,11 +197,13 @@ Promise.all([
     if (scale === 'Linear') {
       legendscaleaxis = d3.scaleLinear()
         .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
-        .domain(colorscale.domain());
+        .domain(colorscale.domain())
+        .nice();
     } else {
       legendscaleaxis = d3.scaleLog()
         .range([1, heightLegend - marginLegend.top - marginLegend.bottom])
-        .domain(colorscale.domain());
+        .domain(colorscale.domain())
+        .nice();
     }
 
     const legendaxis = d3.axisRight()
@@ -651,7 +653,7 @@ Promise.all([
       .range([margin.left, width - margin.right])
 
     const y = d3.scaleLinear()
-      .domain([0, d3.max(Array.from(casesMap), d => d[1])]).nice()
+      .domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
       .range([height - margin.bottom, margin.top])
 
     const line = d3.line()
@@ -675,13 +677,20 @@ Promise.all([
         if (!extent) {
           if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
           x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))]).nice()
+          // y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
         } else {
+          const test = casesFilteredByYear.filter(d => new Date(d[0]) >= x.invert(extent[0]) && new Date(d[0]) <= x.invert(extent[1]))
+          console.log(test)
+
           x.domain([x.invert(extent[0]), x.invert(extent[1])]).nice()
+          // y.domain([0, d3.max(Array.from(test), d => d[1])]).nice()
           d3.select(this).call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
         }
 
         // Update axis and line position
         d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0))
+        // d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y))
+
         d3
           .select('#cases')
           .transition()
@@ -710,6 +719,7 @@ Promise.all([
       .call(brush)
 
     const yAxis = g => g
+      .attr("id", "yNumber")
       .attr("transform", `translate(${margin.left},0)`)
       .call(d3.axisLeft(y))
       .attr("font-size", "2vh")
@@ -755,6 +765,8 @@ Promise.all([
 
     svg.on('dblclick', function reset() {
       x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
+      // y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
+
       d3.select('#xDate')
         .transition()
         .duration(1000)
@@ -762,6 +774,13 @@ Promise.all([
           .tickFormat(d => formatMonthLabel(d))
           .ticks(width / 80)
           .tickSizeOuter(0))
+
+      // d3.select('#yNumber')
+      //   .transition()
+      //   .duration(1000)
+      //   .call(yAxis)
+
+
       plan
         .select('#cases')
         .transition()
