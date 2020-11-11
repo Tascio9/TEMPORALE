@@ -1,0 +1,40 @@
+-- 2020-11-09
+Dataset costruiti (Dataset[anno/mese/giorno]_[annopaper]_[abstract|text]_[stemming|lemmatizer]): 
+    - Dataset201106_20_text_lem; --> Paper: 76689, Words: 1066496
+Elbow curve costruito solo su "Dataset201106_20_abstract_stem" con il max_features=41188 (Report\Images\Dataset201106_20_abstract_stem_max41188.png)
+Elbow curve costruito solo su "Dataset201106_20_abstract_stem" (Report\Images\Dataset201106_20_abstract_stem.png)
+
+
+-- 2020-11-08
+Dataset costruiti (Dataset[anno/mese/giorno]_[annopaper]_[abstract|text]_[stemming|lemmatizer]): 
+    - Dataset201106_20_abstract_stem; --> Paper: 76689, Words: 137292
+    - Dataset201106_20_abstract_lem; --> Paper: 76689, Words: 160539
+    - Dataset201106_20_text_stem. --> Paper: 76689, Words: 944694
+
+Elbow curve costruito solo su "Dataset201106_20_abstract_stem" con il max_features=50 (Report\Images\Dataset201106_20_abstract_stem_max50.png)
+Risultati (con KMeans K=5):
+    Cluster 0: sarscov infect virus coronavirus viral protein cell covid respiratori sever
+    Cluster 1: use model studi data result effect develop method differ provid
+    Cluster 2: cell diseas present protein activ provid respons number care develop
+    Cluster 3: patient covid clinic hospit diseas sever care studi treatment infect
+    Cluster 4: covid pandem health diseas case care studi risk use coronavirus
+Risultati (SVD dims=20, KMeans K=5):
+    Cluster 0: cell diseas test activ respons clinic protein increas develop care
+    Cluster 1: patient covid clinic hospit diseas care sever studi treatment infect
+    Cluster 2: covid pandem health diseas case studi care risk use coronavirus
+    Cluster 3: use model studi data result develop effect differ method time
+    Cluster 4: sarscov infect virus coronavirus cell protein viral covid respiratori sever
+
+Elbow curve costruito solo su "Dataset201106_20_abstract_lem" con il max_features=50 (Report\Images\Dataset201106_20_abstract_lem_max50.png)
+Risultati (con KMeans K=5):
+    Cluster 0: sarscov infect virus coronavirus viral protein cell covid respiratori sever
+    Cluster 1: cell diseas present protein activ provid respons number care develop
+    Cluster 2: covid pandem health diseas case care studi risk use coronavirus
+    Cluster 3: use model studi data result effect develop method differ provid
+    Cluster 4: patient covid clinic hospit diseas sever care studi treatment infect
+Risultati (SVD dims=20, KMeans K=5):
+    Cluster 0: use model studi data result develop effect differ method time
+    Cluster 1: covid pandem health diseas case studi care risk use coronavirus
+    Cluster 2: cell test diseas activ clinic respons develop care increas provid
+    Cluster 3: sarscov infect virus coronavirus cell protein viral covid respiratori sever
+    Cluster 4: patient covid clinic hospit diseas care sever studi treatment infect

@@ -673,23 +673,25 @@ Promise.all([
       .on("end", function updateChart(event) {
         extent = event.selection
 
-        // If no selection, back to initial coordinate. Otherwise, update X axis domain
+        // If no selection, back to initial coordinate. Otherwise, update X axis domain and Y domain
         if (!extent) {
           if (!idleTimeout) return idleTimeout = setTimeout(idled, 350); // This allows to wait a little bit
           x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))]).nice()
-          // y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
+          y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
         } else {
           const test = casesFilteredByYear.filter(d => new Date(d[0]) >= x.invert(extent[0]) && new Date(d[0]) <= x.invert(extent[1]))
           console.log(test)
 
           x.domain([x.invert(extent[0]), x.invert(extent[1])]).nice()
-          // y.domain([0, d3.max(Array.from(test), d => d[1])]).nice()
+          y.domain([0, d3.max(Array.from(test), d => d[1])]).nice()
           d3.select(this).call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
         }
 
         // Update axis and line position
-        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0))
-        // d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y))
+        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0)).attr("font-size", "2vh").attr("color", "white")
+        d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y)).attr("font-size", "2vh")
+          .attr("color", "white")
+          .on("start", () => { d3.select('#yNumber').select(".domain").remove() })
 
         d3
           .select('#cases')
@@ -699,6 +701,7 @@ Promise.all([
             .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
             .y(d => y(d[1]))
           )
+
         d3
           .select('#deaths')
           .transition()
@@ -725,18 +728,31 @@ Promise.all([
       .attr("font-size", "2vh")
       .attr("color", "white")
       .call(g => g.select(".domain").remove())                // Remove the y-axis line
-      .call(g => g.select(".tick:last-of-type text").clone()
-        .attr("x", 3)
-        .attr("text-anchor", "start")
-        .attr("font-weight", "bold")
-        .text('Number')
-      )
+
 
     svg.append("g")
       .call(xAxis);
 
+    svg.append("text")      // text label for the x axis
+      .attr("transform", `translate(${width / 2},${height - 10})`)
+      .attr("fill", "white")
+      .attr("font-weight", "bold")
+      .style("text-anchor", "middle")
+      .text("Date");
+
     svg.append("g")
       .call(yAxis);
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0)
+      .attr("x", 0 - (height / 2) + margin.top)
+      .attr("dy", "1em")
+      .attr("fill", "white")
+      .attr("font-weight", "bold")
+      .style("text-anchor", "middle")
+      .text("Number");
+
 
     var plan = svg.append('g')
       .attr("id", "plan")
@@ -765,7 +781,7 @@ Promise.all([
 
     svg.on('dblclick', function reset() {
       x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
-      // y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
+      y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
 
       d3.select('#xDate')
         .transition()
@@ -775,10 +791,11 @@ Promise.all([
           .ticks(width / 80)
           .tickSizeOuter(0))
 
-      // d3.select('#yNumber')
-      //   .transition()
-      //   .duration(1000)
-      //   .call(yAxis)
+      d3.select('#yNumber')
+        .transition()
+        .duration(1000)
+        .call(yAxis)
+        .on("start", () => { d3.select('#yNumber').select(".domain").remove() })
 
 
       plan
