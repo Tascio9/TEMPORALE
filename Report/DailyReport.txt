@@ -1,3 +1,6 @@
+-- 2020-11-13
+Elbow curve costruito solo su "Dataset201106_20_abstract_stem" (Report\Images\Dataset201106_20_abstract_lem.png)
+
 -- 2020-11-09
 Dataset costruiti (Dataset[anno/mese/giorno]_[annopaper]_[abstract|text]_[stemming|lemmatizer]): 
     - Dataset201106_20_text_lem; --> Paper: 76689, Words: 1066496
