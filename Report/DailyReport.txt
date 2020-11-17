@@ -1,5 +1,16 @@
+-- 2020-11-14/17
+Elbow curve costruito solo su "Dataset201106_20_abstract_lem" con il max_features=48162. (Report\Images\Dataset201106_20_abstract_lem_max48162.png)
+Testato file "cord_19_embeddings_2020-11-06.csv" tracciando anche qui l'Elbow Curve. Risultato ideale.
+Quindi ho provato ad usare BERT sui documenti con stemming ma senza successo: troppo tempo.
+Allora ho deciso di guardare meglio i documenti che avevo a disposizione: path doppi, dove alle volte alcuni non contenevano 'abstract' e quindi
+restituivano testi vuoti. Soluzione: analizzo tutti i path che ha a disposizione e se ha l'abstract allora lo prendo.
+Ancora, alcuni testi sono francesi, tedeschi, spagnoli.. Decido di rimuovere tutti questi documenti usando 'words' di NLTK in modo tale 
+che se non sono nel dizionario allora al 99% è un documento "non inglese".
+Quindi sono passato da 76689 documenti a circa 46000, tutto ciò per applicare BERT e ottimizzare i tempi.
+Inoltre, sono state aggiunte nuove stopwords da me.
+
 -- 2020-11-13
-Elbow curve costruito solo su "Dataset201106_20_abstract_stem" (Report\Images\Dataset201106_20_abstract_lem.png)
+Elbow curve costruito solo su "Dataset201106_20_abstract_lem" (Report\Images\Dataset201106_20_abstract_lem.png)
 
 -- 2020-11-09
 Dataset costruiti (Dataset[anno/mese/giorno]_[annopaper]_[abstract|text]_[stemming|lemmatizer]): 
