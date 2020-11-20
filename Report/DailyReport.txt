@@ -1,3 +1,62 @@
+-- 2020-11-20
+Primo tentativo di usare BERT fallito, troppa RAM.
+Nel frattempo provato algoritmo di Cristina ma....
+
+-- 2020-11-19
+New dataset Dataset201106_20_abstract_stem_201119_eng.pickle: 46962, 19494 -- Stem. 30% ≃ 5848
+Risultati (con KMeans++ K=5, max_features=5848):
+    Cluster 0: protein viral ace immun infect cell bind vaccin express human
+    Cluster 1: test detect posit sensit assay diagnost infect specif negat serolog
+    Cluster 2: sever diseas respiratori clinic infect mortal risk acut syndrom day
+    Cluster 3: health pandem care data social public time work effect medic
+    Cluster 4: model epidem number transmiss spread infect data outbreak popul rate
+Risultati (SVD dims=768, KMeans++ K=5):
+    Cluster 0: test detect posit sensit assay diagnost infect specif viral negat
+    Cluster 1: health pandem care data social public time work impact medic
+    Cluster 2: sever diseas clinic respiratori infect mortal acut risk treatment day
+    Cluster 3: model epidem number transmiss spread infect data time rate outbreak
+    Cluster 4: protein viral ace immun cell infect bind express vaccin human
+
+New dataset Dataset201106_20_abstract_lem_201119_eng.pickle: 46962, 26527 -- Lem. 30% ≃ 7958
+Risultati (con KMeans++ K=5):
+    Cluster 0: health care pandemic public social mental anxiety risk medical psychological
+    Cluster 1: model epidemic number transmission spread data rate population outbreak disease
+    Cluster 2: protein ace viral cell binding infection host human spike immune
+    Cluster 3: severe respiratory disease clinical infection mortality acute day risk syndrome
+    Cluster 4: data analysis pandemic time paper learning based detection clinical method
+Risultati (SVD dims=768, KMeans++ K=5):
+    Cluster 0: protein viral ace cell infection binding human immune host expression
+    Cluster 1: health pandemic care public social medical risk mental disease impact
+    Cluster 2: severe respiratory disease clinical infection acute day mortality risk treatment
+    Cluster 3: data analysis paper learning time method detection based approach work
+    Cluster 4: model epidemic number transmission data spread rate population outbreak time
+
+Elbow curve tracciato per stem e lem.
+
+-- 2020-11-18
+Sulla base dei risultati ottenuti il giorno precedente (raccolti la maggior parte in "Strange_papers.txt" e "No_eng_papers.txt") ho deciso di
+rimuovere alcune words che NLTK indica come inglese quando inglesi non sono, come:
+- 'wir', 'das', 'sind', 'wird' 'ist' 'nach', 'word', 'count', 'se', 'las', 'di', 'bora', 'ana', 'silva', 'ant'
+e in oltre se come risultato del parser ottengo meno di 5 parole, allora scarto il documento perché potrebbe essere il risultato di un documento
+ipoteticamente tedesco che ha come stemma alcune delle parole in inglese.
+Nuovo dataset: 46964 papers (in Discarded_papers.txt si possono vedere quali non sono stati presi). Ma ancora c'è qualche elemento all'interno
+dei paper che non viene scartato, come 'um', 'ist'.... (controllare meglio stopwords). Siamo passati da 76689 papers a 46964 dove almeno 1000
+sono stati rimossi perché corti o non avendo contenuti. Ma la cosa "strana" è che siamo passati da 137292 parole a 19497 (30% ≃ 5850).
+Traccio Elbow Curve per Dataset201106_20_201118_eng_len5 (NB: CI SONO GLI ABSTRACT) con max_features = 5850.
+(Report\Images\Dataset201106_20_abstract_201118_eng_len5_max5820.png)
+Risultati (con KMeans++ K=5):
+    Cluster 0: health pandem care data social public time work effect impact
+    Cluster 1: test detect posit sensit assay diagnost infect specif negat serolog
+    Cluster 2: sever diseas respiratori clinic infect mortal risk acut syndrom day
+    Cluster 3: model epidem number transmiss spread infect data outbreak popul rate
+    Cluster 4: protein viral ace immun infect cell bind vaccin express human
+Risultati (SVD dims=768, KMeans++ K=5):
+    Cluster 0: model epidem number transmiss spread data infect time rate outbreak
+    Cluster 1: sever diseas clinic respiratori infect mortal acut risk treatment day
+    Cluster 2: test detect posit sensit assay diagnost infect specif negat viral
+    Cluster 3: health pandem care social data public time work impact effect
+    Cluster 4: protein viral ace immun cell infect bind express vaccin human
+
 -- 2020-11-14/17
 Elbow curve costruito solo su "Dataset201106_20_abstract_lem" con il max_features=48162. (Report\Images\Dataset201106_20_abstract_lem_max48162.png)
 Testato file "cord_19_embeddings_2020-11-06.csv" tracciando anche qui l'Elbow Curve. Risultato ideale.
@@ -6,8 +65,14 @@ Allora ho deciso di guardare meglio i documenti che avevo a disposizione: path d
 restituivano testi vuoti. Soluzione: analizzo tutti i path che ha a disposizione e se ha l'abstract allora lo prendo.
 Ancora, alcuni testi sono francesi, tedeschi, spagnoli.. Decido di rimuovere tutti questi documenti usando 'words' di NLTK in modo tale 
 che se non sono nel dizionario allora al 99% è un documento "non inglese".
-Quindi sono passato da 76689 documenti a circa 46000, tutto ciò per applicare BERT e ottimizzare i tempi.
-Inoltre, sono state aggiunte nuove stopwords da me.
+Quindi sono passato da 76689 documenti a circa 48000, tutto ciò per applicare BERT e ottimizzare i tempi.
+Inoltre, sono state aggiunte nuove stopwords da me (anche usando un file).
+Risultati (SVD da 768 a dims=200, KMeans++ K=5):
+    Cluster 0: test detect posit sensit diagnost assay infect specif viral negat
+    Cluster 1: protein viral cell immun infect ace express activ bind human
+    Cluster 2: health pandem care social public impact medic effect work time
+    Cluster 3: model data number epidem paper time base learn method predict
+    Cluster 4: sever diseas clinic respiratori infect risk acut mortal treatment day
 
 -- 2020-11-13
 Elbow curve costruito solo su "Dataset201106_20_abstract_lem" (Report\Images\Dataset201106_20_abstract_lem.png)
