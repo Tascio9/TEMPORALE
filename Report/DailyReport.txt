@@ -1,6 +1,10 @@
+-- 2020-12-01
+Dopo molti giorni spesi nel buildare il dataset con BERT... NON SONO IN GRADO DI USARLO!
+Upload Elbow Curve di Embs e CA.
+
 -- 2020-11-20
 Primo tentativo di usare BERT fallito, troppa RAM.
-Nel frattempo provato algoritmo di Cristina ma....
+Nel frattempo provato algoritmo di Cristina ma.... risultati non incoraggianti
 
 -- 2020-11-19
 New dataset Dataset201106_20_abstract_stem_201119_eng.pickle: 46962, 19494 -- Stem. 30% ≃ 5848
