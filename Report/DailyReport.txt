@@ -1,3 +1,97 @@
+-- 2020-12-09
+Tracciato e salvato Elbow Curve per Dataset201206_20_abstract_stem_eng.pickle con TfIdf
+max_features uguale a 5000.
+Report/Images/201206/Dataset201206_20_abstract_stem_max500.png.
+
+-- 2020-12-08
+Dopo aver provato CA e Stem, costruisco Lem -> Dataset201206_20_abstract_lem_eng.pickle
+Lem papers: 53821. 8 in meno rispetto a Stem. Anche qui, più di 5 parole nell'abstract.
+I paper che non hanno passato il controllo li troviamo qui (Report/Discarded_papers_201206_lem.txt).
+Risultati (con KMeans++ K=5, max_features=5000):
+    Cluster 0: protein ace viral cell infection binding immune human host spike
+    Cluster 1: data pandemic analysis time learning paper clinical based review detection
+    Cluster 2: severe respiratory clinical infection mortality day acute risk syndrome treatment
+    Cluster 3: health care pandemic public social mental anxiety psychological risk medical
+    Cluster 4: model epidemic number transmission data spread rate population outbreak infected
+Risultati (SVD 20 components, KMeans++ K=5, max_features=5000):
+    Cluster 0: health pandemic care social public medical risk impact mental people
+    Cluster 1: data learning model analysis social paper based pandemic approach method
+    Cluster 2: viral protein cell infection immune human host antiviral ace binding
+    Cluster 3: clinical severe respiratory day infection mortality risk acute treatment syndrome
+    Cluster 4: model epidemic number transmission spread data social pandemic infection day
+
+Nel frattempo analizzo Stem Dataset201206_20_abstract_stem_eng.pickle e max_features a 5000, 
+applico anche qui SVD e t-SNE. 
+Con SVD a 400 componenti traccio la varianza spiegata: 
+Report/Images/201206/Cluster-SVD/Stem/Dataset201206_20_abstarct_stem_max5000_variance.png
+L'Elbow curve: Report/Images/201206/Cluster-SVD/Stem/Dataset201206_20_abstarct_stem_SVD.png
+E trovo i Cluster: Report/Images/201206/Cluster-SVD/Stem.
+Silhouette score: 0.014.
+Con t-SNE parto SVD a 400 componenti e ottengo un elbow curve 
+Report/Images/201206/Cluster-tSNE/Stem/Dataset201206_20_abstarct_stem_t-SNE.png
+E i seguenti cluster: Report/Images/201206/Cluster-tSNE/Stem.
+Silhouette Coefficient: -0.026.
+
+Continuo l'avventura con Lem analizzo Stem Dataset201206_20_abstract_lem_eng.pickle, max_features a 5000, 
+applico SVD e t-SNE.
+Con SVD a 400 componenti traccio la varianza spiegata: 
+Report/Images/201206/Cluster-SVD/Lem/Dataset201206_20_abstarct_lem_max5000_variance.png
+L'Elbow curve: Report/Images/201206/Cluster-SVD/Lem/Dataset201206_20_abstarct_lem_SVD.png
+E trovo i Cluster: Report/Images/201206/Cluster-SVD/Lem.
+Silhouette score: 0.012
+t-SNE a 400 componenti.
+Elbow curve: Report/Images/201206/Cluster-tSNE/Lem/Dataset201206_20_abstarct_lem_t-SNE.png
+Cluster: Report/Images/201206/Cluster-tSNE/Lem e grafico Report/Images/201206/Cluster-tSNE/Lem/t-SNE.png
+Silhouette score: -0.032
+
+
+IMPORTANTE: in questi giorni ho notato che quando traccio l'elbow curve, diminuendo il numero di
+componenti è meno visibile il fenomeno di "spike" ed esce una curva più "regolare", anche se
+un vero e proprio elbow non si vede.
+Ad oggi, direi che ci sono 5 macro cluster.
+
+-- 2020-12-07
+Nuovo incontro, nuove missioni:
+- t-SNE, Cluster (metodo grafico)
+- Silhouette score (metodo analitico)
+- IDEA: Uso Covid, Coronavirus ecc... per prendere paper che trattano di questo.
+    + lunghezza paper = 10, max_features = 50
+--- DA IMPLEMENTARE GRAFICAMENTE I CLUSTER NEL SITO.
+
+Dataset nuovo: 2020-12-06 con 374892 papers (35660 in più rispetto a 2020-11-06).
+Estrazione con STEM: 53839 papers del 2020, non vuoti, con almeno 5 parole all'interno 
+(pochine? Passerò a 10 se serve). Nel dataset precedente ne avevo 46962.
+I paper che non hanno passato il controllo li troviamo qui (Report/Discarded_papers_201206_stem.txt).
+Numero di parole all'interno: 20229. Proviamo con "max_features=50".
+Dataset201206_20_abstract_stem_eng.pickle
+Elbow curve: Report/Images/201206/Dataset201206_20_abstarct_stem_eng_max50.png
+Risultati (con KMeans++ K=5, max_features=50):
+    Cluster 0: model data number base time effect infect spread analysi diseas
+    Cluster 1: viral protein activ infect immun human potenti respons effect develop
+    Cluster 2: data test clinic time analysi posit risk day effect base
+    Cluster 3: health pandem care social public impact global diseas effect time
+    Cluster 4: sever respiratori diseas acut infect clinic risk treatment pandem patient
+
+
+Nel frattempo studio l'algoritmo di Cristina. Mi tira fuori 55120 papers MA NON ELIMINA I PAPER
+NON INGLESI('jk25uv4m' spagnolo, 'xutv2x8p' francese, '5m6sqwq8' empty, 'u5ol3nmm' spanish, ...).
+Inoltre, non elimina paper con una sola parola o più che possono non avere senso ('wuqekxxc', 'h3lvbldz', ...)
+In più vengono considerati anche i numeri, cosa che io non faccio, quindi nel momento in cui vengono
+generate le parole io non ne tengo conto di queste, quindi il motivo per cui ho meno parole e meno
+documenti è perché il numero di parole sarà superiore a 5 ed inoltre non fa stemming.
+Ho notato un'altra feature di Cristina: prende solo parole che hanno almeno 4 caratteri.
+Può avere senso? Numero di parole intanto: 146383.
+Attuo TDIDF con "max_features=5000". Procedo con SVD vs t-SNE.
+Il primo produce il seguente grafico Report/Images/Dataset201206_20_abstarct_stem_eng_max50.png
+Applico SVD con n_components=400 (inizialmente era 10, ma su consiglio di Andrea cambio in 400, il
+risultato è nella 400) 
+e cerco 7 cluster ed ottengo: Report/Images/201206/Cluster-SVD/CA.
+Silhouette score: DA CALCOLARE, mi sono dimenticato
+Il secondo con SVD a 400 components, t-SNE computato in 1 ora e 12min circa con 55120 documenti.
+Trovo i seguenti cluster: Report/Images/201206/Cluster-tSNE/CA.
+Silhouette score: -0.02/-0.03
+----------------------------------------------------------------------------------------
+
 -- 2020-12-01
 Dopo molti giorni spesi nel buildare il dataset con BERT... NON SONO IN GRADO DI USARLO!
 Upload Elbow Curve di Embs e CA.
