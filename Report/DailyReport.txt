@@ -1,3 +1,50 @@
+-- 2020-12-13
+Sfida di oggi: togliere i duplicati e aumentare la len a 10 e vedere cosa succede.
+APPLICO LEMMATIZER.
+Prendo 52547 papers con len 10, e ne tolgo 208 perché duplicati. Totale: 52339.
+Dataset201206_abstract_lem_eng_10.pickle => 52339 x 27482 words.
+Prima di fare TfIdf per 5000, decido di graficare Elbow Curve con TfIdf a 100 (per fare prima).
+Risultati (con KMeans++ K=5, max_features=5000):
+    Cluster 0: data analysis pandemic time learning paper based detection clinical method
+    Cluster 1: model epidemic number transmission data spread rate population outbreak infected
+    Cluster 2: protein ace viral cell infection binding immune human host spike
+    Cluster 3: health pandemic care public social mental anxiety psychological medical risk
+    Cluster 4: severe respiratory clinical mortality infection day risk acute syndrome treatment
+Risultati (SVD 20 components, KMeans++ K=5, max_features=5000):
+    Cluster 0: health pandemic care social public medical impact mental risk people
+    Cluster 1: clinical severe respiratory day risk infection acute mortality treatment patient
+    Cluster 2: model number epidemic transmission data spread rate outbreak pandemic infection
+    Cluster 3: data model learning analysis paper based social approach method time
+    Cluster 4: viral protein cell infection immune human host ace antiviral vaccine
+
+-- 2020-12-12
+Dato il dataset di Cristina, lo inserisco nel mio notebook. 55120 x 146383 parole.
+TfIdf a 5000 e computo i cluster in un'ora... Sempre troppo.
+Risultati (con KMeans++ K=5, max_features=5000):
+    Cluster 0: data based covid research study using results used model paper
+    Cluster 1: patients covid disease clinical severe risk mortality sars respiratory infection
+    Cluster 2: sars viral virus coronavirus infection ace2 protein covid respiratory cells
+    Cluster 3: health covid pandemic care social healthcare public risk patients medical
+    Cluster 4: cases model covid epidemic number countries transmission data spread population
+Risultati (SVD 20 components, KMeans++ K=5, max_features=5000):
+    Cluster 0: model data learning based research using models used analysis students
+    Cluster 1: patients covid clinical disease severe risk respiratory treatment mortality care
+    Cluster 2: sars viral virus cells protein cell infection covid human coronavirus
+    Cluster 3: cases covid model number epidemic data transmission countries spread measures
+    Cluster 4: health covid pandemic care social public healthcare mental research risk
+Disegno anche SVD a 5 clusters su SVD a 20 components.
+
+Prendo Stem_eng. 53839 x 20229 parole.
+Prendo Lem_eng. 53821 x 27517 parole.
+
+NUOVA SCOPERTA: Nel associare chiave-classificazione, ho scoperto che ci sono dei documenti che hanno
+STESSO CONTENUTO --> Decido di eliminarli e di fare nei nuovi dataset. Non sono molti, circa 300, ma voglio
+togliere altro noise.
+
+-- 2020-12-10
+Impossibile tracciare elbow curve per Dataset201206_20_abstract_CA.pickle.
+Troppo grande.
+
 -- 2020-12-09
 Tracciato e salvato Elbow Curve per Dataset201206_20_abstract_stem_eng.pickle con TfIdf
 max_features uguale a 5000.
@@ -86,7 +133,7 @@ Il primo produce il seguente grafico Report/Images/Dataset201206_20_abstarct_ste
 Applico SVD con n_components=400 (inizialmente era 10, ma su consiglio di Andrea cambio in 400, il
 risultato è nella 400) 
 e cerco 7 cluster ed ottengo: Report/Images/201206/Cluster-SVD/CA.
-Silhouette score: DA CALCOLARE, mi sono dimenticato
+Silhouette score: 0.016
 Il secondo con SVD a 400 components, t-SNE computato in 1 ora e 12min circa con 55120 documenti.
 Trovo i seguenti cluster: Report/Images/201206/Cluster-tSNE/CA.
 Silhouette score: -0.02/-0.03
