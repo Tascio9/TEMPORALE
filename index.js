@@ -4,7 +4,7 @@
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
-  d3.json("mySecondDataset.json"),
+  d3.json("Dataset201214Classification.json"),
   d3.json("CovidEuropean.json")
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json")
 ]).then(data => {

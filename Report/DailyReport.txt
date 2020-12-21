@@ -1,3 +1,43 @@
+-- 2020-12-15
+Visto che ci sono dei paper che non hanno tutte le info in "metadata.csv", decido di rimuoverli dal dataset
+e provare a fare un clustering usando solo quelli "perfetti", ovvero che hanno tutte le caratteristiche
+che vogliamo (Cord_UID, Journal, Publish_Date, ...) partendo da Dataset201206_20_abstract_lem_eng_10.pickle.
+vectorizer = TfidfVectorizer(stop_words='english', use_idf=True, 
+                             smooth_idf=True, ngram_range=(1,2), min_df=100)
+Uso anche bi-grams.
+Traccio Elbow Curve: Report\Images\201206\Dataset201206_abstract_lem_eng_10_perfect.png
+X = (28198, 2921)
+Risultati (con KMeans++ K=5):
+    Cluster 0: "viral" "protein" "cell" "immune" "infection" "antiviral" "vaccine" "human" "host" "drug"
+    Cluster 1: "ace" "receptor" "spike" "protein" "binding" "expression" "entry" "enzyme" "spike protein" "enzyme ace"
+    Cluster 2: "severe" "respiratory" "clinical" "infection" "day" "acute" "mortality" "risk" "syndrome" "pneumonia"
+    Cluster 3: "model" "data" "paper" "analysis" "learning" "time" "based" "number" "method" "approach"
+    Cluster 4: "health" "pandemic" "care" "social" "public" "mental" "risk" "medical" "anxiety" "psychological"
+Silhouette Coefficient: 0.006316188024764012
+Elbow curve dopo SVD: Report\Images\201206\Dataset201206_abstract_lem_eng_10_perfect.png
+Risultati (SVD 20 components, KMeans++ K=5):
+    Cluster 0: "pandemic" "health" "social" "care" "public" "people" "impact" "risk" "time" "medical"
+    Cluster 1: "clinical" "day" "risk" "mortality" "infection" "positive" "patient" "treatment" "data" "age"
+    Cluster 2: "viral" "protein" "cell" "infection" "immune" "human" "host" "antiviral" "binding" "ace"
+    Cluster 3: "model" "data" "learning" "paper" "method" "analysis" "based" "approach" "time" "performance"
+    Cluster 4: "respiratory" "severe" "acute" "syndrome" "acute respiratory" "respiratory syndrome" "severe acute" "infection" "clinical" "pandemic"
+Silhouette Coefficient: 0.124
+
+-- 2020-12-14
+Esporto Dataset classificato usando questi parametri:
+vectorizer = TfidfVectorizer(stop_words='english', use_idf=True, 
+                             smooth_idf=True, ngram_range=(1,2), min_df=100) ## Corpus is in English
+SVD a 20 e...
+Cluster 0: "model" "epidemic" "number" "transmission" "data" "spread" "infection" "rate" "outbreak" "time"
+Cluster 1: "viral" "protein" "cell" "infection" "immune" "human" "host" "antiviral" "ace" "binding"
+Cluster 2: "clinical" "severe" "respiratory" "day" "risk" "infection" "mortality" "acute" "treatment" "patient"
+Cluster 3: "health" "pandemic" "care" "social" "public" "medical" "risk" "impact" "people" "mental"
+Cluster 4: "data" "model" "learning" "analysis" "paper" "method" "based" "approach" "social" "time"
+Salvo Dataset201214Classification.json dove al suo interno c'è il coding (cord_uid, classificarion).
+NOTA BENE: Classification è più piccolo di 20k rispetto al padre!
+Dataset201206_20_abstract_lem_eng_10.pickle = 52339
+Dataset201214Classification.json            = 28200
+
 -- 2020-12-13
 Sfida di oggi: togliere i duplicati e aumentare la len a 10 e vedere cosa succede.
 APPLICO LEMMATIZER.
