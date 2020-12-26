@@ -48,6 +48,11 @@ Promise.all([
   // colorChart(data[1])
   colorChart(dataset2020)
 
+  // Container BAR CHART --------------------------------------------------------------------------
+  // Draw the barchart
+  // colorChart(data[1])
+  barchart(dataset2020)
+
   // Container MAP ----------------------------------------------------------------------------
   // Draw the map with the respective colors
   // colorMap(data[1])
@@ -557,7 +562,8 @@ Promise.all([
 
 
   // -------------------------------------------------------------------------------------------------
-  // Based on this (https://observablehq.com/@d3/line-chart-with-tooltip), draw a chart using the dataset
+  // Based on this (https://observablehq.com/@d3/line-chart-with-tooltip), draw a chart using the dataset.
+  // If a "nation" is passed, it draws the chart according to the nation passed.
   // CovidEuropean.json to see the cases and deaths
   // IDEA: https://bl.ocks.org/d3noob/5d621a60e2d1d02086bf
   function chart(dataset, nation) {
@@ -897,6 +903,36 @@ Promise.all([
     }
   }
 
+  // -----------------------------------------------------------------------------------------------
+  // Given a dataset, draw the barchart
+  function barchart(dataset) {
+    // https://github.com/d3/d3-array/blob/master/README.md#rollup
+    // const datasetClass = d3.group(dataset, d => d.Nation, d => d.Classification);
+    const datasetClass = d3.group(dataset, d => d.Classification, d => d.Nation)
+    console.log({ datasetClass })
+
+    var svg = d3.select("#bar-chart"),
+      margin = { top: 20, right: 20, bottom: 30, left: 40 },
+      width = +svg.attr("width") - margin.left - margin.right,
+      height = +svg.attr("height") - margin.top - margin.bottom,
+      g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // The scale spacing the groups:
+    var x0 = d3.scaleBand()
+      .rangeRound([0, width])
+      .paddingInner(0.1);
+
+    // The scale for spacing each group's bar:
+    var x1 = d3.scaleBand()
+      .padding(0.05);
+
+    var y = d3.scaleLinear()
+      .rangeRound([height, 0]);
+
+    var z = d3.scaleOrdinal()
+      // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+  }
 
   // --------------------------------------------------------------------------------
   // Draw the map according to the dataset passed, which inside there are the papers.
@@ -920,6 +956,7 @@ Promise.all([
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
     const svg = d3.select('#worldMap');
+
     let colorScale
 
     // let colorscale = palette(datasetState)
@@ -1074,7 +1111,5 @@ Promise.all([
       d3.select("#worldMap").select(`path[id='${d}']`).transition().duration(100).style("opacity", "1")
     })
   }
-
-
 
 });
