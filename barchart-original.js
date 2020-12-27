@@ -1,13 +1,7 @@
-Promise.all([
-    d3.json("Dataset201214Classification.json"),
-    d3.json("CovidEuropean.json")
-]).then(data => {
-    const datasetClass = d3.group(data[0], d => d.Nation, d => d.Classification)
-    console.log({ datasetClass })
-
-    const listNation = []
-    // const listNation = ['Italy', 'Germany']
-
+d3.csv("data.csv", function (d, i, columns) {
+    for (var i = 1, n = columns.length; i < n; ++i) d[columns[i]] = +d[columns[i]];
+    return d;
+}).then(data => {
     var svg = d3.select("#barchart"),
         margin = { top: 20, right: 20, bottom: 30, left: 40 },
         width = +svg.attr("width") - margin.left - margin.right,
@@ -15,64 +9,55 @@ Promise.all([
         g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // The scale spacing the groups:
-    var y0 = d3.scaleBand()
+    var x0 = d3.scaleBand()
         .rangeRound([0, width])
         .paddingInner(0.1);
 
     // The scale for spacing each group's bar:
-    var y1 = d3.scaleBand()
+    var x1 = d3.scaleBand()
         .padding(0.05);
 
-    var x = d3.scaleLinear()
+    var y = d3.scaleLinear()
         .rangeRound([height, 0]);
 
     var z = d3.scaleOrdinal()
-        // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-    // var keys = data.columns.slice(1);
-    // const keys = Array.from(data[0], (v, k) => v.Classification).map(v => v.Classification).keys()
-    // const keys = d3.map(data, function(d) {return d.value;}).keys()
-    const keys = [...new Set(Array.from(data[0], v => v.Classification))]
+    // d3.csv("data.csv", function (d, i, columns) {
+    //     for (var i = 1, n = columns.length; i < n; ++i) d[columns[i]] = +d[columns[i]];
+    //     return d;
+    // }, function (error, data) {
+    //     if (error) throw error;
 
-    console.log(keys)
+    var keys = data.columns.slice(1);
 
-
-
-    console.log(datasetClass.get('Italy'))
-    console.log(datasetClass.get('Germany'))
-
-    // x0 --> y0
-    // x1 --> y1
-    // y  --> x
-
-    y0.domain(datasetClass.values());
-    y1.domain(keys).rangeRound([0, y0.bandwidth()]);
-    x.domain([0, d3.max(data[0], function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
+    x0.domain(data.map(function (d) { return d.State; }));
+    x1.domain(keys).rangeRound([0, x0.bandwidth()]);
+    y.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
 
     g.append("g")
         .selectAll("g")
-        .data(datasetClass)
+        .data(data)
         .enter().append("g")
         .attr("class", "bar")
-        .attr("transform", function (d) { return "translate(" + y0(d.Classification) + ",0)"; })
+        .attr("transform", function (d) { return "translate(" + x0(d.State) + ",0)"; })
         .selectAll("rect")
         .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
         .enter().append("rect")
-        .attr("x", function (d) { return x(d.value); })
-        .attr("y", function (d) { return y1(d.key); })
-        .attr("width", y1.bandwidth())
+        .attr("x", function (d) { return x1(d.key); })
+        .attr("y", function (d) { return y(d.value); })
+        .attr("width", x1.bandwidth())
         .attr("height", function (d) { return height - y(d.value); })
         .attr("fill", function (d) { return z(d.key); });
 
     g.append("g")
         .attr("class", "axis")
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(y0));
+        .call(d3.axisBottom(x0));
 
     g.append("g")
         .attr("class", "y axis")
-        .call(d3.axisLeft(x).ticks(null, "s"))
+        .call(d3.axisLeft(y).ticks(null, "s"))
         .append("text")
         .attr("x", 2)
         .attr("y", y(y.ticks().pop()) + 0.5)
@@ -98,7 +83,7 @@ Promise.all([
         .attr("fill", z)
         .attr("stroke", z)
         .attr("stroke-width", 2)
-        .on("click", function (d) { update(d) });
+        .on("click", d => update(d));
 
     legend.append("text")
         .attr("x", width - 24)
@@ -114,19 +99,21 @@ Promise.all([
 
     function update(d) {
 
+        var label = d.originalTarget.__data__
+
         //
         // Update the array to filter the chart by:
         //
 
         // add the clicked key if not included:
-        if (filtered.indexOf(d) == -1) {
-            filtered.push(d);
+        if (filtered.indexOf(label) == -1) {
+            filtered.push(label);
             // if all bars are un-checked, reset:
             if (filtered.length == keys.length) filtered = [];
         }
         // otherwise remove it:
         else {
-            filtered.splice(filtered.indexOf(d), 1);
+            filtered.splice(filtered.indexOf(label), 1);
         }
 
         //
