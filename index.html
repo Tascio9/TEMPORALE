@@ -21,11 +21,14 @@
     <script type="text/javascript" src="DataTables/datatables.min.js"></script>
     <script type="text/javascript"
       src="https://cdn.datatables.net/plug-ins/1.10.21/features/scrollResize/dataTables.scrollResize.min.js"></script>
+    <script type="text/javascript"
+      src="https:cdn.datatables.net/plug-ins/1.10.22/features/pageResize/dataTables.pageResize.min.js"></script>
+    <!-- https://github.com/Silvacom/colResize -->
+    <script type="text/javascript" src="js/dataTables.colResize.js"></script>
     <!-- My scripts -->
     <script defer src="index.js"></script>
     <script src="paperTable.js"></script>
     <script src="moment.js"></script>
-    <!-- <script src="barchart-original.js"></script> -->
   </head>
 
 <body>
@@ -59,7 +62,7 @@
 
 
     <div class="title">
-      <h1 id="titleThesis">Lorem ipsum</h1>
+      <h1 id="titleThesis">CORD - 19 Research Viz</h1>
     </div>
 
     <div class="reset">
@@ -70,7 +73,7 @@
     <div class="legend-div"></div>
 
     <div class="barchart-div">
-      <svg id="barchart" width="480" height="250"></svg>
+      <svg id="barchart" width="550" height="200"></svg>
     </div>
 
 
@@ -83,7 +86,7 @@
     </div>
 
     <div class="filter-div">
-      <table id="paperTable">
+      <table id="paperTable" class="display pageResize">
         <thead>
           <tr>
             <th>Cord UID</th>
@@ -96,9 +99,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-
-          </tr>
+          <tr></tr>
         </tbody>
       </table>
     </div>

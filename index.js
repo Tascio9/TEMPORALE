@@ -4,12 +4,8 @@
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
-  d3.json("Dataset201214Classification.json"),
-  d3.json("CovidEuropean.json"),
-  d3.csv("data.csv", function (d, i, columns) {
-    for (var i = 1, n = columns.length; i < n; ++i) d[columns[i]] = +d[columns[i]];
-    return d
-  })
+  d3.json("Dataset201214ClassificationCleaned.json"),
+  d3.json("CovidEuropean.json")
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json")
 ]).then(data => {
   // data[0] is the first dataset "world"
@@ -150,7 +146,7 @@ Promise.all([
     let legendscaleaxis
     let filterDataset = []
 
-    const heightLegend = 300;
+    const heightLegend = 200; // Original = 300
     const widthLegend = 100;
     const marginLegend = { top: 20, right: 80, bottom: 10, left: 2 };
 
@@ -294,7 +290,7 @@ Promise.all([
   function sliderTime(dataset) {
     const marginSlider = { top: 10, right: 40, bottom: 10, left: 30 }
     const widthSlider = 100;
-    const heightSlider = 290;
+    const heightSlider = 190;  // Original = 290
     const sliderWidth = widthSlider + marginSlider.left + marginSlider.right
     const sliderHeight = heightSlider + marginSlider.top + marginSlider.bottom
     const minPublishTime = d3.min(dataset, d => d.Publish_time);
@@ -909,7 +905,8 @@ Promise.all([
 
   // -----------------------------------------------------------------------------------------------
   // Given a dataset, draw the barchart
-  function barchart(dataset) {
+  function barchart(dataset, nation) {
+    const listNation = []
     // // https://github.com/d3/d3-array/blob/master/README.md#rollup
     // // const datasetClass = d3.group(dataset, d => d.Nation, d => d.Classification);
     // const datasetClass = d3.group(dataset, d => d.Classification, d => d.Nation)
@@ -936,7 +933,26 @@ Promise.all([
     // var z = d3.scaleOrdinal()
     //   // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
     //   .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
-    ////////////-------- TO MODIFY! -------------------------------------------------
+
+    const datasetClass = d3.group(dataset, d => d.Nation, d => d.Classification)
+    console.log({ datasetClass })
+
+    if (nation) {
+      listNation.push(nation)
+    } else {
+      const sortDataset = Array.from(d3.group(dataset, d => d.Nation)).sort((x, y) => d3.descending(x[1], y[1]))
+      console.log(sortDataset.slice(0, 5))
+      for (let elem of sortDataset.slice(0, 5)) {
+        listNation.push(elem[0])
+      }
+      // datasetClass.sort((x, y) => d3.ascending(x[0], y[0]))
+    }
+
+    // const listNation = []
+    // const listNation = ['Italy', 'United States of America']
+    // console.log(datasetClass.get('Italy'))
+    // console.log(datasetClass.get('United States of America'))
+
     var svg = d3.select("#barchart"),
       margin = { top: 20, right: 20, bottom: 30, left: 40 },
       width = +svg.attr("width") - margin.left - margin.right,
@@ -958,26 +974,21 @@ Promise.all([
     var z = d3.scaleOrdinal()
       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-    // d3.csv("data.csv", function (d, i, columns) {
-    //     for (var i = 1, n = columns.length; i < n; ++i) d[columns[i]] = +d[columns[i]];
-    //     return d;
-    // }, function (error, data) {
-    //     if (error) throw error;
+    const keys = [...new Set(Array.from(dataset, v => v.Classification))]
+    console.log({ keys })
 
-    var keys = data[3].columns.slice(1);
-
-    x0.domain(data[3].map(function (d) { return d.State; }));
+    x0.domain(listNation);
     x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-    y.domain([0, d3.max(data[3], function (d) { return d3.max(keys, function (key) { return d[key]; }); })]).nice();
+    y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { return datasetClass.get(d).get(key).length; }); })]).nice();
 
     g.append("g")
       .selectAll("g")
-      .data(data[3])
+      .data(listNation)
       .enter().append("g")
       .attr("class", "bar")
-      .attr("transform", function (d) { return "translate(" + x0(d.State) + ",0)"; })
+      .attr("transform", function (d) { return "translate(" + x0(d) + ",0)"; })
       .selectAll("rect")
-      .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
+      .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
       .enter().append("rect")
       .attr("x", function (d) { return x1(d.key); })
       .attr("y", function (d) { return y(d.value); })
@@ -997,10 +1008,10 @@ Promise.all([
       .attr("x", 2)
       .attr("y", y(y.ticks().pop()) + 0.5)
       .attr("dy", "0.32em")
-      .attr("fill", "#000")
+      .attr("fill", "#FFF")
       .attr("font-weight", "bold")
       .attr("text-anchor", "start")
-      .text("Population");
+      .text("N° Papers");
 
     var legend = g.append("g")
       .attr("font-family", "sans-serif")
@@ -1021,6 +1032,7 @@ Promise.all([
       .on("click", d => update(d));
 
     legend.append("text")
+      .attr("fill", "#FFF")
       .attr("x", width - 24)
       .attr("y", 9.5)
       .attr("dy", "0.32em")
@@ -1061,7 +1073,9 @@ Promise.all([
         }
       })
       x1.domain(newKeys).rangeRound([0, x0.bandwidth()]);
-      y.domain([0, d3.max(data[3], function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return d[key]; }); })]).nice();
+      // y.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return d[key]; }); })]).nice();
+      y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return datasetClass.get(d).get(key).length; }); })]).nice();
+
 
       // update the y axis:
       svg.select(".y")
@@ -1074,7 +1088,9 @@ Promise.all([
       // Filter out the bands that need to be hidden:
       //
       var bars = svg.selectAll(".bar").selectAll("rect")
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
+        // .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
+        .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
+
 
       bars.filter(function (d) {
         return filtered.indexOf(d.key) > -1;
@@ -1129,7 +1145,7 @@ Promise.all([
   function colorMap(dataset) {
     const widthWindow = window.innerWidth
     const heightWindow = window.innerHeight
-    const height = heightWindow - 388;
+    const height = heightWindow - 288;
     const width = widthWindow - 500;
     // const projection = d3.geoNaturalEarth1();
     const projection = d3.geoPatterson().scale(1070)

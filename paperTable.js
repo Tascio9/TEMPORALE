@@ -28,6 +28,7 @@ function Table(dataset) {
         $('#paperTable').DataTable().clear().destroy();
     }
     $('#paperTable').DataTable({
+        dom: 'Zlfrtip',
         data: dataset,
         columns: [
             { data: 'Cord_UID' },
@@ -48,14 +49,27 @@ function Table(dataset) {
             { data: 'Journal' },
             { data: 'Classification' }
         ],
+        // colResize: true,
+        pageResize: true,
         scrollResize: true,
-        scrollY: 100,
+        scrollY: '15vh',
         scrollCollapse: true,
         paging: true
     });
 
+    // $('#paperTable').colResizable()
+    // $('#paperTable').ColReorder()
+
+
+    // https://www.brainbell.com/javascript/making-resizable-table-js.html
     // var table = document.getElementById('paperTable');
+    // var table = document.getElementsByTagName('table');
+
     // resizableGrid(table);
+
+    // for (var i = 0; i < table.length; i++) {
+    //     resizableGrid(table[i]);
+    // }
 }
 
 // function resizableGrid(table) {
