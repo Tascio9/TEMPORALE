@@ -115,6 +115,8 @@ Promise.all([
     colorChart(dataset2020)
     colorMap(dataset2020)
     sliderTime(dataset2020)
+    Table(dataset2020)
+    barchart(dataset2020)
   })
 
   // -----------------------------------------------------------------------------------------------
@@ -137,6 +139,7 @@ Promise.all([
   // -----------------------------------------------------------------------------------------------
   // Draw the chart on the left according to the dataset and the scale in the check
   function colorChart(dataset) {
+    console.log(`ColorChart dataset: ${dataset}`)
     const datasetState = d3.group(dataset, d => d.Nation);
     // const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     // const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
@@ -234,7 +237,7 @@ Promise.all([
 
     const brushLegend = d3.brushY()
       .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - marginLegend.bottom]])
-      .on("brush", function filterView(event) {
+      .on("end", function filterView(event) {
         // const selection1 = d3.brushSelection(d3.select(".brush1").node());
         // if (!event.sourceEvent || !selection1) return;
         // const [x0, x1] = selection1.map(d => d3.timeMonth.every(1).round(dateScale.invert(d)));
@@ -250,19 +253,25 @@ Promise.all([
         colorChartBoolean = true
         countriesChart = []
         filterDataset = []
+        test = ["Italy", "Germany"]
+
 
         Array.from(datasetState).filter(function (d) {
           if (selectionLegendBegin <= d[1].length && d[1].length <= selectionLegendEnd) {
             d3.select("#worldMap").select(`path[id='${d[0]}']`).transition().duration(100).style("opacity", "1")
             countriesChart.push(d[0])
+            console.log(d[1])
             d[1].forEach(function (e) {
               filterDataset.push(e)
             })
           }
         })
-        console.log({ countriesChart })
+        console.log({ filterDataset })
         Table(filterDataset)
       })
+    // .on("end", function updateView(event){
+
+    // })
 
     svgLegend.append("g")
       .attr("class", "brushLegend")
@@ -381,12 +390,13 @@ Promise.all([
           if (newData.length != 0) {
             colorChart(newData)
             colorMap(newData)
+            Table(newData)
           } else {
             alert('No papers available in this period')
           }
 
-          colorChart(newData)
-          colorMap(newData)
+          // colorChart(newData)
+          // colorMap(newData)
         });
 
       svgSlider1.append("g")
@@ -402,6 +412,7 @@ Promise.all([
 
           colorChart(dataset)
           colorMap(dataset)
+          Table(dataset)
         })
         .call(brush1);
       const handle1 = svgSlider1.append("g")
@@ -694,10 +705,13 @@ Promise.all([
         }
 
         // Update axis and line position
-        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0)).attr("font-size", "2vh").attr("color", "white")
-        d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y)).attr("font-size", "2vh")
+        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0)).attr("font-size", "1vh").attr("color", "white")
+        d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y)).attr("font-size", "1vh")
           .attr("color", "white")
-          .on("start", () => { d3.select('#yNumber').select(".domain").remove() })
+          .on("start", () => {
+            d3.select('#yNumber')
+            // .select(".domain").remove()                  // Remove the y-axis line
+          })
 
         d3
           .select('#cases')
@@ -723,7 +737,7 @@ Promise.all([
       .attr("transform", `translate(0,${height - margin.bottom})`)
       .call(d3.axisBottom(x)
         .tickFormat(d => formatMonthLabel(d)).ticks(width / 80).tickSizeOuter(0))
-      .attr("font-size", "2vh")
+      .attr("font-size", "1vh")
       .attr("color", "white")
       .call(brush)
 
@@ -731,9 +745,9 @@ Promise.all([
       .attr("id", "yNumber")
       .attr("transform", `translate(${margin.left},0)`)
       .call(d3.axisLeft(y))
-      .attr("font-size", "2vh")
+      // .attr("font-size", "1vh")
       .attr("color", "white")
-      .call(g => g.select(".domain").remove())                // Remove the y-axis line
+    // .call(g => g.select(".domain").remove())                // Remove the y-axis line
 
 
     svg.append("g")
@@ -801,7 +815,10 @@ Promise.all([
         .transition()
         .duration(1000)
         .call(yAxis)
-        .on("start", () => { d3.select('#yNumber').select(".domain").remove() })
+        .on("start", () => {
+          d3.select('#yNumber')
+          // .select(".domain").remove() 
+        })
 
 
       plan
@@ -906,45 +923,19 @@ Promise.all([
   // -----------------------------------------------------------------------------------------------
   // Given a dataset, draw the barchart
   function barchart(dataset, nation) {
-    const listNation = []
-    // // https://github.com/d3/d3-array/blob/master/README.md#rollup
-    // // const datasetClass = d3.group(dataset, d => d.Nation, d => d.Classification);
-    // const datasetClass = d3.group(dataset, d => d.Classification, d => d.Nation)
-    // console.log({ datasetClass })
-
-    // var svg = d3.select("#bar-chart"),
-    //   margin = { top: 20, right: 20, bottom: 30, left: 40 },
-    //   width = +svg.attr("width") - margin.left - margin.right,
-    //   height = +svg.attr("height") - margin.top - margin.bottom,
-    //   g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // // The scale spacing the groups:
-    // var x0 = d3.scaleBand()
-    //   .rangeRound([0, width])
-    //   .paddingInner(0.1);
-
-    // // The scale for spacing each group's bar:
-    // var x1 = d3.scaleBand()
-    //   .padding(0.05);
-
-    // var y = d3.scaleLinear()
-    //   .rangeRound([height, 0]);
-
-    // var z = d3.scaleOrdinal()
-    //   // .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-    //   .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56"]);
+    var listNation = []
 
     const datasetClass = d3.group(dataset, d => d.Nation, d => d.Classification)
     console.log({ datasetClass })
 
-    if (nation) {
-      listNation.push(nation)
-    } else {
+    if (nation === undefined || nation.length == 0) {
       const sortDataset = Array.from(d3.group(dataset, d => d.Nation)).sort((x, y) => d3.descending(x[1], y[1]))
       console.log(sortDataset.slice(0, 5))
       for (let elem of sortDataset.slice(0, 5)) {
         listNation.push(elem[0])
       }
+    } else {
+      listNation = nation
       // datasetClass.sort((x, y) => d3.ascending(x[0], y[0]))
     }
 
@@ -953,8 +944,17 @@ Promise.all([
     // console.log(datasetClass.get('Italy'))
     // console.log(datasetClass.get('United States of America'))
 
+    // d3.select('#barchart').remove()
+    d3.select('#barchart').remove()
+    d3.select('.barchart-div')
+      .append('svg')
+      .attr('id', 'barchart')
+      .attr('width', 620)
+      .attr('height', 200)
+
+
     var svg = d3.select("#barchart"),
-      margin = { top: 20, right: 20, bottom: 30, left: 40 },
+      margin = { top: 20, right: 20, bottom: 30, left: 75 },
       width = +svg.attr("width") - margin.left - margin.right,
       height = +svg.attr("height") - margin.top - margin.bottom,
       g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -1001,17 +1001,28 @@ Promise.all([
       .attr("transform", "translate(0," + height + ")")
       .call(d3.axisBottom(x0));
 
+
+    svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0)
+      .attr("x", 0 - (height / 2) - margin.top)
+      .attr("dy", "1em")
+      .attr("fill", "white")
+      .attr("font-weight", "bold")
+      .style("text-anchor", "middle")
+      .text("N° Paper");
+
     g.append("g")
       .attr("class", "y axis")
-      .call(d3.axisLeft(y).ticks(null, "s"))
-      .append("text")
-      .attr("x", 2)
-      .attr("y", y(y.ticks().pop()) + 0.5)
-      .attr("dy", "0.32em")
-      .attr("fill", "#FFF")
-      .attr("font-weight", "bold")
-      .attr("text-anchor", "start")
-      .text("N° Papers");
+      .call(d3.axisLeft(y).ticks())   // .ticks(null, "s") ---> 0.1k, 0,2k scale..
+    // .append("text")
+    // .attr("x", 2)
+    // .attr("y", y(y.ticks().pop()) + 0.5)
+    // .attr("dy", "0.32em")
+    // .attr("fill", "#FFF")
+    // .attr("font-weight", "bold")
+    // .attr("text-anchor", "start")
+    // .text("N° Papers");
 
     var legend = g.append("g")
       .attr("font-family", "sans-serif")
@@ -1080,7 +1091,7 @@ Promise.all([
       // update the y axis:
       svg.select(".y")
         .transition()
-        .call(d3.axisLeft(y).ticks(null, "s"))
+        .call(d3.axisLeft(y).ticks())  // .ticks(null, "s")
         .duration(500);
 
 
@@ -1136,8 +1147,6 @@ Promise.all([
           }
         })
         .duration(100);
-
-
     }
   }
   // --------------------------------------------------------------------------------
@@ -1164,6 +1173,7 @@ Promise.all([
     const svg = d3.select('#worldMap');
 
     let colorScale
+    var chosenNation = []
 
     // let colorscale = palette(datasetState)
     console.log({ datasetState })
@@ -1240,31 +1250,92 @@ Promise.all([
       //   // })
       // })
       .on('mousemove', function (d) {
-        d3.select(this).style('stroke', 'coral');
-        d3.select(this).style('stroke-opacity', '1');
-        tooltipCountry.transition().duration(150)
-          .style('display', "block");
-        tooltipCountry.html(contentCountryTip(datasetState, d))
-          .style('left', (d.clientX + 50) + 'px')
-          .style('top', (d.clientY) + 'px');
-        handleMouseMoveCountry(d);
+        if (chosenNation === undefined || chosenNation.length == 0) {
+          d3.select(this).style('stroke', 'coral');
+          d3.select(this).style('stroke-opacity', '1');
+          tooltipCountry.transition().duration(150)
+            .style('display', "block");
+          tooltipCountry.html(contentCountryTip(datasetState, d))
+            .style('left', (d.clientX + 50) + 'px')
+            .style('top', (d.clientY) + 'px');
+          handleMouseMoveCountry(d);
+        }
       })
       .on('mouseout', function (d) {
         tooltipCountry.transition().duration(150)
           .style('display', "none");
-        if (!colorChartBoolean) {
-          handleMouseOutCountry()
-        } else {
-          handleMouseOutCountryChart(countriesChart)
+        if (chosenNation === undefined || chosenNation.length == 0) {
+          if (!colorChartBoolean) {
+            handleMouseOutCountry()
+          } else {
+            handleMouseOutCountryChart(countriesChart)
+          }
+          // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
+          d3.select(this).style('stroke', 'white')
+          d3.select(this).style('stroke-opacity', '0.4');
         }
-        // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
-        d3.select(this).style('stroke', 'white')
-        d3.select(this).style('stroke-opacity', '0.4');
       })
-      .on('click', function (d) {
-        Table(datasetState.get(this.id))
-        chart(data[2], this.id)
-      })
+      // .on('click', function (d) {
+      //   Table(datasetState.get(this.id))
+      //   chart(data[2], this.id)
+      // })
+      .on('mousedown', function (event, d) {
+        // if (navigator.appVersion.indexOf("Win") != -1
+        //   || navigator.appVersion.indexOf("X11") != -1
+        //   || navigator.appVersion.indexOf("Linux") != -1) {
+        //   console.log("CTRL")
+        if (event.ctrlKey) {
+          console.log(`${d.properties.name}`)
+
+          if (chosenNation.includes(d.properties.name)) {
+            var removeNationIndex = chosenNation.indexOf(d.properties.name)
+            if (removeNationIndex > -1) {
+              chosenNation.splice(removeNationIndex, 1);
+            }
+          }
+          else {
+            if (chosenNation.length > 4) {
+              chosenNation.shift()
+            }
+            chosenNation.push(d.properties.name)
+          }
+          multipleChosenNation(chosenNation)
+          barchart(dataset, chosenNation)
+        }
+        // }
+        else if (navigator.appVersion.indexOf("Mac") != -1 && event.metaKey) {
+          console.log("CMD")
+
+          console.log(`${d.properties.name}`)
+
+          if (chosenNation.includes(d.properties.name)) {
+            var removeNationIndex = chosenNation.indexOf(d.properties.name)
+            if (removeNationIndex > -1) {
+              chosenNation.splice(removeNationIndex, 1);
+            }
+          }
+          else {
+            if (chosenNation.length > 4) {
+              chosenNation.shift()
+            }
+            chosenNation.push(d.properties.name)
+          }
+          multipleChosenNation(chosenNation)
+          barchart(dataset, chosenNation)
+        }
+        else {
+          chosenNation = []
+          chosenNation.push(this.id)
+          d3.selectAll('path').style('stroke', 'white')
+          d3.selectAll('path').style('stroke-opacity', '0.4');
+          d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
+          Table(datasetState.get(this.id))
+          chart(data[2], this.id)
+          barchart(dataset, chosenNation)
+        }
+      }
+
+      )
     // .call(d3.zoom().on("zoom", function (event) {
     //   projection.translate(event.translate).scale(event.scale);
     //   svg.selectAll('path').attr("d", pathGenerator)
@@ -1311,6 +1382,15 @@ Promise.all([
   // -------------------------------------
   // Reset of the "handleMouseMoveCountry"
   function handleMouseOutCountryChart(countries) {
+    console.log({ countries })
+    d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "0.4");
+    countries.forEach(function (d) {
+      d3.select("#worldMap").select(`path[id='${d}']`).transition().duration(100).style("opacity", "1")
+    })
+  }
+
+  // -------------------------------------
+  function multipleChosenNation(countries) {
     console.log({ countries })
     d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "0.4");
     countries.forEach(function (d) {
