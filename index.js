@@ -639,8 +639,8 @@ Promise.all([
     const deathsArray = Array.from(deathsMap)
 
     // const test = Array.from(casesMap.values())
-    console.log({ casesMap })
-    console.log({ deathsMap })
+    // console.log({ casesMap })
+    // console.log({ deathsMap })
 
     casesArray.sort((x, y) => d3.ascending(x[0], y[0]))
     deathsArray.sort((x, y) => d3.ascending(x[0], y[0]))
@@ -648,8 +648,8 @@ Promise.all([
     const deathsFilteredByYear = deathsArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
 
 
-    console.log({ casesArray })
-    console.log({ casesFilteredByYear })
+    // console.log({ casesArray })
+    // console.log({ casesFilteredByYear })
 
     const width = 1000
     const height = 300
@@ -942,28 +942,31 @@ Promise.all([
       }
     } else {
       listNation = nation
-      // datasetClass.sort((x, y) => d3.ascending(x[0], y[0]))
     }
 
-    // const listNation = []
-    // const listNation = ['Italy', 'United States of America']
-    // console.log(datasetClass.get('Italy'))
-    // console.log(datasetClass.get('United States of America'))
+    var width = 1000
+    var height = 300
 
-    // d3.select('#barchart').remove()
     d3.select('#barchart').remove()
     d3.select('.barchart-div')
       .append('svg')
       .attr('id', 'barchart')
-      .attr('width', 620)
-      .attr('height', 200)
+      // .attr('width', 620)
+      // .attr('height', 200)
+      .attr("viewBox", [0, 0, width, height])
+
+    // width="550" height="200"
 
 
-    var svg = d3.select("#barchart"),
-      margin = { top: 20, right: 20, bottom: 30, left: 75 },
-      width = +svg.attr("width") - margin.left - margin.right,
-      height = +svg.attr("height") - margin.top - margin.bottom,
-      g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+    var svg = d3.select("#barchart")
+    margin = { top: 20, right: 20, bottom: 30, left: 75 }
+
+    width = +width - margin.left - margin.right
+    height = +height - margin.top - margin.bottom
+    g = svg.append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // The scale spacing the groups:
     var x0 = d3.scaleBand()
@@ -1014,6 +1017,7 @@ Promise.all([
       .attr("x", 0 - (height / 2) - margin.top)
       .attr("dy", "1em")
       .attr("fill", "white")
+      .attr("font-size", "1vh")
       .attr("font-weight", "bold")
       .style("text-anchor", "middle")
       .text("N° Paper");
@@ -1031,7 +1035,6 @@ Promise.all([
     // .text("N° Papers");
 
     var legend = g.append("g")
-      .attr("font-family", "sans-serif")
       .attr("font-size", 10)
       .attr("text-anchor", "end")
       .selectAll("g")
@@ -1300,20 +1303,13 @@ Promise.all([
       // //   chart(data[2], this.id)
       // // })
       .on('mousedown', function (event, d) {
-        // if (navigator.appVersion.indexOf("Win") != -1
-        //   || navigator.appVersion.indexOf("X11") != -1
-        //   || navigator.appVersion.indexOf("Linux") != -1) {
-        //   console.log("CTRL")
         if (event.ctrlKey) {
-          console.log(`${d.properties.name}`)
-
           if (chosenNation.includes(d.properties.name)) {
             var removeNationIndex = chosenNation.indexOf(d.properties.name)
             if (removeNationIndex > -1) {
               chosenNation.splice(removeNationIndex, 1);
             }
-          }
-          else {
+          } else {
             if (chosenNation.length > 4) {
               chosenNation.shift()
             }
@@ -1321,20 +1317,14 @@ Promise.all([
           }
           multipleChosenNation(chosenNation)
           barchart(dataset, chosenNation)
-        }
-        // }
-        else if (navigator.appVersion.indexOf("Mac") != -1 && event.metaKey) {
+        } else if (navigator.appVersion.indexOf("Mac") != -1 && event.metaKey) {
           console.log("CMD")
-
-          console.log(`${d.properties.name}`)
-
           if (chosenNation.includes(d.properties.name)) {
             var removeNationIndex = chosenNation.indexOf(d.properties.name)
             if (removeNationIndex > -1) {
               chosenNation.splice(removeNationIndex, 1);
             }
-          }
-          else {
+          } else {
             if (chosenNation.length > 4) {
               chosenNation.shift()
             }
@@ -1354,9 +1344,7 @@ Promise.all([
           chart(data[2], this.id)
           barchart(dataset, chosenNation)
         }
-      }
-
-      )
+      })
     // .call(d3.zoom().on("zoom", function (event) {
     //   projection.translate(event.translate).scale(event.scale);
     //   svg.selectAll('path').attr("d", pathGenerator)
@@ -1364,8 +1352,8 @@ Promise.all([
 
     // Remove the Antarctica State
     svg.select('#Antarctica').remove()
-    //Table(dataset)
 
+    // Init Tippy for each country
     tippy('[country-tippy]', {
       content(reference) {
         return reference.getAttribute('country-tippy')
