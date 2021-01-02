@@ -2,7 +2,6 @@
 // Takes in input an object (NOT A LIST WITH NATIONS, DATE ecc... )
 // "dataset" and draw it.
 function Table(dataset) {
-    console.log(`Paper dataset: ${dataset}`)
     if ($.fn.dataTable.isDataTable('#paperTable')) {
         $('#paperTable').DataTable().clear().destroy();
     }

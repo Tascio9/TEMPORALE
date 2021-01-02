@@ -62,6 +62,10 @@ Promise.all([
   // sliderTime(data[1])
   sliderTime(dataset2020)
 
+  // Container PAPER TABLE -------------------------------------------------------------------------
+  // sliderTime(data[1])
+  Table(dataset2020)
+
   // Handling events on:
   // - Dropdown selection
   d3.select('#selectYear').on('change', function (d) {
@@ -71,6 +75,7 @@ Promise.all([
       colorChart(data[1])
       sliderTime(data[1])
       chart(data[2], '')
+      Table(data[1])
     } else {
       yearDataset = groupByYear.get(this.value)
       colorChartBoolean = false
@@ -78,6 +83,7 @@ Promise.all([
       colorChart(yearDataset)
       sliderTime(yearDataset)
       chart(data[2], '')
+      Table(yearDataset)
     }
   })
 
@@ -139,7 +145,6 @@ Promise.all([
   // -----------------------------------------------------------------------------------------------
   // Draw the chart on the left according to the dataset and the scale in the check
   function colorChart(dataset) {
-    console.log(`ColorChart dataset: ${dataset}`)
     const datasetState = d3.group(dataset, d => d.Nation);
     // const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     // const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
@@ -238,11 +243,7 @@ Promise.all([
     const brushLegend = d3.brushY()
       .extent([[0, 0], [widthLegend - marginLegend.left - marginLegend.right, heightLegend - marginLegend.top - marginLegend.bottom]])
       .on("end", function filterView(event) {
-        // const selection1 = d3.brushSelection(d3.select(".brush1").node());
-        // if (!event.sourceEvent || !selection1) return;
-        // const [x0, x1] = selection1.map(d => d3.timeMonth.every(1).round(dateScale.invert(d)));
-        // d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
-
+        // it was .on("brush", ....
         const selection1 = d3.brushSelection(d3.select(".brushLegend").node());
         if (!event.sourceEvent || !selection1) return;
         const selectionLegendBegin = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[0]));
@@ -253,8 +254,6 @@ Promise.all([
         colorChartBoolean = true
         countriesChart = []
         filterDataset = []
-        test = ["Italy", "Germany"]
-
 
         Array.from(datasetState).filter(function (d) {
           if (selectionLegendBegin <= d[1].length && d[1].length <= selectionLegendEnd) {
@@ -266,12 +265,13 @@ Promise.all([
             })
           }
         })
-        console.log({ filterDataset })
-        Table(filterDataset)
+        if (filterDataset.length > 0) {
+          console.log({ filterDataset })
+          Table(filterDataset)
+        } else {
+          alert('No countries available in this range')
+        }
       })
-    // .on("end", function updateView(event){
-
-    // })
 
     svgLegend.append("g")
       .attr("class", "brushLegend")
@@ -390,6 +390,7 @@ Promise.all([
           if (newData.length != 0) {
             colorChart(newData)
             colorMap(newData)
+            barchart(newData)
             Table(newData)
           } else {
             alert('No papers available in this period')
@@ -412,6 +413,7 @@ Promise.all([
 
           colorChart(dataset)
           colorMap(dataset)
+          barchart(dataset)
           Table(dataset)
         })
         .call(brush1);
@@ -507,6 +509,8 @@ Promise.all([
           if (newData.length != 0) {
             colorChart(newData)
             colorMap(newData)
+            barchart(newData)
+            Table(newData)
           } else {
             alert('No papers available in this period')
           }
@@ -525,6 +529,8 @@ Promise.all([
 
           colorChart(dataset)
           colorMap(dataset)
+          barchart(dataset)
+          Table(dataset)
         })
         .call(brush1);
 
@@ -1170,6 +1176,12 @@ Promise.all([
     const datasetState = d3.group(dataset, d => d.Nation);
     const minDatasetState = d3.min(Array.from(datasetState.values())).length;
     const maxDatasetState = d3.max(Array.from(datasetState.values())).length;
+
+    d3.select('#worldMap').remove()
+    d3.select('.map-div')
+      .append('svg')
+      .attr('id', 'worldMap')
+
     const svg = d3.select('#worldMap');
 
     let colorScale
@@ -1198,7 +1210,7 @@ Promise.all([
       .attr('height', height)
       .style('fill', 'none')
 
-    svg.selectAll('path').remove()      // Necessary to update the mapcolors
+    // svg.selectAll('path').remove()      // Necessary to update the mapcolors
 
     projection.scale([200])
       .translate([width / 2, height / 1.7]);
@@ -1237,48 +1249,56 @@ Promise.all([
         // return (datasetState.get(this.id)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
         // return (datasetState.get(this.id)) ? colorscale(logScale(datasetState.get(this.id).length)) : colorscale(logScale(0))
       })
-      // .on('mouseover', function (d) {
-      //   d3.select(this).style('stroke', 'orange');
-      //   d3.select(this).style('stroke-opacity', '1');
-      //   if (datasetState.get(this.id)) {
-      //     d3.select('#state').text(this.id + ": " + datasetState.get(this.id).length);
-      //   } else {
-      //     d3.select('#state').text(this.id + ": 0");
+      .attr('country-tippy', d => {
+        const nPaper = (datasetState.get(d.properties.name)) ? datasetState.get(d.properties.name).length : "0"
+        return `<div class="country-tippy">	
+				<b>Name</b> ${'&nbsp;'.repeat(2)}${d.properties.name}<br>
+				<b>N° Paper</b> ${'&nbsp;'.repeat(1)}${nPaper}<br>
+			</div>`
+      }
+      )
+      // // .on('mouseover', function (d) {
+      // //   d3.select(this).style('stroke', 'orange');
+      // //   d3.select(this).style('stroke-opacity', '1');
+      // //   if (datasetState.get(this.id)) {
+      // //     d3.select('#state').text(this.id + ": " + datasetState.get(this.id).length);
+      // //   } else {
+      // //     d3.select('#state').text(this.id + ": 0");
+      // //   }
+      // //   // d3.select(this).style('fill', function (d) {
+      // //   //   return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
+      // //   // })
+      // // })
+      // .on('mousemove', function (d) {
+      //   if (chosenNation === undefined || chosenNation.length == 0) {
+      //     d3.select(this).style('stroke', 'coral');
+      //     d3.select(this).style('stroke-opacity', '1');
+      //     tooltipCountry.transition().duration(150)
+      //       .style('display', "block");
+      //     tooltipCountry.html(contentCountryTip(datasetState, d))
+      //       .style('left', (d.clientX + 50) + 'px')
+      //       .style('top', (d.clientY) + 'px');
+      //     handleMouseMoveCountry(d);
       //   }
-      //   // d3.select(this).style('fill', function (d) {
-      //   //   return (datasetState.get(d.properties.name)) ? d3.interpolateViridis(linearScale(datasetState.get(this.id).length)) : d3.interpolateViridis(linearScale(0))
-      //   // })
       // })
-      .on('mousemove', function (d) {
-        if (chosenNation === undefined || chosenNation.length == 0) {
-          d3.select(this).style('stroke', 'coral');
-          d3.select(this).style('stroke-opacity', '1');
-          tooltipCountry.transition().duration(150)
-            .style('display', "block");
-          tooltipCountry.html(contentCountryTip(datasetState, d))
-            .style('left', (d.clientX + 50) + 'px')
-            .style('top', (d.clientY) + 'px');
-          handleMouseMoveCountry(d);
-        }
-      })
-      .on('mouseout', function (d) {
-        tooltipCountry.transition().duration(150)
-          .style('display', "none");
-        if (chosenNation === undefined || chosenNation.length == 0) {
-          if (!colorChartBoolean) {
-            handleMouseOutCountry()
-          } else {
-            handleMouseOutCountryChart(countriesChart)
-          }
-          // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
-          d3.select(this).style('stroke', 'white')
-          d3.select(this).style('stroke-opacity', '0.4');
-        }
-      })
-      // .on('click', function (d) {
-      //   Table(datasetState.get(this.id))
-      //   chart(data[2], this.id)
+      // .on('mouseout', function (d) {
+      //   tooltipCountry.transition().duration(150)
+      //     .style('display', "none");
+      //   if (chosenNation === undefined || chosenNation.length == 0) {
+      //     if (!colorChartBoolean) {
+      //       handleMouseOutCountry()
+      //     } else {
+      //       handleMouseOutCountryChart(countriesChart)
+      //     }
+      //     // d3.select(this).style('fill', d3.interpolateViridis(linearScale(datasetState.get(this.id).length)));
+      //     d3.select(this).style('stroke', 'white')
+      //     d3.select(this).style('stroke-opacity', '0.4');
+      //   }
       // })
+      // // .on('click', function (d) {
+      // //   Table(datasetState.get(this.id))
+      // //   chart(data[2], this.id)
+      // // })
       .on('mousedown', function (event, d) {
         // if (navigator.appVersion.indexOf("Win") != -1
         //   || navigator.appVersion.indexOf("X11") != -1
@@ -1326,10 +1346,11 @@ Promise.all([
         else {
           chosenNation = []
           chosenNation.push(this.id)
+          var clickedNation = datasetState.get(this.id)
           d3.selectAll('path').style('stroke', 'white')
           d3.selectAll('path').style('stroke-opacity', '0.4');
           d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
-          Table(datasetState.get(this.id))
+          Table(clickedNation)
           chart(data[2], this.id)
           barchart(dataset, chosenNation)
         }
@@ -1343,7 +1364,20 @@ Promise.all([
 
     // Remove the Antarctica State
     svg.select('#Antarctica').remove()
-    Table(dataset)
+    //Table(dataset)
+
+    tippy('[country-tippy]', {
+      content(reference) {
+        return reference.getAttribute('country-tippy')
+      },
+      allowHTML: true,
+      performance: true,
+      arrow: true,
+      size: 'large',
+      animation: 'scale',
+      // placement: 'auto-start',
+      // followCursor: 'vertical',
+    })
   }
 
 
@@ -1391,11 +1425,14 @@ Promise.all([
 
   // -------------------------------------
   function multipleChosenNation(countries) {
-    console.log({ countries })
-    d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "0.4");
-    countries.forEach(function (d) {
-      d3.select("#worldMap").select(`path[id='${d}']`).transition().duration(100).style("opacity", "1")
-    })
+    // console.log({ countries })
+    if (countries.length > 0) {
+      d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "0.4");
+      countries.forEach(function (d) {
+        d3.select("#worldMap").select(`path[id='${d}']`).transition().duration(100).style("opacity", "1")
+      })
+    } else {
+      d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
+    }
   }
-
 });

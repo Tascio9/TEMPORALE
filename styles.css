@@ -188,3 +188,8 @@ body {
   font-weight: bold;
   text-align: right;
 }
+
+/* Tippy is here! */
+.country-tippy {
+  text-align: left;
+}
