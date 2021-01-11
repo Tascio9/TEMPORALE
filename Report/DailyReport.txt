@@ -1,3 +1,7 @@
+-- 2021-01-09
+Nuovo anno, decido di usare anche papers che sono presenti nel 2021 (magari).
+
+
 -- 2020-12-15
 Visto che ci sono dei paper che non hanno tutte le info in "metadata.csv", decido di rimuoverli dal dataset
 e provare a fare un clustering usando solo quelli "perfetti", ovvero che hanno tutte le caratteristiche

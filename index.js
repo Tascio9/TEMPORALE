@@ -41,7 +41,11 @@ Promise.all([
 
   // Container LINE-CHART ---------------------------------------------------------------------
   // Draw the left chart bar for the colors
-  chart(data[2], '')
+  chart(data[2])
+
+  // Container LINE-CHART ---------------------------------------------------------------------
+  // Draw the left chart bar for the colors
+  selectChart()
 
   // Container CHART --------------------------------------------------------------------------
   // Draw the left chart bar for the colors
@@ -74,7 +78,6 @@ Promise.all([
       colorMap(data[1])
       colorChart(data[1])
       sliderTime(data[1])
-      chart(data[2], '')
       Table(data[1])
     } else {
       yearDataset = groupByYear.get(this.value)
@@ -82,9 +85,10 @@ Promise.all([
       colorMap(yearDataset)
       colorChart(yearDataset)
       sliderTime(yearDataset)
-      chart(data[2], '')
       Table(yearDataset)
     }
+    chart(data[2], '')
+    selectChart()
   })
 
   // - Radio button on Palette
@@ -118,6 +122,7 @@ Promise.all([
   d3.select('#buttonReset').on('click', function () {
     d3.select('#selectYear').property('value', '2020')
     chart(data[2], '')
+    selectChart()
     colorChart(dataset2020)
     colorMap(dataset2020)
     sliderTime(dataset2020)
@@ -587,7 +592,6 @@ Promise.all([
     const dayFormat = d3.timeFormat("%Y-%m-%d")
     const yearValue = d3.select('#selectYear').property('value')
     const formatMonthLabel = d3.timeFormat('%b');
-    console.log('line-chart')
     console.log({ dataset })
 
     let casesMap
@@ -926,8 +930,38 @@ Promise.all([
     }
   }
 
+  function selectChart(nation) {
+    d3.select('#selectChart').remove()
+
+    d3.select('.selectChart-div').append('select')
+      .attr('id', 'selectChart')
+      .attr('class', 'selectChartCountries')
+      .append('option')
+      .attr('value', 'World')
+      .text('-- World --')
+
+    if (nation) {
+      for (let d of nation) {
+        d3.select('#selectChart')
+          .append('option')
+          .attr('value', d)
+          .text(d)
+      }
+    }
+
+    // - Dropdown selection
+    d3.select('#selectChart').on('change', function (d) {
+      if (this.value === 'World') {
+        chart(data[2], '')
+      } else {
+        chart(data[2], this.value)
+      }
+    })
+  }
+
   // -----------------------------------------------------------------------------------------------
   // Given a dataset, draw the barchart
+  // If the is "nation", which is a list of countries, it draws the list of countries inside "nation"
   function barchart(dataset, nation) {
     var listNation = []
 
@@ -956,9 +990,6 @@ Promise.all([
       .attr("viewBox", [0, 0, width, height])
 
     // width="550" height="200"
-
-
-
 
     var svg = d3.select("#barchart")
     margin = { top: 20, right: 20, bottom: 30, left: 75 }
@@ -1316,6 +1347,7 @@ Promise.all([
             chosenNation.push(d.properties.name)
           }
           multipleChosenNation(chosenNation)
+          selectChart(chosenNation)
           barchart(dataset, chosenNation)
         } else if (navigator.appVersion.indexOf("Mac") != -1 && event.metaKey) {
           console.log("CMD")
@@ -1331,6 +1363,7 @@ Promise.all([
             chosenNation.push(d.properties.name)
           }
           multipleChosenNation(chosenNation)
+          selectChart(chosenNation)
           barchart(dataset, chosenNation)
         }
         else {
@@ -1342,6 +1375,7 @@ Promise.all([
           d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
           Table(clickedNation)
           chart(data[2], this.id)
+          selectChart(chosenNation)
           barchart(dataset, chosenNation)
         }
       })

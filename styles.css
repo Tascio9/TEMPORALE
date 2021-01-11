@@ -41,7 +41,7 @@ body {
   display: grid;
   /* grid-template-columns: [first-column] 1vw [line1] 10vw [line2] auto [line3] 10vw [line4] 1vw [last-column]; */
   grid-template-columns: [first-column] 0.1vw [line1] 15% [line2] 15% [line3] auto [line4] auto [line5] 0.1vw [last-column];
-  grid-template-rows: [first-row] 5vh [mid1] auto [mid2] auto [mid3] auto [mid4] auto [last-row];
+  grid-template-rows: [first-row] 5vh [mid1] auto [mid2] auto [mid3] auto [mid4] auto [mid5] auto [last-row];
   grid-column-gap: 0.5vw;
   padding-left: 0.2vw;
   padding-right: 0.2vw;
@@ -115,34 +115,41 @@ body {
   color: white;
 }
 
-.barchart-div {
+.chart {
   grid-column-start: line1;
   grid-column-end: line3;
   grid-row-start: mid3;
   grid-row-end: mid4;
-  /* justify-self: center;
-  align-self: center; */
-  color: white;
 }
 
-.chart {
+.selectChart-div {
   grid-column-start: line1;
   grid-column-end: line3;
   grid-row-start: mid2;
   grid-row-end: mid3;
 }
 
+.barchart-div {
+  grid-column-start: line1;
+  grid-column-end: line3;
+  grid-row-start: mid4;
+  grid-row-end: mid5;
+  /* justify-self: center;
+  align-self: center; */
+  color: white;
+}
+
 .map-div {
   grid-column-start: line3;
   grid-column-end: line5;
   grid-row-start: mid1;
-  grid-row-end: mid4;
+  grid-row-end: mid5;
 }
 
 .filter-div {
   grid-column-start: line1;
   grid-column-end: line5;
-  grid-row-start: mid4;
+  grid-row-start: mid5;
   grid-row-end: last-row;
   display: blocks;
   background-color: rgb(220, 220, 220);
@@ -157,13 +164,19 @@ body {
   opacity: 0.4;
 }
 
+.selectChartCountries {
+  margin-left: 30%;
+  margin-right: 30%;
+  width: 40%;
+}
+
 /* SVGs
 #worldMap{
     width: 70vw;
     height: 54vh;
 } */
 
-.d3-tip {
+/* .d3-tip {
   line-height: 1;
   padding: 12px;
   position: absolute;
@@ -187,7 +200,7 @@ body {
 #tooltip td:first-child {
   font-weight: bold;
   text-align: right;
-}
+} */
 
 /* Tippy is here! */
 .country-tippy {
