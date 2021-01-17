@@ -400,7 +400,6 @@ Promise.all([
           } else {
             alert('No papers available in this period')
           }
-
           // colorChart(newData)
           // colorMap(newData)
         });
@@ -930,6 +929,9 @@ Promise.all([
     }
   }
 
+  // -----------------------------------------------------------------------------------------------
+  // Given a dataset, draw the barchart
+  // If the is "nation", which is a list of countries, it draws the list of countries inside "nation"
   function selectChart(nation) {
     d3.select('#selectChart').remove()
 
@@ -947,7 +949,12 @@ Promise.all([
           .attr('value', d)
           .text(d)
       }
+      if (nation.length == '1') {
+        console.log("Dentro")
+        d3.select('#selectChart').property('value', nation[0])
+      }
     }
+
 
     // - Dropdown selection
     d3.select('#selectChart').on('change', function (d) {
@@ -1348,6 +1355,7 @@ Promise.all([
           }
           multipleChosenNation(chosenNation)
           selectChart(chosenNation)
+          // chart(data[2], chosenNation)
           barchart(dataset, chosenNation)
         } else if (navigator.appVersion.indexOf("Mac") != -1 && event.metaKey) {
           console.log("CMD")
@@ -1364,6 +1372,7 @@ Promise.all([
           }
           multipleChosenNation(chosenNation)
           selectChart(chosenNation)
+          // chart(data[2], chosenNation)
           barchart(dataset, chosenNation)
         }
         else {
@@ -1373,10 +1382,10 @@ Promise.all([
           d3.selectAll('path').style('stroke', 'white')
           d3.selectAll('path').style('stroke-opacity', '0.4');
           d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
-          Table(clickedNation)
           chart(data[2], this.id)
           selectChart(chosenNation)
           barchart(dataset, chosenNation)
+          Table(clickedNation)
         }
       })
     // .call(d3.zoom().on("zoom", function (event) {
@@ -1457,4 +1466,27 @@ Promise.all([
       d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "1");
     }
   }
-});
+}).then(unlockUI);
+
+// function lockUI() {
+//   return new Promise(function () {
+//     console.log("lockUI")
+//   })
+// }
+
+function lockUI() {
+  console.log("LockUI")
+  document.getElementById("overlay").style.display = "block";
+  document.getElementById("loader").style.display = "block";
+}
+
+function unlockUI() {
+  console.log("UnlockUI")
+  document.getElementById("overlay").style.display = "none";
+  document.getElementById("loader").style.display = "none";
+}
+
+// $('#main').on("load", function (event) {
+//   document.getElementById("overlay").style.display = "block";
+//   document.getElementById("loader").style.display = "block";
+// })
