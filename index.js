@@ -5,7 +5,7 @@ Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
   d3.json("Dataset201214ClassificationCleaned.json"),
-  d3.json("CovidEuropean.json")
+  d3.json("CovidEuropean_new.json")
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json")
 ]).then(data => {
   // data[0] is the first dataset "world"
@@ -602,17 +602,17 @@ Promise.all([
       console.log(nation)
       data = data.get(nation)
       console.log(data)
-      casesMap = d3.rollup(data, v => d3.sum(v, e => e.cases), function (k) {
+      casesMap = d3.rollup(data, v => d3.sum(v, e => e.cases_weekly), function (k) {
         return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
       })
-      deathsMap = d3.rollup(data, v => d3.sum(v, e => e.deaths), function (k) {
+      deathsMap = d3.rollup(data, v => d3.sum(v, e => e.deaths_weekly), function (k) {
         return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
       })
     } else {
-      casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases), function (k) {
+      casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases_weekly), function (k) {
         return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
       })
-      deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths), function (k) {
+      deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths_weekly), function (k) {
         return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
       })
     }
@@ -796,7 +796,13 @@ Promise.all([
       .attr("stroke-width", 2)
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
-      .attr("d", line);
+      .attr("d", line)
+      .attr('linechart-tippy', d => {
+        return `<div class="country-tippy">	
+            <b>Name</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
+            <b>N° Paper</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
+        </div>`
+      });
 
     plan.append("path")
       .attr("id", "deaths")
@@ -927,6 +933,20 @@ Promise.all([
       path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`)
         .attr("transform", "rotate(180)");
     }
+
+    tippy('[linechart-tippy]', {
+      content(reference) {
+        return reference.getAttribute('linechart-tippy')
+      },
+      allowHTML: true,
+      performance: true,
+      arrow: true,
+      size: 'large',
+      animation: 'scale',
+      followCursor: 'initial'
+      // placement: 'auto-start',
+      // followCursor: 'vertical',
+    })
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -1041,7 +1061,14 @@ Promise.all([
       .attr("y", function (d) { return y(d.value); })
       .attr("width", x1.bandwidth())
       .attr("height", function (d) { return height - y(d.value); })
-      .attr("fill", function (d) { return z(d.key); });
+      .attr("fill", function (d) { return z(d.key); })
+      .attr('barchart-tippy', d => {
+        const nPaper = d.value
+        return `<div class="country-tippy">	
+                <b>Class</b> ${'&nbsp;'.repeat(2)}${d.key}<br>
+                <b>N° Paper</b> ${'&nbsp;'.repeat(1)}${nPaper}<br>
+            </div>`
+      });
 
     g.append("g")
       .attr("class", "axis")
@@ -1097,6 +1124,19 @@ Promise.all([
       .text(function (d) { return d; });
 
     var filtered = [];
+
+    tippy('[barchart-tippy]', {
+      content(reference) {
+        return reference.getAttribute('barchart-tippy')
+      },
+      allowHTML: true,
+      performance: true,
+      arrow: true,
+      size: 'large',
+      animation: 'scale',
+      // placement: 'auto-start',
+      // followCursor: 'vertical',
+    })
 
     ////
     //// Update and transition on click:
@@ -1296,8 +1336,7 @@ Promise.all([
 				<b>Name</b> ${'&nbsp;'.repeat(2)}${d.properties.name}<br>
 				<b>N° Paper</b> ${'&nbsp;'.repeat(1)}${nPaper}<br>
 			</div>`
-      }
-      )
+      })
       // // .on('mouseover', function (d) {
       // //   d3.select(this).style('stroke', 'orange');
       // //   d3.select(this).style('stroke-opacity', '1');
@@ -1406,6 +1445,7 @@ Promise.all([
       arrow: true,
       size: 'large',
       animation: 'scale',
+      followCursor: 'initial'
       // placement: 'auto-start',
       // followCursor: 'vertical',
     })

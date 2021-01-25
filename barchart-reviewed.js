@@ -64,7 +64,7 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
     //     .attr("height", function (d) { return height - y(d.value); })
     //     .attr("fill", function (d) { return z(d.key); });
 
-    g.append("g")
+    let rect = g.append("g")
         .selectAll("g")
         .data(listNation)
         .enter().append("g")
@@ -77,7 +77,31 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
         .attr("y", function (d) { return y(d.value); })
         .attr("width", x1.bandwidth())
         .attr("height", function (d) { return height - y(d.value); })
-        .attr("fill", function (d) { return z(d.key); });
+        .attr("fill", function (d) { return z(d.key); })
+        // .on('mouseover', function (d) {
+        //     console.log(d)
+        //     d.target.append("text")
+        //         .attr("class", "label")
+        //         //y position of the label is halfway down the bar
+        //         .attr("y", function (d) {
+        //             return y(d.srcElement.__data__.value) + y.rangeBand() / 2 + 4;
+        //         })
+        //         //x position is 3 pixels to the right of the bar
+        //         .attr("x", function (d) {
+        //             return x(d.srcElement.__data__.key) + 3;
+        //         })
+        //         .text(function (d) {
+        //             return d.srcElement.__data__.value;
+        //         });
+        //     console.log(d.srcElement.__data__.value)
+        // })
+        .attr('barchart-tippy', d => {
+            const nPaper = d.value
+            return `<div class="country-tippy">	
+                    <b>Name</b> ${'&nbsp;'.repeat(2)}${d.key}<br>
+                    <b>N° Paper</b> ${'&nbsp;'.repeat(1)}${nPaper}<br>
+                </div>`
+        })
 
     g.append("g")
         .attr("class", "axis")
@@ -121,6 +145,19 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
         .text(function (d) { return d; });
 
     var filtered = [];
+
+    tippy('[barchart-tippy]', {
+        content(reference) {
+            return reference.getAttribute('barchart-tippy')
+        },
+        allowHTML: true,
+        performance: true,
+        arrow: true,
+        size: 'large',
+        animation: 'scale',
+        // placement: 'auto-start',
+        // followCursor: 'vertical',
+    })
 
     ////
     //// Update and transition on click:
