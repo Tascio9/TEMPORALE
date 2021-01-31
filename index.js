@@ -1031,7 +1031,18 @@ Promise.all([
 
     x0.domain(listNation);
     x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-    y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { return datasetClass.get(d).get(key).length; }); })]).nice();
+    // y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { return datasetClass.get(d).get(key).length; }); })]).nice();
+    y.domain([0, d3.max(listNation, function (d) {
+      return d3.max(keys, function (key) {
+        let value
+        try {
+          value = datasetClass.get(d).get(key).length;
+        } catch {
+          value = 0
+        }
+        return value
+      });
+    })]).nice();
 
     g.append("g")
       .selectAll("g")
@@ -1040,7 +1051,19 @@ Promise.all([
       .attr("class", "bar")
       .attr("transform", function (d) { return "translate(" + x0(d) + ",0)"; })
       .selectAll("rect")
-      .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
+      .data(function (d) {
+        return keys.map(function (key) {
+          console.log(key) // 0, 1, 2, 3, 4
+          let value
+          try {
+            value = datasetClass.get(d).get(key).length
+          } catch {
+            value = 0
+          }
+          console.log(value)
+          return { key: key, value: value };
+        });
+      })
       .enter().append("rect")
       .attr("x", function (d) { return x1(d.key); })
       .attr("y", function (d) { return y(d.value); })
@@ -1157,8 +1180,18 @@ Promise.all([
       })
       x1.domain(newKeys).rangeRound([0, x0.bandwidth()]);
       // y.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return d[key]; }); })]).nice();
-      y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return datasetClass.get(d).get(key).length; }); })]).nice();
-
+      // y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return datasetClass.get(d).get(key).length; }); })]).nice();
+      y.domain([0, d3.max(listNation, function (d) {
+        return d3.max(keys, function (key) {
+          let value
+          try {
+            if (filtered.indexOf(key) == -1) value = datasetClass.get(d).get(key).length;
+          } catch {
+            value = 0
+          }
+          return value
+        });
+      })]).nice();
 
       // update the y axis:
       svg.select(".y")
@@ -1172,8 +1205,21 @@ Promise.all([
       //
       var bars = svg.selectAll(".bar").selectAll("rect")
         // .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
-
+        // .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
+        .data(function (d) {
+          console.log(d) // Italy, Venezuela
+          return keys.map(function (key) {
+            console.log(key) // 0, 1, 2, 3, 4
+            let value
+            try {
+              value = datasetClass.get(d).get(key).length
+            } catch {
+              value = 0
+            }
+            console.log(value)
+            return { key: key, value: value };
+          });
+        })
 
       bars.filter(function (d) {
         return filtered.indexOf(d.key) > -1;

@@ -6,9 +6,9 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
     console.log({ datasetClass })
 
     // const listNation = []
-    const listNation = ['Italy', 'Germany']
+    const listNation = ['Italy', 'Venezuela']
     console.log(datasetClass.get('Italy').get(0).length)
-    console.log(datasetClass.get('Germany'))
+    // console.log(datasetClass.get('Germany'))
 
     var svg = d3.select("#barchart"),
         margin = { top: 20, right: 20, bottom: 30, left: 40 },
@@ -40,6 +40,9 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
     // var keys = data.Classification.value();
     const keys = [...new Set(Array.from(data, v => v.Classification))]
     console.log({ keys })
+    console.log(keys.length)
+
+
 
     // x0.domain(data.map(function (d) { return d.State; }));
     // x1.domain(keys).rangeRound([0, x0.bandwidth()]);
@@ -47,7 +50,17 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
 
     x0.domain(listNation);
     x1.domain(keys).rangeRound([0, x0.bandwidth()]);
-    y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { return datasetClass.get(d).get(key).length; }); })]).nice();
+    y.domain([0, d3.max(listNation, function (d) {
+        return d3.max(keys, function (key) {
+            let value
+            try {
+                value = datasetClass.get(d).get(key).length;
+            } catch {
+                value = 0
+            }
+            return value
+        });
+    })]).nice();
 
     // g.append("g")
     //     .selectAll("g")
@@ -71,7 +84,34 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
         .attr("class", "bar")
         .attr("transform", function (d) { return "translate(" + x0(d) + ",0)"; })
         .selectAll("rect")
-        .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
+        .data(function (d) {
+            // console.log(d)
+            // keys.forEach(function (k) {
+            //     console.log(k)
+            //     let value
+            //     try {
+            //         value = datasetClass.get(d).get(k).length
+            //     } catch {
+            //         value = 0
+            //     }
+            //     console.log(value)
+            //     return { key: k, value: value }
+            // })
+
+            console.log(d) // Italy, Venezuela
+            return keys.map(function (key) {
+                console.log(key) // 0, 1, 2, 3, 4
+                let value
+                try {
+                    value = datasetClass.get(d).get(key).length
+                } catch {
+                    value = 0
+                }
+                console.log(value)
+                return { key: key, value: value };
+            });
+
+        })
         .enter().append("rect")
         .attr("x", function (d) { return x1(d.key); })
         .attr("y", function (d) { return y(d.value); })
@@ -193,8 +233,18 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
         })
         x1.domain(newKeys).rangeRound([0, x0.bandwidth()]);
         // y.domain([0, d3.max(data, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return d[key]; }); })]).nice();
-        y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return datasetClass.get(d).get(key).length; }); })]).nice();
-
+        // y.domain([0, d3.max(listNation, function (d) { return d3.max(keys, function (key) { if (filtered.indexOf(key) == -1) return datasetClass.get(d).get(key).length; }); })]).nice();
+        y.domain([0, d3.max(listNation, function (d) {
+            return d3.max(keys, function (key) {
+                let value
+                try {
+                    if (filtered.indexOf(key) == -1) value = datasetClass.get(d).get(key).length;
+                } catch {
+                    value = 0
+                }
+                return value
+            });
+        })]).nice();
 
         // update the y axis:
         svg.select(".y")
@@ -208,7 +258,21 @@ d3.json("Dataset201214ClassificationCleaned.json", function (d, i, columns) {
         //
         var bars = svg.selectAll(".bar").selectAll("rect")
             // .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
-            .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
+            .data(function (d) {
+                // return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); 
+                console.log(d) // Italy, Venezuela
+                return keys.map(function (key) {
+                    console.log(key) // 0, 1, 2, 3, 4
+                    let value
+                    try {
+                        value = datasetClass.get(d).get(key).length
+                    } catch {
+                        value = 0
+                    }
+                    console.log(value)
+                    return { key: key, value: value };
+                });
+            })
 
 
         bars.filter(function (d) {
