@@ -33,6 +33,15 @@ d3.json("CovidEuropean_new.json").then(function (data) {
     console.log({ casesMap })
     console.log({ deathsMap })
 
+    const filterCasesByYear = new Map()
+
+    casesMap.forEach(function (v, k) {
+        const date = k.split('-')
+        if (date[0] === "2020") {
+            filterCasesByYear.set(k, v)
+        }
+    });
+
     test.sort((x, y) => d3.ascending(x[0], y[0]))
     const filter = test.filter(d => new Date(d[0]).getFullYear() === 2020)
     console.log({ test })
@@ -61,13 +70,16 @@ d3.json("CovidEuropean_new.json").then(function (data) {
         .attr("x", margin.left)
         .attr("y", margin.top);
 
-    const x = d3.scaleTime()
-        .domain([new Date(moment(d3.min(casesMap, d => d.key), 'YYYY-MM-DD')), new Date(moment(d3.max(casesMap, d => d.key), 'YYYY-MM-DD'))])
+    var x = d3.scaleTime()
+        // .domain(d3.extent(filter, d => moment(d[0], 'YYYY-MM-DD')))
+        .domain([new Date(moment(d3.min(filter, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(filter, d => d[0]), 'YYYY-MM-DD'))])
         // .domain([new Date("2020-01-01"), new Date("2020-12-31")])
         .range([margin.left, width - margin.right])
 
+    console.log(x('2020-01-06'))
 
-    const y = d3.scaleLinear()
+
+    var y = d3.scaleLinear()
         .domain([0, d3.max(Array.from(casesMap), d => d[1])]).nice()
         .range([height - margin.bottom, margin.top])
 
@@ -122,6 +134,41 @@ d3.json("CovidEuropean_new.json").then(function (data) {
                 .transition()
                 .duration(1000)
                 .attr('d', line)
+
+            var dots = plan.selectAll(".dot")
+                .data(filter)
+                .enter().append("circle") // Uses the enter().append() method
+                .attr("class", "dot") // Assign a class for styling
+                // .attr("stroke", "steelblue")
+                .attr("stroke", "#222222")
+                .attr("fill", "#45bd20")
+                .attr("cx", function (d, i) { return x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))) })
+                .attr("cy", function (d) { return y(d[1]) })
+                .attr("r", 5)
+                .attr('circlechart-tippy', d => {
+                    return `<div class="country-tippy">	
+                        <b>Date</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
+                        <b>Cases</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
+                    </div>`
+                });
+
+            dots.transition()
+                .delay(1000)
+                .duration(1000)
+
+            tippy('[circlechart-tippy]', {
+                content(reference) {
+                    return reference.getAttribute('circlechart-tippy')
+                },
+                allowHTML: true,
+                performance: true,
+                arrow: true,
+                size: 'large',
+                animation: 'scale',
+                // followCursor: 'initial'
+                // placement: 'auto-start',
+                // followCursor: 'vertical',
+            })
         })
 
     const xAxis = g => g
@@ -164,12 +211,41 @@ d3.json("CovidEuropean_new.json").then(function (data) {
         .attr("stroke-linejoin", "round")
         .attr("stroke-linecap", "round")
         .attr("d", line)
-    // .attr('linechart-tippy', d => {
-    //     return `<div class="country-tippy">	
-    //             <b>Name</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
-    //             <b>N° Paper</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
-    //         </div>`
-    // });
+
+    var dots = plan.selectAll(".dot")
+        .data(filter)
+        .enter().append("circle") // Uses the enter().append() method
+        .attr("class", "dot") // Assign a class for styling
+        // .attr("stroke", "steelblue")
+        .attr("stroke", "#222222")
+        .attr("fill", "#45bd20")
+        .attr("cx", function (d, i) { return x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))) })
+        .attr("cy", function (d) { return y(d[1]) })
+        .attr("r", 5)
+        .attr('circlechart-tippy', d => {
+            return `<div class="country-tippy">	
+                <b>Date</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
+                <b>Cases</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
+            </div>`
+        });
+
+    dots.transition()
+        .delay(1000)
+        .duration(1000)
+
+    tippy('[circlechart-tippy]', {
+        content(reference) {
+            return reference.getAttribute('circlechart-tippy')
+        },
+        allowHTML: true,
+        performance: true,
+        arrow: true,
+        size: 'large',
+        animation: 'scale',
+        // followCursor: 'initial'
+        // placement: 'auto-start',
+        // followCursor: 'vertical',
+    })
 
     svg.on('dblclick', function reset() {
         x.domain([new Date(moment(d3.min(filter, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(filter, d => d[0]), 'YYYY-MM-DD'))])
@@ -182,11 +258,46 @@ d3.json("CovidEuropean_new.json").then(function (data) {
                 .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
                 .y(d => y(d[1]))
             )
+
+        var dots = plan.selectAll(".dot")
+            .data(filter)
+            .enter().append("circle") // Uses the enter().append() method
+            .attr("class", "dot") // Assign a class for styling
+            // .attr("stroke", "steelblue")
+            .attr("stroke", "#222222")
+            .attr("fill", "#45bd20")
+            .attr("cx", function (d, i) { return x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))) })
+            .attr("cy", function (d) { return y(d[1]) })
+            .attr("r", 5)
+            .attr('circlechart-tippy', d => {
+                return `<div class="country-tippy">	
+                    <b>Date</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
+                    <b>Cases</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
+                </div>`
+            });
+
+        dots.transition()
+            .delay(1000)
+            .duration(1000)
+
+        tippy('[circlechart-tippy]', {
+            content(reference) {
+                return reference.getAttribute('circlechart-tippy')
+            },
+            allowHTML: true,
+            performance: true,
+            arrow: true,
+            size: 'large',
+            animation: 'scale',
+            // followCursor: 'initial'
+            // placement: 'auto-start',
+            // followCursor: 'vertical',
+        })
     })
 
     const tooltip = svg.append("g");
 
-    d3.select('#chart-cases').on("touchmove mousemove", function (event) {
+    svg.on("touchmove mousemove", function (event) {
         const { date, value } = bisect(d3.pointer(event, this)[0])
 
         tooltip
@@ -241,16 +352,16 @@ d3.json("CovidEuropean_new.json").then(function (data) {
         // path.append("circle").attr("r", 10)
     }
 
-    tippy('[linechart-tippy]', {
+    tippy('[circlechart-tippy]', {
         content(reference) {
-            return reference.getAttribute('linechart-tippy')
+            return reference.getAttribute('circlechart-tippy')
         },
         allowHTML: true,
         performance: true,
         arrow: true,
         size: 'large',
         animation: 'scale',
-        followCursor: 'initial'
+        // followCursor: 'initial'
         // placement: 'auto-start',
         // followCursor: 'vertical',
     })

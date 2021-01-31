@@ -1,6 +1,3 @@
-// const height = 300
-// const width = 100
-
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
@@ -587,6 +584,7 @@ Promise.all([
   // If a "nation" is passed, it draws the chart according to the nation passed.
   // CovidEuropean.json to see the cases and deaths
   // IDEA: https://bl.ocks.org/d3noob/5d621a60e2d1d02086bf
+  // IDEA: https://bl.ocks.org/pbeshai/484d6bf04edcdecfc3731e00c062f47e
   function chart(dataset, nation) {
     const dayFormat = d3.timeFormat("%Y-%m-%d")
     const yearValue = d3.select('#selectYear').property('value')
@@ -594,7 +592,7 @@ Promise.all([
     console.log({ dataset })
 
     let casesMap
-    let deathsMap
+    // let deathsMap
     let data = d3.group(dataset.records, d => d.countriesAndTerritories)
 
     if (nation) {
@@ -605,16 +603,16 @@ Promise.all([
       casesMap = d3.rollup(data, v => d3.sum(v, e => e.cases_weekly), function (k) {
         return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
       })
-      deathsMap = d3.rollup(data, v => d3.sum(v, e => e.deaths_weekly), function (k) {
-        return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
-      })
+      // deathsMap = d3.rollup(data, v => d3.sum(v, e => e.deaths_weekly), function (k) {
+      //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+      // })
     } else {
       casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases_weekly), function (k) {
         return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
       })
-      deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths_weekly), function (k) {
-        return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
-      })
+      // deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths_weekly), function (k) {
+      //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+      // })
     }
 
     // const x = d3.group(data.records, d => d.dateRep)
@@ -637,18 +635,17 @@ Promise.all([
     //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     // })
 
-
     const casesArray = Array.from(casesMap)
-    const deathsArray = Array.from(deathsMap)
+    // const deathsArray = Array.from(deathsMap)
 
     // const test = Array.from(casesMap.values())
     // console.log({ casesMap })
     // console.log({ deathsMap })
 
     casesArray.sort((x, y) => d3.ascending(x[0], y[0]))
-    deathsArray.sort((x, y) => d3.ascending(x[0], y[0]))
+    // deathsArray.sort((x, y) => d3.ascending(x[0], y[0]))
     const casesFilteredByYear = casesArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
-    const deathsFilteredByYear = deathsArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
+    // const deathsFilteredByYear = deathsArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
 
 
     // console.log({ casesArray })
@@ -656,7 +653,8 @@ Promise.all([
 
     const width = 1000
     const height = 300
-    const margin = ({ top: 20, right: 70, bottom: 70, left: 120 })
+    // const margin = ({ top: 20, right: 70, bottom: 70, left: 120 })
+    const margin = ({ top: 20, right: 20, bottom: 30, left: 75 })
 
     d3.select('#line-chart').remove()
     d3.select('.chart').append('svg').attr('id', 'line-chart')
@@ -683,6 +681,7 @@ Promise.all([
       .range([height - margin.bottom, margin.top])
 
     const line = d3.line()
+      // .curve(d3.curveStep)
       .defined(d => !isNaN(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
       .defined(d => !isNaN(d[1]))
       .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
@@ -706,15 +705,18 @@ Promise.all([
           y.domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
         } else {
           const test = casesFilteredByYear.filter(d => new Date(d[0]) >= x.invert(extent[0]) && new Date(d[0]) <= x.invert(extent[1]))
-          console.log(test)
-
+          // console.log(test)
           x.domain([x.invert(extent[0]), x.invert(extent[1])]).nice()
           y.domain([0, d3.max(Array.from(test), d => d[1])]).nice()
           d3.select(this).call(brush.move, null) // This remove the grey brush area as soon as the selection has been done
         }
 
         // Update axis and line position
-        d3.select('#xDate').transition().duration(1000).call(d3.axisBottom(x).ticks(width / 160).tickSizeOuter(0)).attr("font-size", "1vh").attr("color", "white")
+        d3.select('#xDate').transition().duration(1000).call(
+          d3.axisBottom(x)
+            .ticks(width / 160)
+          // .tickSizeOuter(0)
+        ).attr("font-size", "1vh").attr("color", "white")
         d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y)).attr("font-size", "1vh")
           .attr("color", "white")
           .on("start", () => {
@@ -731,21 +733,44 @@ Promise.all([
             .y(d => y(d[1]))
           )
 
-        d3
-          .select('#deaths')
+        d3.selectAll(".dot") // change the circle
           .transition()
           .duration(1000)
-          .attr('d', d3.line()
-            .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
-            .y(d => y(d[1]))
-          )
+          .attr("cx", function (d, i) { return x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))) })
+          .attr("cy", function (d) { return y(d[1]) })
+
+        tippy('[circlechart-tippy]', {
+          content(reference) {
+            return reference.getAttribute('circlechart-tippy')
+          },
+          allowHTML: true,
+          performance: true,
+          arrow: true,
+          size: 'large',
+          animation: 'scale',
+          // followCursor: 'initial'
+          // placement: 'auto-start',
+          // followCursor: 'vertical',
+        })
+
+        // d3
+        //   .select('#deaths')
+        //   .transition()
+        //   .duration(1000)
+        //   .attr('d', d3.line()
+        //     .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+        //     .y(d => y(d[1]))
+        //   )
       })
 
     const xAxis = g => g
       .attr("id", "xDate")
       .attr("transform", `translate(0,${height - margin.bottom})`)
       .call(d3.axisBottom(x)
-        .tickFormat(d => formatMonthLabel(d)).ticks(width / 80).tickSizeOuter(0))
+        .tickFormat(d => formatMonthLabel(d))
+        .ticks(width / 80)
+        //  .tickSizeOuter(0)                   // Remove the last tick
+      )
       .attr("font-size", "1vh")
       .attr("color", "white")
       .call(brush)
@@ -763,8 +788,9 @@ Promise.all([
       .call(xAxis);
 
     svg.append("text")      // text label for the x axis
-      .attr("transform", `translate(${width / 2},${height - 10})`)
+      .attr("transform", `translate(${width / 2},${height})`)
       .attr("fill", "white")
+      .attr("font-size", "1vh")
       .attr("font-weight", "bold")
       .style("text-anchor", "middle")
       .text("Date");
@@ -778,6 +804,7 @@ Promise.all([
       .attr("x", 0 - (height / 2) + margin.top)
       .attr("dy", "1em")
       .attr("fill", "white")
+      .attr("font-size", "1vh")
       .attr("font-weight", "bold")
       .style("text-anchor", "middle")
       .text("Number");
@@ -793,26 +820,42 @@ Promise.all([
       .attr("fill", "none")
       // .attr("stroke", "steelgreen")
       .attr("stroke", "#45bd20")
-      .attr("stroke-width", 2)
+      .attr("stroke-width", 3)
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
       .attr("d", line)
-      .attr('linechart-tippy', d => {
+
+    var dots = plan.selectAll(".dot")
+      .data(casesFilteredByYear)
+      .enter().append("circle") // Uses the enter().append() method
+      .attr("class", "dot") // Assign a class for styling
+      // .attr("stroke", "steelblue")
+      .attr("stroke", "#222222")
+      .attr("fill", "#45bd20")
+      .attr("cx", function (d, i) { return x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))) })
+      .attr("cy", function (d) { return y(d[1]) })
+      .attr("r", 5)
+      .attr('circlechart-tippy', d => {
         return `<div class="country-tippy">	
-            <b>Name</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
-            <b>N° Paper</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
-        </div>`
+              <b>Date</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
+              <b>Cases</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
+          </div>`
       });
 
-    plan.append("path")
-      .attr("id", "deaths")
-      .datum(deathsFilteredByYear)
-      .attr("fill", "none")
-      .attr("stroke", "#fb1e05")
-      .attr("stroke-width", 2)
-      .attr("stroke-linejoin", "round")
-      .attr("stroke-linecap", "round")
-      .attr("d", line);
+    // plan.append("path")
+    //   .attr("id", "deaths")
+    //   .datum(deathsFilteredByYear)
+    //   .attr("fill", "none")
+    //   .attr("stroke", "#fb1e05")
+    //   .attr("stroke-width", 3)
+    //   .attr("stroke-linejoin", "round")
+    //   .attr("stroke-linecap", "round")
+    //   .attr("d", line).attr('deathschart-tippy', d => {
+    //     return `<div class="country-tippy">	
+    //         <b>Date</b> ${'&nbsp;'.repeat(2)}${d[0]}<br>
+    //         <b>N° Paper</b> ${'&nbsp;'.repeat(1)}${d[1]}<br>
+    //     </div>`
+    //   });
 
     svg.on('dblclick', function reset() {
       x.domain([new Date(moment(d3.min(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD')), new Date(moment(d3.max(casesFilteredByYear, d => d[0]), 'YYYY-MM-DD'))])
@@ -824,7 +867,8 @@ Promise.all([
         .call(d3.axisBottom(x)
           .tickFormat(d => formatMonthLabel(d))
           .ticks(width / 80)
-          .tickSizeOuter(0))
+          // .tickSizeOuter(0)
+        )
 
       d3.select('#yNumber')
         .transition()
@@ -844,109 +888,50 @@ Promise.all([
           .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
           .y(d => y(d[1]))
         )
-      plan
-        .select('#deaths')
+
+      d3.selectAll(".dot") // change the circle
         .transition()
         .duration(1000)
-        .attr('d', d3.line()
-          .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
-          .y(d => y(d[1]))
-        )
+        .attr("cx", function (d, i) { return x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))) })
+        .attr("cy", function (d) { return y(d[1]) })
+
+      tippy('[circlechart-tippy]', {
+        content(reference) {
+          return reference.getAttribute('circlechart-tippy')
+        },
+        allowHTML: true,
+        performance: true,
+        arrow: true,
+        size: 'large',
+        animation: 'scale',
+        // followCursor: 'initial'
+        // placement: 'auto-start',
+        // followCursor: 'vertical',
+      })
+      // plan
+      //   .select('#deaths')
+      //   .transition()
+      //   .duration(1000)
+      //   .attr('d', d3.line()
+      //     .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
+      //     .y(d => y(d[1]))
+      //   )
     })
 
-    const tooltip = svg.append("g");
-
-    d3.select("#cases").on("touchmove mousemove", function (event) {
-      const { date, value } = bisectCases(d3.pointer(event, this)[0])
-
-      tooltip
-        .attr("transform", `translate(${x(date)},${y(value)})`)
-        .call(callout, `Cases: ${value}\nDate: ${dayFormat(date)}`);
-      // .call(callout, `${value}\n${dayFormat(date)}`);
-
-    });
-
-    d3.select("#deaths").on("touchmove mousemove", function (event) {
-      const { date, value } = bisectDeaths(d3.pointer(event, this)[0])
-
-      tooltip
-        .attr("transform", `translate(${x(date)},${y(value)})`)
-        .call(callout, `Deaths: ${value}\nDate: ${dayFormat(date)}`);
-      // .call(callout, `${value}\n${dayFormat(date)}`);
-
-    });
-
-    svg.on("touchend mouseleave", () => tooltip.call(callout, null));
-
-    bisectCases = (point) => {
-      const date = x.invert(point)
-      const value = casesMap.get(dayFormat(date))
-
-      // console.log(date)
-      // console.log(value)
-
-      return { date, value }
-    }
-
-    bisectDeaths = (point) => {
-      const date = x.invert(point)
-      const value = deathsMap.get(dayFormat(date))
-
-      // console.log(date)
-      // console.log(value)
-
-      return { date, value }
-    }
-
-    callout = (g, value) => {
-      if (value == null) return g.style("display", "none");
-
-      g
-        .style("display", null)
-        .style("pointer-events", "none")
-        .style("font", "2.5vh");
-
-      const path = g.selectAll("path")
-        .data([null])
-        .join("path")
-        .attr("fill", "white")
-        .attr("stroke", "black");
-
-      const text = g.selectAll("text")
-        .data([null])
-        .join("text")
-        .call(text => text
-          .selectAll("tspan")
-          .data((value + "").split(/\n/))
-          .join("tspan")
-          .attr("x", 0)
-          .attr("y", (d, i) => `${i * 1.1}em`)
-          .style("font-weight", (_, i) => i ? null : "bold")
-          .text(d => d));
-
-      const { x, y, width: w, height: h } = text.node().getBBox();
-
-      // text.attr("transform", `translate(${-w / 2},${15 - y})`);
-      // path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`);
-
-      text.attr("transform", `translate(${-w / 2},${y - 15})`);
-      path.attr("d", `M${-w / 2 - 10},5H-5l5,-5l5,5H${w / 2 + 10}v${h + 20}h-${w + 20}z`)
-        .attr("transform", "rotate(180)");
-    }
-
-    tippy('[linechart-tippy]', {
+    tippy('[circlechart-tippy]', {
       content(reference) {
-        return reference.getAttribute('linechart-tippy')
+        return reference.getAttribute('circlechart-tippy')
       },
       allowHTML: true,
       performance: true,
       arrow: true,
       size: 'large',
       animation: 'scale',
-      followCursor: 'initial'
+      // followCursor: 'initial'
       // placement: 'auto-start',
       // followCursor: 'vertical',
     })
+
   }
 
   // -----------------------------------------------------------------------------------------------
@@ -969,10 +954,10 @@ Promise.all([
           .attr('value', d)
           .text(d)
       }
-      if (nation.length == '1') {
-        console.log("Dentro")
-        d3.select('#selectChart').property('value', nation[0])
-      }
+      // if (nation.length == '1') {
+      //   console.log("Dentro")
+      //   d3.select('#selectChart').property('value', nation[0])
+      // }
     }
 
 
@@ -1445,7 +1430,7 @@ Promise.all([
       arrow: true,
       size: 'large',
       animation: 'scale',
-      followCursor: 'initial'
+      followCursor: 'horizontal',
       // placement: 'auto-start',
       // followCursor: 'vertical',
     })
@@ -1514,10 +1499,15 @@ Promise.all([
 //   })
 // }
 
-function lockUI() {
-  console.log("LockUI")
-  document.getElementById("overlay").style.display = "block";
-  document.getElementById("loader").style.display = "block";
+async function lockUI() {
+  try {
+    console.log("LockUI")
+    document.getElementById("overlay").style.display = "block";
+    document.getElementById("loader").style.display = "block";
+
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 function unlockUI() {
