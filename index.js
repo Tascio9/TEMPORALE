@@ -1,8 +1,8 @@
 Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
-  d3.json("Dataset201214ClassificationCleaned.json"),
-  d3.json("CovidEuropean_new.json")
+  d3.json("Dataset210203ClassificationCleaned.json"),
+  d3.json("CovidEuropean_20210203.json")
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json")
 ]).then(data => {
   // data[0] is the first dataset "world"
@@ -33,6 +33,8 @@ Promise.all([
       .text(d)
   }
   d3.select('#selectYear').append('option').attr('value', 'All').text('All')
+
+  yearValue = d3.select('#selectYear').property('value')
 
   const dataset2020 = groupByYear.get(yearValue)
 
@@ -717,7 +719,8 @@ Promise.all([
             .ticks(width / 160)
           // .tickSizeOuter(0)
         ).attr("font-size", "1vh").attr("color", "white")
-        d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y)).attr("font-size", "1vh")
+
+        d3.select('#yNumber').transition().duration(1000).call(d3.axisLeft(y))
           .attr("color", "white")
           .on("start", () => {
             d3.select('#yNumber')
@@ -774,6 +777,12 @@ Promise.all([
       .attr("font-size", "1vh")
       .attr("color", "white")
       .call(brush)
+    // .call(g => g.select(".tick:last-of-type text")
+    //   .attr("x", 3)
+    //   .attr("text-anchor", "middle")
+    //   .attr("font-weight", "bold")
+    //   .text('Number')
+    // )
 
     const yAxis = g => g
       .attr("id", "yNumber")
