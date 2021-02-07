@@ -1,0 +1,5 @@
+tips:
+colorare brush dello sliderTime
+aggiungere dot al posto del arrow
+update del chart con animazione
+crossfilter

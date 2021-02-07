@@ -10,6 +10,11 @@ body {
   /* min-height: 100%; */
 }
 
+#titleThesis{
+  fill: color;
+  color: white;
+}
+
 .boundary {
   stroke: white;
   stroke-opacity: 0.4;
@@ -40,17 +45,20 @@ body {
 .container {
   display: grid;
   /* grid-template-columns: [first-column] 1vw [line1] 10vw [line2] auto [line3] 10vw [line4] 1vw [last-column]; */
-  grid-template-columns: [first-column] 0.1vw [line1] 15% [line2] 15% [line3] auto [line4] auto [line5] 0.1vw [last-column];
-  grid-template-rows: [first-row] 5vh [mid1] auto [mid2] auto [mid3] auto [mid4] auto [mid5] auto [last-row];
+  /* grid-template-columns: [first-column] 0.1vw [line1] 15% [line2] 15% [line3] auto [line4] auto [line5] 0.1vw [last-column];
+  grid-template-rows: [first-row] 5vh [mid1] auto [mid2] auto [mid3] auto [mid4] auto [mid5] auto [last-row]; */
+  grid-template-columns: [first-column] 0.1vw [line1] 9% [line2] auto [line3] 31% [line4] 0.1vw [last-column];
+  grid-template-rows: [first-row] 2% [mid1] auto [mid2] auto [mid3] auto [mid4] auto [last-row];
   grid-column-gap: 0.5vw;
+  grid-row-gap: 0.5vw;
   padding-left: 0.2vw;
   padding-right: 0.2vw;
 }
 
 /* Grid Item */
 .test {
-  grid-column-start: line1;
-  grid-column-end: line2;
+  grid-column-start: line3;
+  grid-column-end: line4;
   grid-row-start: first-row;
   grid-row-end: mid1;
   justify-self: center;
@@ -69,29 +77,32 @@ body {
 }
 
 .yearSelect {
-  grid-column-start: line2;
-  grid-column-end: line3;
-  grid-row-start: first-row;
-  grid-row-end: mid1;
+  grid-column-start: line1;
+  grid-column-end: line2;
+  grid-row-start: mid3;
+  grid-row-end: mid4;
   align-self: center;
+  margin: 0.5vh;
 }
 
 .title {
   grid-column-start: line1;
-  grid-column-end: line5;
+  grid-column-end: line3;
   grid-row-start: first-row;
   grid-row-end: mid1;
-  justify-self: center;
-  align-self: center;
+  justify-self: left;
+  align-self: left;
 }
 
 .reset {
-  grid-column-start: line4;
-  grid-column-end: line5;
-  grid-row-start: first-row;
-  grid-row-end: mid1;
+  grid-column-start: line1;
+  grid-column-end: line2;
+  grid-row-start: mid3;
+  grid-row-end: mid4;
   justify-self: center;
   align-self: center;
+  background-color: #333333;
+  border-radius: 5px;
 }
 
 .chart-div {
@@ -103,53 +114,70 @@ body {
   /* justify-self: center;
     align-self: center; */
   color: white;
+  background-color: #333333;
+  border-radius: 5px;
 }
 
 .legend-div {
-  grid-column-start: line2;
-  grid-column-end: line3;
-  grid-row-start: mid1;
-  grid-row-end: mid2;
+  grid-column-start: line1;
+  grid-column-end: line2;
+  grid-row-start: mid2;
+  grid-row-end: mid3;
+  justify-self: center;
   /* justify-self: center;
   align-self: center; */
   color: white;
+  background-color: #333333;
+  border-radius: 5px;
+  margin: 0.5vh;
+}
+
+/* .selectChart-div {
+  grid-column-start: line3;
+  grid-column-end: line4;
+  grid-row-start: mid3;
+  grid-row-end: mid4;
+} */
+
+.barchart-div {
+  grid-column-start: line3;
+  grid-column-end: line4;
+  grid-row-start: mid1;
+  grid-row-end: mid2;
+  color: white;
+  justify-self: center;
+  background-color: #333333;
+  border-radius: 5px;
+  padding: 0.75rem;
 }
 
 .chart {
-  grid-column-start: line1;
-  grid-column-end: line3;
-  grid-row-start: mid3;
-  grid-row-end: mid4;
-}
-
-.selectChart-div {
-  grid-column-start: line1;
-  grid-column-end: line3;
+  grid-column-start: line3;
+  grid-column-end: line4;
   grid-row-start: mid2;
-  grid-row-end: mid3;
-}
-
-.barchart-div {
-  grid-column-start: line1;
-  grid-column-end: line3;
-  grid-row-start: mid4;
-  grid-row-end: mid5;
+  grid-row-end: mid4;
+  align-self: last baseline;
   /* justify-self: center;
   align-self: center; */
   color: white;
+  background-color: #333333;
+  border-radius: 5px;
+  padding: 0.75rem;
 }
 
 .map-div {
-  grid-column-start: line3;
-  grid-column-end: line5;
+  grid-column-start: line2;
+  grid-column-end: line3;
   grid-row-start: mid1;
-  grid-row-end: mid5;
+  grid-row-end: mid4;
+  background-color: #333333;
+  border-radius: 5px;
 }
 
 .filter-div {
   grid-column-start: line1;
-  grid-column-end: line5;
-  grid-row-start: mid5;
+  grid-column-end: line4;
+  grid-row-start: mid4;
   grid-row-end: last-row;
   display: blocks;
   background-color: rgb(220, 220, 220);
@@ -165,9 +193,13 @@ body {
 }
 
 .selectChartCountries {
-  margin-left: 30%;
+  /* margin-left: 30%; */
   margin-right: 30%;
   width: 40%;
+}
+
+#buttonReset {
+  width: 170px;
 }
 
 /* SVGs

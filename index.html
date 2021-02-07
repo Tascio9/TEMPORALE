@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css" />
     <!-- Development -->
     <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+    <!-- <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script> -->
     <!-- Production -->
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
@@ -75,25 +75,30 @@
       </div>
     </div>
 
-    <div class="yearSelect">
-      <label class="label">Year: </label>
-      <select id="selectYear">
-        <!-- <option value="All">All</option> -->
-      </select>
-      <button id="buttonReset" style="margin-left: 2.5vw;">Reset</button>
-    </div>
+
 
 
     <div class="title">
-      <h1 id="titleThesis">CORD - 19 Research Viz</h1>
+      <h1 id="titleThesis" href="https://www.kaggle.com/allen-institute-for-ai/CORD-19-research-challenge">CORD - 19
+        Research Viz</h1>
     </div>
 
     <div class="reset">
+      <button id="buttonReset">Reset</button>
     </div>
 
-    <div class="chart-div"></div>
+    <div class="chart-div">
 
-    <div class="legend-div"></div>
+    </div>
+
+    <div class="legend-div">
+      <div class="yearSelect">
+        <label class="label">Year: </label>
+        <select id="selectYear">
+          <!-- <option value="All">All</option> -->
+        </select>
+      </div>
+    </div>
 
     <div class="barchart-div">
       <svg id="barchart"></svg>
@@ -101,10 +106,9 @@
 
 
     <div class="chart">
+      <div class="selectChart-div"></div>
       <svg id="line-chart"></svg>
     </div>
-
-    <div class="selectChart-div"></div>
 
     <div class="map-div">
       <svg id="worldMap"></svg>
