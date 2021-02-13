@@ -9,10 +9,8 @@ Promise.all([
   // data[1] is the second dataset by me
   // data[2] CovidEuropean: cases and deaths for nation + date
   const groupByYear = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 1).join('-'))
-  const groupByMonth = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 2).join('-'))
+  let groupByMonth = d3.group(data[1], d => d.Publish_time.split('-').slice(0, 2).join('-'))
 
-  let yearValue = '2020'
-  let yearDataset
   let colorChartBoolean = false           // Variable to set true when the brush on 'colorChart' happends
   let countriesChart = []                 // Variable to store the countries obtained by the brush action on 'colorChart'
   let colorPalette = d3.select('input[name="colorPalette"]:checked').property('value')
@@ -34,9 +32,9 @@ Promise.all([
   }
   d3.select('#selectYear').append('option').attr('value', 'All').text('All')
 
-  yearValue = d3.select('#selectYear').property('value')
+  let yearValue = d3.select('#selectYear').property('value')
 
-  const datasetYear = groupByYear.get(yearValue)
+  let datasetYear = groupByYear.get(yearValue)
 
   // Container LINE-CHART ---------------------------------------------------------------------
   // Draw the left chart bar for the colors
@@ -79,14 +77,15 @@ Promise.all([
       sliderTime(data[1])
       Table(data[1])
     } else {
-      yearDataset = groupByYear.get(this.value)
+      datasetYear = groupByYear.get(this.value)
+      console.log({ datasetYear })
       colorChartBoolean = false
       lockUI()
-      colorMap(yearDataset)
-      colorChart(yearDataset)
-      sliderTime(yearDataset)
-      barchart(yearDataset)
-      Table(yearDataset)
+      colorMap(datasetYear)
+      colorChart(datasetYear)
+      sliderTime(datasetYear)
+      barchart(datasetYear)
+      Table(datasetYear)
       unlockUI()
     }
     chart(data[2], '')
@@ -104,11 +103,11 @@ Promise.all([
       colorChart(data[1])
       sliderTime(data[1])
     } else {
-      yearDataset = groupByYear.get(yearValue)
+      datasetYear = groupByYear.get(yearValue)
       colorChartBoolean = false
-      colorMap(yearDataset)
-      colorChart(yearDataset)
-      sliderTime(yearDataset)
+      colorMap(datasetYear)
+      colorChart(datasetYear)
+      sliderTime(datasetYear)
     }
   });
 
@@ -122,7 +121,9 @@ Promise.all([
 
   // - Button RESET
   d3.select('#buttonReset').on('click', function () {
-    d3.select('#selectYear').property('value')
+    console.log('RESET')
+    yearValue = d3.select('#selectYear').property('value')
+    datasetYear = groupByYear.get(yearValue)
     chart(data[2], '')
     // selectChart()
     colorChart(datasetYear)
@@ -630,16 +631,23 @@ Promise.all([
       .text('-- World --')
 
     if (nation) {
-      for (let d of nation) {
+      if (typeof (nation) === 'string') {
         d3.select('#selectChart')
           .append('option')
-          .attr('value', d)
-          .text(d)
+          .attr('value', nation)
+          .text(nation)
+        d3.select('#selectChart').property('value', nation)
+        casesMap = d3.rollup(data.get(nation.split(" ").join("_")), v => d3.sum(v, e => e.cases_weekly), function (k) {
+          return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
+        })
+      } else {
+        for (let d of nation) {
+          d3.select('#selectChart')
+            .append('option')
+            .attr('value', d)
+            .text(d)
+        }
       }
-      // if (nation.length == '1') {
-      //   console.log("Dentro")
-      //   d3.select('#selectChart').property('value', nation[0])
-      // }
     }
 
 
@@ -962,6 +970,9 @@ Promise.all([
       //     .x(d => x(new Date(moment(d[0], 'YYYY-MM-DD').format('YYYY-MM-DD'))))
       //     .y(d => y(d[1]))
       //   )
+      if (typeof (nation) === 'string') {
+        casesFilteredByYear = update(nation)
+      }
     })
 
     // A function that update the chart
@@ -1157,14 +1168,14 @@ Promise.all([
       .selectAll("rect")
       .data(function (d) {
         return keys.map(function (key) {
-          console.log(key) // 0, 1, 2, 3, 4
+          // console.log(key) // 0, 1, 2, 3, 4
           let value
           try {
             value = datasetClass.get(d).get(key).length
           } catch {
             value = 0
           }
-          console.log(value)
+          // console.log(value)
           return { key: key, value: value };
         });
       })
@@ -1548,8 +1559,7 @@ Promise.all([
           // selectChart(chosenNation)
           chart(data[2], chosenNation)
           barchart(dataset, chosenNation)
-        }
-        else {
+        } else {
           chosenNation = []
           chosenNation.push(this.id)
           var clickedNation = datasetState.get(this.id)
@@ -1559,7 +1569,7 @@ Promise.all([
           chart(data[2], this.id)
           // selectChart(chosenNation)
           barchart(dataset, chosenNation)
-          Table(clickedNation)
+          Table(datasetState.get(this.id))
         }
       })
     // .call(d3.zoom().on("zoom", function (event) {
