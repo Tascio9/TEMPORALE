@@ -3,3 +3,28 @@ colorare brush dello sliderTime
 aggiungere dot al posto del arrow
 update del chart con animazione
 crossfilter
+
+
+
+INDICE
+INTRODUZIONE
+1. <Problematica>
+    1.1 New "Hottest" Topic -> come tenere traccia dello sviluppo di un nuovo "fenomeno" scientifico (tool visivo per 
+        aiutare dato che è assente)
+    1.2 Case study: COVID 19
+2. <State of the Art & Related work> -> ricerca sulla (studi di bibliografia, tool che hanno provato a visualizzare dati,
+        text mining per ricercare paper, visualizzation, MANCA UN TOOL CHE MANTIENE TRACCIA DELLA RICERCA)
+3. <Problema affrontato: Definizione (cioè Requisiti)>
+    3.1 Dataset e pre processing (chi è, cos'è, da dove viene, problematiche annesse..)
+    3.2 Visualizzazione
+4. <Strumenti metodologici e tecnologici utilizzati e NON>
+
+5. <Soluzione: analisi del problema (architettura, tecniche)
+
+
+INTRODUZIONE - Descritto il problema
+STATE OF THE ART
+METHODOLOGY --> THE SYSTEM and CLUSTERING
+RESULTS
+CONCLUSIONS
+FUTURE WORKS
