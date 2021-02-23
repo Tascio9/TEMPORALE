@@ -57,24 +57,33 @@
 
   <div class="container">
     <div class="test">
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div class="formPalette">
+            <form id="radioPalette">
+              <label>Color palette:</label>
+              <input type="radio" name="colorPalette" value="Viridis" checked>Viridis</input>
+              <input type="radio" name="colorPalette" value="Magma">Magma</input>
+            </form>
+          </div>
+
+          <div class="formScale">
+            <form id="radioScale">
+              <label>Scale:</label>
+              <input type="radio" name="scale" value="Linear" checked>Linear</input>
+              <input type="radio" name="scale" value="Log">Logarithmic</input>
+            </form>
+          </div>
+        </div>
+
+      </div>
       <input id="settings" type="image" src="Icons/settings.png" alt="Settings">
       <input id="about" type="image" src="Icons/about.png" alt="About">
       <!-- <h1 id="state">Hello!</h1> -->
-      <div class="formPalette">
-        <form id="radioPalette" class="label">
-          <label class="label">Color palette:</label>
-          <input type="radio" name="colorPalette" value="Viridis" checked>Viridis</input>
-          <input type="radio" name="colorPalette" value="Magma">Magma</input>
-        </form>
-      </div>
-
-      <div class="formScale">
-        <form id="radioScale" class="label">
-          <label class="label">Scale:</label>
-          <input type="radio" name="scale" value="Linear" checked>Linear</input>
-          <input type="radio" name="scale" value="Log">Logarithmic</input>
-        </form>
-      </div>
     </div>
 
 
