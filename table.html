@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CORD - 19: Viz</title>
+    <link rel="icon" type="image/png" href="./Icons/favicon.ico" />
     <link rel="stylesheet" href="styles.css">
     <!-- Font selected: Oxygen (https://fonts.google.com/specimen/Oxygen?sidebar.open=true&selection.family=Oxygen:wght@300;400;700) -->
     <link href="https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap" rel="stylesheet">
@@ -19,7 +20,7 @@
     <script type="text/javascript" src="js/dataTables.colResize.js"></script>
     <script>
         var dataset = JSON.parse(sessionStorage.getItem("dataset"));
-        var hScroll = $(window).height() -250
+        var hScroll = $(window).height() - 250
         console.log(dataset)
         $(document).ready(function () {
             $('#paperTable').DataTable({

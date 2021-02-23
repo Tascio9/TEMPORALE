@@ -206,6 +206,16 @@ body {
   width: 170px;
 }
 
+#settings{
+  width: 3%;
+  height: auto;
+}
+
+#about{
+  width: 3%;
+  height: auto;
+}
+
 .table-div{
   height: 97%;
   background-color: rgb(220, 220, 220);

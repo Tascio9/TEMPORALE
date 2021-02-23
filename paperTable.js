@@ -7,19 +7,22 @@ function Table(dataset) {
     console.log(typeof (dataset))
     console.log({ dataset })
 
-    const newTabButton = document.createElement('button')
-    newTabButton.setAttribute('id', 'newTable')
-    newTabButton.innerHTML = "Open in a new tab"
+    const newTabButton = document.createElement('input')
+    newTabButton.setAttribute('id', '')
+    newTabButton.setAttribute('type', 'image')
+    newTabButton.setAttribute('scr', 'Icons/popup.png')
+    newTabButton.setAttribute('alt', 'Open in a new tab')
+    // newTabButton.innerHTML = "Open in a new tab"
     newTabButton.addEventListener("click", function () {
-        if (!extend) {
-            extend = true
-            d3.select('.filter-div').transition().duration(1000).style('height', '40vh')
-            console.log('40vh')
-        } else {
-            extend = false
-            d3.select('.filter-div').transition().duration(1000).style('height', '20vh')
-            console.log('25vh')
-        }
+        // if (!extend) {
+        //     extend = true
+        //     d3.select('.filter-div').transition().duration(1000).style('height', '40vh')
+        //     console.log('40vh')
+        // } else {
+        //     extend = false
+        //     d3.select('.filter-div').transition().duration(1000).style('height', '20vh')
+        //     console.log('25vh')
+        // }
         $('#paperTable').DataTable().clear().draw();
         $('#paperTable').DataTable().rows.add(dataset); // Add new data
         $('#paperTable').DataTable().columns.adjust().draw(); // Redraw the DataTable
