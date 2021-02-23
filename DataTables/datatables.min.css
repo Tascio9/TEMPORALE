@@ -381,7 +381,7 @@ table.dataTable td {
 
 .dataTables_wrapper .dataTables_filter {
     float: left;
-    text-align: right;
+    /* text-align: right; */
     padding: 0.4vw;
 }
 

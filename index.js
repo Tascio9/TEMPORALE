@@ -128,8 +128,15 @@ Promise.all([
     // window.addEventListener("resize", location.reload());
   })
 
+  // - Button SETTINGS
+  d3.select('#settings').on('click', function() {
+    window.alert('Settings')
+  })
 
-
+  // - Button ABOUT
+   d3.select('#about').on('click', function() {
+     window.alert('About')
+  })
 
   // - Button RESET
   d3.select('#buttonReset').on('click', function () {

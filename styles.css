@@ -216,6 +216,20 @@ body {
   height: auto;
 }
 
+#popup{
+  width: 2.7%;
+  height: auto;
+  vertical-align: middle;
+}
+
+/* #popup{
+  background: url('Icons/popup.png');
+  background-repeat: no-repeat;
+  width: 100px;
+  height: 100px;
+  border: 0;
+} */
+
 .table-div{
   height: 97%;
   background-color: rgb(220, 220, 220);

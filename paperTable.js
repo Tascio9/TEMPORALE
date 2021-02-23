@@ -8,9 +8,9 @@ function Table(dataset) {
     console.log({ dataset })
 
     const newTabButton = document.createElement('input')
-    newTabButton.setAttribute('id', '')
+    newTabButton.setAttribute('id', 'popup')
     newTabButton.setAttribute('type', 'image')
-    newTabButton.setAttribute('scr', 'Icons/popup.png')
+    newTabButton.setAttribute('src', 'Icons/popup.png')
     newTabButton.setAttribute('alt', 'Open in a new tab')
     // newTabButton.innerHTML = "Open in a new tab"
     newTabButton.addEventListener("click", function () {
@@ -66,7 +66,7 @@ function Table(dataset) {
             ],
             pageResize: true,
             scrollResize: true,
-            // scrollY: '15vh',
+            scrollY: '15vh',
             scrollCollapse: true,
             paging: true
         });
