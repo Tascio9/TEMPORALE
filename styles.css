@@ -207,15 +207,15 @@ body {
 }
 
 .table-div{
-  height: 98%;
+  height: 97%;
   background-color: rgb(220, 220, 220);
   border-radius: 5px;
-  margin: 0.2vw;
+  margin: 0.5vw;
 }
 
-div.dataTables_length {
+/* div.dataTables_length {
   display: none;
-}
+} */
 
 /* SVGs
 #worldMap{

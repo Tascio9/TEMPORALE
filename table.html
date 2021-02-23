@@ -19,9 +19,12 @@
     <script type="text/javascript" src="js/dataTables.colResize.js"></script>
     <script>
         var dataset = JSON.parse(sessionStorage.getItem("dataset"));
+        var hScroll = $(window).height() -250
         console.log(dataset)
         $(document).ready(function () {
             $('#paperTable').DataTable({
+                pageLength: 50,
+                lengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]],
                 dom: 'Zlfrtip',             // Needed to use colResize. See it on index.html
                 data: dataset,
                 columns: [
@@ -43,9 +46,7 @@
                     { data: 'Journal' },
                     { data: 'Classification' }
                 ],
-                responsive: true,
-                scrollY: "100%",
-                pageResize: true,
+                scrollY: "80vh",
                 scrollResize: true,
                 scrollCollapse: true,
                 paging: true

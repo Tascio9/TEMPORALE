@@ -61,10 +61,9 @@ function Table(dataset) {
                 { data: 'Journal' },
                 { data: 'Classification' }
             ],
-            responsive: true,
             pageResize: true,
             scrollResize: true,
-            scrollY: '15vh',
+            // scrollY: '15vh',
             scrollCollapse: true,
             paging: true
         });
