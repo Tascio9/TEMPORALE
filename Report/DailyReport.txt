@@ -1,3 +1,64 @@
+-- 2021-02-18
+Passo a W2V.
+Inizio con l'original.
+# CBOW (Continuous Bag of Words) [https://media.geeksforgeeks.org/wp-content/uploads/cbow-1.png]
+word2vec = Word2Vec(dataset_w2v.values(), min_count=3, size=100, window=5) # size 100 by default
+X = (19700, 100)
+Elbow curve.
+Cluster 5.
+Silhouette Coefficient: 0.53445053
+
+SVD a 75 features.
+Silhouette Coefficient: 0.06819047
+
+tSNE
+Silhouette Coefficient: 0.360
+
+-- 2021-02-18
+Inizio a processare l'ultimo e definitvo dataset(cord-19_2021-02-15):
+https://ai2-semanticscholar-cord-19.s3-us-west-2.amazonaws.com/historical_releases/cord-19_2021-02-15.tar.gz
+Procedo con estrarrere abstract SOLO dei paper 2020-2021 e utilizzo LEMMATIZER.
+TFIDF: vectorizer = TfidfVectorizer(stop_words='english', use_idf=True, 
+                             smooth_idf=True, ngram_range=(1,2), min_df=100) ## Corpus is in English
+Ottengo alla fine X = (66979, 5859) [paper x terms].
+Cerco con Elbow curve il gomito -> Dataset210215_2021_abstract_lem_eng_10.
+Data la curva, scelgo K=3. In 210215/Originals ottengo le 3 classificazioni.
+Cluster 0: "health" "pandemic" "model" "data" "social" "care" "time" "number" "public" "analysis"
+Cluster 1: "severe" "respiratory" "clinical" "infection" "mortality" "day" "risk" "acute" "syndrome" "treatment"
+Cluster 2: "protein" "viral" "ace" "cell" "immune" "infection" "binding" "human" "host" "expression"
+Silhouette Coefficient: 0.005495839093630324
+
+
+Decido di tracciare la varianza -> Variance.png
+Scelgo max_features = 500 ed disegno di nuovo l'Elbow curve -> Dataset210215_2021_abstract_lem_eng_10_500features
+Di nuovo, scelgo K=3 e clusterizzo.
+Cluster 0: "protein" "viral" "cell" "ace" "immune" "human" "infection" "binding" "host" "expression"
+Cluster 1: "health" "pandemic" "model" "data" "social" "care" "time" "number" "public" "analysis"
+Cluster 2: "clinical" "severe" "respiratory" "infection" "day" "mortality" "risk" "acute" "treatment" "patient"
+Silhouette Coefficient: 0.013
+
+tSNE 
+Silhouette Coefficient: 0.382
+
+Passo al trovare il PERFECT DATASET.
+X diventa adesso (36438, 3643).
+Traccio Elbow Curve -> Dataset210215_2021_abstract_lem_eng_10_perfect
+Cluster 0: "health" "pandemic" "data" "model" "social" "care" "time" "public" "analysis" "number"
+Cluster 1: "severe" "respiratory" "clinical" "infection" "day" "acute" "mortality" "risk" "syndrome" "treatment"
+Cluster 2: "protein" "viral" "ace" "cell" "infection" "binding" "immune" "human" "host" "spike"
+Silhouette Coefficient: 0.006620304587912687
+
+SVD a 500 features. Cluster a 3 -> Dataset210215_2021_abstract_lem_eng_10_500features_perfect
+Cluster 0: "protein" "viral" "cell" "ace" "infection" "human" "immune" "binding" "host" "antiviral"
+Cluster 1: "health" "pandemic" "data" "model" "social" "care" "time" "analysis" "paper" "public"
+Cluster 2: "clinical" "severe" "respiratory" "infection" "day" "acute" "mortality" "risk" "treatment" "syndrome"
+Silhouette Coefficient: 0.015
+
+tSNE
+Silhouette Coefficient: 0.387
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+
 -- 2021-01-09
 Nuovo anno, decido di usare anche papers che sono presenti nel 2021 (magari).
 

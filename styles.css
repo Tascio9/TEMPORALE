@@ -4,7 +4,7 @@
 
 body {
   margin: 0px;
-  overflow: hidden;
+  /* overflow: hidden; */
   background-color: #222222;
   font-family: 'Oxygen', sans-serif;
   /* min-height: 100%; */
@@ -204,6 +204,17 @@ body {
 
 #buttonReset {
   width: 170px;
+}
+
+.table-div{
+  height: 98%;
+  background-color: rgb(220, 220, 220);
+  border-radius: 5px;
+  margin: 0.2vw;
+}
+
+div.dataTables_length {
+  display: none;
 }
 
 /* SVGs

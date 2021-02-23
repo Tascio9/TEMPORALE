@@ -2,13 +2,41 @@
 // Takes in input an object (NOT A LIST WITH NATIONS, DATE ecc... )
 // "dataset" and draw it.
 function Table(dataset) {
+    var extend = false
+
     console.log(typeof (dataset))
     console.log({ dataset })
 
-    if ($.fn.dataTable.isDataTable('#paperTable')) {
-        $('#paperTable').DataTable().clear().draw();;
+    const newTabButton = document.createElement('button')
+    newTabButton.setAttribute('id', 'newTable')
+    newTabButton.innerHTML = "Open in a new tab"
+    newTabButton.addEventListener("click", function () {
+        if (!extend) {
+            extend = true
+            d3.select('.filter-div').transition().duration(1000).style('height', '40vh')
+            console.log('40vh')
+        } else {
+            extend = false
+            d3.select('.filter-div').transition().duration(1000).style('height', '20vh')
+            console.log('25vh')
+        }
+        $('#paperTable').DataTable().clear().draw();
         $('#paperTable').DataTable().rows.add(dataset); // Add new data
         $('#paperTable').DataTable().columns.adjust().draw(); // Redraw the DataTable
+        sessionStorage.setItem("dataset", JSON.stringify(dataset));
+        var win = window.open("./table.html#test?dataset");
+        win.focus()
+        // var win = window.open('./table.html');
+        // win.focus();
+    })
+
+    if ($.fn.dataTable.isDataTable('#paperTable')) {
+        $('#paperTable').DataTable().clear().draw();
+        $('#paperTable').DataTable().rows.add(dataset); // Add new data
+        $('#paperTable').DataTable().columns.adjust().draw(); // Redraw the DataTable
+        document.getElementById('newTable').remove()
+        document.getElementById('paperTable_filter').appendChild(newTabButton)
+
         console.log('Distrutto')
     } else {
         $('#paperTable').DataTable({
@@ -33,18 +61,13 @@ function Table(dataset) {
                 { data: 'Journal' },
                 { data: 'Classification' }
             ],
-            // pageResize: true,
+            responsive: true,
+            pageResize: true,
             scrollResize: true,
-            // scrollY: '15vh',
+            scrollY: '15vh',
             scrollCollapse: true,
             paging: true
         });
-        const newTabButton = document.createElement('button')
-        newTabButton.innerHTML = "Open in a new tab"
-        newTabButton.addEventListener("click", function () {
-            var win = window.open();
-            win.focus();
-        })
         document.getElementById('paperTable_filter').appendChild(newTabButton)
     }
 }
