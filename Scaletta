@@ -1,0 +1,30 @@
+Title: Scientific Research Visualization: A Case Study on Covid-19 Literature
+1  Introduction
+2  Tracking research evolution process
+    2.1  Case study: Covid 19
+3  State of the Art
+4  System Design
+    4.1  Dataset and preprocessing
+        4.1.1  TF-IDF
+        4.1.2  KMEANS++
+        4.1.3  SVD
+        4.1.4  t-SNE
+    4.2  Visualization
+        4.2.1  Slider n° papers
+        4.2.2  Slider by time
+        4.2.3  Map
+        4.2.4  Barchart
+        4.2.5  Chart
+        4.2.6  Table
+5  System Implementation
+    5.1  Data Mining
+        5.1.1  Original
+        5.1.2  SVD
+        5.1.3  t-SNE
+    5.2  Visualization platform
+6  Conclusions & future works
+7  Bibliography
+
+
+
+-> FARE UNA PIPELINE: Dataset -> Data cleaning -> 

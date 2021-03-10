@@ -20,17 +20,19 @@ INTRODUZIONE -> "Abstract" e breve descrizione dei vari capitoli
 4. <Strumenti metodologici e tecnologici utilizzati e NON>
     4.1 Colab
     4.2 Python
-    4.3 JS - D3
+    4.3 JS
+    4.4 D3
+5. <
     4.4 TFIDF
-    4.5 W2V
     4.6 SVD
     4.7 t-SNE
     4.8 KMEANS++
-5. <Soluzione proposta>
+5. <Soluzione proposta e Risultati>
     5.1 Dataset e pre processing (chi è, cos'è, da dove viene, problematiche annesse..)
-    5.2 Tecniche utilizzate e poi perché scelte (data mining)
-        5.2.1 TFIDF
-        5.2.2 W2V
+    5.2 Tecnica applicata TFIDF (data mining)
+        5.2.1 Normal (Original)
+        5.2.2 SVD
+        5.2.3 tSNE
     5.3 Visual analysis
         5.3.1 Slider numero paper
         5.3.2 Slider su tempo
@@ -40,7 +42,7 @@ INTRODUZIONE -> "Abstract" e breve descrizione dei vari capitoli
         5.3.6 Tabella
 6. <Conclusioni e Lavori futuri>
     6.1 Conclusione ed eventuali lezioni imparate
-    6.2 Future migliorie ed estensioni 
+    6.2 Future migliorie ed estensioni // Sistema scalabile
 BIBLIOGRAFIA
 
 
@@ -51,3 +53,6 @@ METHODOLOGY --> THE SYSTEM and CLUSTERING
 RESULTS
 CONCLUSIONS
 FUTURE WORKS
+
+
+XIGRAIP -- Maestrale_20210310

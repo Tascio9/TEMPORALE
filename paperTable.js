@@ -37,7 +37,7 @@ function Table(dataset) {
         $('#paperTable').DataTable().clear().draw();
         $('#paperTable').DataTable().rows.add(dataset); // Add new data
         $('#paperTable').DataTable().columns.adjust().draw(); // Redraw the DataTable
-        document.getElementById('newTable').remove()
+        document.getElementById('popup').remove()
         document.getElementById('paperTable_filter').appendChild(newTabButton)
 
         console.log('Distrutto')

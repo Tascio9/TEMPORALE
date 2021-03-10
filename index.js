@@ -2,9 +2,11 @@ Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
   //d3.json("Dataset210203ClassificationCleaned.json"),
-  d3.json("Report/Images/210215/TFIDF/Dataset210215ClassificationCleaned.json"),
-  d3.json("CovidEuropean_20210210.json")
-  // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json")
+  d3.json("Report/Images/210215/TFIDF/Dataset210215ClassificationCleaned_tSNE.json"),
+  d3.json("CovidEuropean_20210309.json")                                   // ---> "The middle"
+  // d3.json("CovidEuropean_20210210.json")                                // ---> "The middle"
+  // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json") ---> Original
+  // d3.json(https://opendata.ecdc.europa.eu/covid19/nationalcasedeath/json/) ---> Actual
 ]).then(data => {
   // data[0] is the first dataset "world"
   // data[1] is the second dataset by me
@@ -652,9 +654,11 @@ Promise.all([
     //   //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     //   // })
     // } else {
+    // --------------------
     casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases_weekly), function (k) {
       return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     })
+    // --------------------
     //   // deathsMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.deaths_weekly), function (k) {
     //   //   return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
     //   // })
