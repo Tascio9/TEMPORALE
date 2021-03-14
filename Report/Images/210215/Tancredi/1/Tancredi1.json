@@ -1,0 +1,102 @@
+[
+    {
+        "Cord_UID": "8ee9ff0j",
+        "Title": "Cancer du poumon à l’ère du COVID-19: Lung cancer in the COVID-19 era",
+        "First_author": "Chouaid",
+        "DOI": "10.1016/s1877-1203(20)30155-5",
+        "Nation": "France",
+        "Publish_time": "2020-12-05",
+        "Journal": "Rev Malad Respir Actual",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "dd0mgalz",
+        "Title": "Antimicrobial resistant and extended-spectrum ß-lactamase (ESBL) producing Escherichia coli isolated from fecal samples of African dromedary camels",
+        "First_author": "Nüesch-Inderbinen",
+        "DOI": "10.1016/j.sciaf.2020.e00274",
+        "Nation": "Switzerland",
+        "Publish_time": "2020-03-31",
+        "Journal": "Scientific African",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "za8i12yz",
+        "Title": "Comparative analysis of three laboratory based serological assays for SARS-CoV-2 in an Australian cohort",
+        "First_author": "Davidson",
+        "DOI": "10.1016/j.pathol.2020.09.008",
+        "Nation": "Australia",
+        "Publish_time": "2020-09-30",
+        "Journal": "Pathology",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "1hobsclz",
+        "Title": "SABR-BRIDGE: Stereotactic ABlative Radiotherapy Before Resection to AvoId Delay for Early-Stage LunG Cancer or OligomEts During the COVID-19 Pandemic",
+        "First_author": "Kidane",
+        "DOI": "10.3389/fonc.2020.580189",
+        "Nation": "Canada",
+        "Publish_time": "2020-09-25",
+        "Journal": "Front Oncol",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "3x3d1yor",
+        "Title": "Might proton pump or sodium‐hydrogen exchanger inhibitors be of value to ameliorate SARs‐CoV‐2 pathophysiology?",
+        "First_author": "Conrad",
+        "DOI": "10.14814/phy2.14649",
+        "Nation": "United States of America",
+        "Publish_time": "2020-12-25",
+        "Journal": "Physiol Rep",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "0yxqld77",
+        "Title": "Time-series analyses of directional sequence changes in SARS-CoV-2 genomes and an efficient search method for candidates for advantageous mutations for growth in human cells",
+        "First_author": "Wada",
+        "DOI": "10.1016/j.gene.2020.100038",
+        "Nation": "Japan",
+        "Publish_time": "2020-08-06",
+        "Journal": "Gene X",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "9jfxw46w",
+        "Title": "Rapid and quantitative detection of SARS-CoV-2 specific IgG for convalescent serum evaluation",
+        "First_author": "Tan",
+        "DOI": "10.1016/j.bios.2020.112572",
+        "Nation": "United States of America",
+        "Publish_time": "2020-09-03",
+        "Journal": "Biosens Bioelectron",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "2qx0q01g",
+        "Title": "The Bittersweet Effects of COVID-19 on Mental Health: Results of an Online Survey among a Sample of the Dutch Population Five Weeks after Relaxation of Lockdown Restrictions",
+        "First_author": "Gijzen",
+        "DOI": "10.3390/ijerph17239073",
+        "Nation": "Netherlands",
+        "Publish_time": "2020-12-04",
+        "Journal": "Int J Environ Res Public Health",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "3itp6vvs",
+        "Title": "Is growth hormone insufficiency the missing link between obesity, male gender, age and COVID‐19 severity?",
+        "First_author": "Lubrano",
+        "DOI": "10.1002/oby.23000",
+        "Nation": "Italy",
+        "Publish_time": "2020-08-17",
+        "Journal": "Obesity (Silver Spring)",
+        "Classification": 1
+    },
+    {
+        "Cord_UID": "25vppt23",
+        "Title": "Two-dimensional echocardiography after return of spontaneous circulation and its association with in-hospital survival after in-hospital cardiopulmonary resuscitation",
+        "First_author": "Song",
+        "DOI": "10.1038/s41598-019-56153-z",
+        "Nation": "South Korea",
+        "Publish_time": "2020-01-08",
+        "Journal": "Sci Rep",
+        "Classification": 1
+    }
+]

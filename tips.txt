@@ -1,0 +1,58 @@
+tips:
+colorare brush dello sliderTime
+aggiungere dot al posto del arrow
+update del chart con animazione
+crossfilter
+
+
+
+INDICE
+INTRODUZIONE -> "Abstract" e breve descrizione dei vari capitoli
+1. <Problematica>
+    1.1 New "Hottest" Topic -> come tenere traccia dello sviluppo di un nuovo "fenomeno" scientifico (tool visivo per 
+        aiutare dato che è assente)
+    1.2 Case study: COVID 19
+2. <State of the Art & Related work> -> ricerca sulla (studi di bibliografia, tool che hanno provato a visualizzare dati,
+        text mining per ricercare paper, visualizzation, MANCA UN TOOL CHE MANTIENE TRACCIA DELLA RICERCA)
+3. <Problema affrontato: Definizione (cioè Requisiti)> -> top-down o bottom-up? Dataset avuto in partenza
+    3.2 Data mining
+    3.2 Visualizzazione
+4. <Strumenti metodologici e tecnologici utilizzati e NON>
+    4.1 Colab
+    4.2 Python
+    4.3 JS
+    4.4 D3
+5. <
+    4.4 TFIDF
+    4.6 SVD
+    4.7 t-SNE
+    4.8 KMEANS++
+5. <Soluzione proposta e Risultati>
+    5.1 Dataset e pre processing (chi è, cos'è, da dove viene, problematiche annesse..)
+    5.2 Tecnica applicata TFIDF (data mining)
+        5.2.1 Normal (Original)
+        5.2.2 SVD
+        5.2.3 tSNE
+    5.3 Visual analysis
+        5.3.1 Slider numero paper
+        5.3.2 Slider su tempo
+        5.3.3 Mappa
+        5.3.4 Barchart
+        5.3.5 Chart
+        5.3.6 Tabella
+6. <Conclusioni e Lavori futuri>
+    6.1 Conclusione ed eventuali lezioni imparate
+    6.2 Future migliorie ed estensioni // Sistema scalabile
+BIBLIOGRAFIA
+
+
+
+INTRODUZIONE - Descritto il problema
+STATE OF THE ART
+METHODOLOGY --> THE SYSTEM and CLUSTERING
+RESULTS
+CONCLUSIONS
+FUTURE WORKS
+
+
+XIGRAIP -- Maestrale_20210310

@@ -1,0 +1,102 @@
+[
+    {
+        "Cord_UID": "r6va0851",
+        "Title": "Impact of face masks on voice radiationa)",
+        "First_author": "Pörschmann",
+        "DOI": "10.1121/10.0002853",
+        "Nation": "Germany",
+        "Publish_time": "2020-12-15",
+        "Journal": "J Acoust Soc Am",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "msgy33e9",
+        "Title": "Pandemic Dreams: Network Analysis of Dream Content During the COVID-19 Lockdown",
+        "First_author": "Pesonen",
+        "DOI": "10.3389/fpsyg.2020.573961",
+        "Nation": "Finland",
+        "Publish_time": "2020-10-01",
+        "Journal": "Front Psychol",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "8iq3ao0c",
+        "Title": "Telemedicine for housebound older persons during the Covid-19 pandemic",
+        "First_author": "Beauchet",
+        "DOI": "10.1016/j.maturitas.2020.06.024",
+        "Nation": "Canada",
+        "Publish_time": "2020-06-26",
+        "Journal": "Maturitas",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "5thvg7qs",
+        "Title": "Comparison of SARS-CoV-2 RT-PCR on a high-throughput molecular diagnostic platform and the cobas SARS-CoV-2 test for the diagnostic of COVID-19 on various clinical samples",
+        "First_author": "Opota",
+        "DOI": "10.1093/femspd/ftaa061",
+        "Nation": "Switzerland",
+        "Publish_time": "2020-10-08",
+        "Journal": "Pathog Dis",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "mpbwewm6",
+        "Title": "Comparative study of ANN and Fuzzy classifier for forecasting Electrical activity of Heart to diagnose Covid-19",
+        "First_author": "Nivethitha",
+        "DOI": "10.1016/j.matpr.2020.10.400",
+        "Nation": "India",
+        "Publish_time": "2020-10-27",
+        "Journal": "Mater Today Proc",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "ewttrbxg",
+        "Title": "ACE2 correlated with immune infiltration serves as a prognostic biomarker in endometrial carcinoma and renal papillary cell carcinoma: implication for COVID-19",
+        "First_author": "Yang",
+        "DOI": "10.18632/aging.103100",
+        "Nation": "China",
+        "Publish_time": "2020-04-27",
+        "Journal": "Aging (Albany NY)",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "62ichbjg",
+        "Title": "Nowcasting the COVID‐19 pandemic in Bavaria",
+        "First_author": "Günther",
+        "DOI": "10.1002/bimj.202000112",
+        "Nation": "Germany",
+        "Publish_time": "2020-12-01",
+        "Journal": "Biom J",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "qqwfreu4",
+        "Title": "Potent in vitro Neutralization of SARS-CoV-2 by Hetero-bivalent Alpaca Nanobodies Targeting the Spike Receptor-Binding Domain",
+        "First_author": "Ma",
+        "DOI": "10.1101/2021.02.02.429311",
+        "Nation": "China",
+        "Publish_time": "2021-02-03",
+        "Journal": "bioRxiv",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "ghmqd3yv",
+        "Title": "Subjective Deterioration of Physical and Psychological Health during the COVID-19 Pandemic in Taiwan: Their Association with the Adoption of Protective Behaviors and Mental Health Problems",
+        "First_author": "Wang",
+        "DOI": "10.3390/ijerph17186827",
+        "Nation": "Taiwan",
+        "Publish_time": "2020-09-18",
+        "Journal": "Int J Environ Res Public Health",
+        "Classification": 2
+    },
+    {
+        "Cord_UID": "mwv7lp82",
+        "Title": "Optimal surveillance mitigation of COVID'19 disease outbreak: Fractional order optimal control of compartment model",
+        "First_author": "Razzaq",
+        "DOI": "10.1016/j.rinp.2020.103715",
+        "Nation": "Pakistan",
+        "Publish_time": "2020-12-30",
+        "Journal": "Results Phys",
+        "Classification": 2
+    }
+]

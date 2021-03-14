@@ -1,0 +1,102 @@
+[
+    {
+        "Cord_UID": "rufae1gg",
+        "Title": "Viral clearance after early corticosteroid treatment in patients with moderate or severe covid-19",
+        "First_author": "Spagnuolo",
+        "DOI": "10.1038/s41598-020-78039-1",
+        "Nation": "Italy",
+        "Publish_time": "2020-12-04",
+        "Journal": "Sci Rep",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "lh0ucm2c",
+        "Title": "Efficacy of ribavirin and interferon-α therapy for hospitalized patients with COVID-19: a multicenter, retrospective cohort study",
+        "First_author": "Li",
+        "DOI": "10.1016/j.ijid.2021.01.055",
+        "Nation": "China",
+        "Publish_time": "2021-01-28",
+        "Journal": "Int J Infect Dis",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "6i3s496h",
+        "Title": "The effect of early-stage public health policies in the transmission of COVID-19 for South American countries",
+        "First_author": "Valcarcel",
+        "DOI": "10.26633/rpsp.2020.148",
+        "Nation": "United States of America",
+        "Publish_time": "2020-11-20",
+        "Journal": "Rev Panam Salud Publica",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "b30gahvy",
+        "Title": "The State of Vaccine Confidence in Poland: A 2019 Nationwide Cross-Sectional Survey",
+        "First_author": "Furman",
+        "DOI": "10.3390/ijerph17124565",
+        "Nation": "Poland",
+        "Publish_time": "2020-06-24",
+        "Journal": "Int J Environ Res Public Health",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "za487ogq",
+        "Title": "The role of textiles as fomites in the healthcare environment: a review of the infection control risk",
+        "First_author": "Owen",
+        "DOI": "10.7717/peerj.9790",
+        "Nation": "United Kingdom",
+        "Publish_time": "2020-08-25",
+        "Journal": "PeerJ",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "8cc8awpc",
+        "Title": "Effects of heterogeneous self-protection awareness on resource-epidemic coevolution dynamics",
+        "First_author": "Chen",
+        "DOI": "10.1016/j.amc.2020.125428",
+        "Nation": "China",
+        "Publish_time": "2020-11-15",
+        "Journal": "Appl Math Comput",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "dxyiuqq3",
+        "Title": "International Multi-Center Analysis of In-hospital Morbidity and Mortality of Low-Voltage Electrical Injuries",
+        "First_author": "Warenits",
+        "DOI": "10.3389/fmed.2020.590758",
+        "Nation": "Austria",
+        "Publish_time": "2020-11-11",
+        "Journal": "Front Med (Lausanne)",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "7tfmb5ow",
+        "Title": "A rapid, low cost, and highly sensitive SARS-CoV-2 diagnostic based on whole genome sequencing",
+        "First_author": "St Hilaire",
+        "DOI": "10.1101/2020.04.25.061499",
+        "Nation": "United States of America",
+        "Publish_time": "2020-05-11",
+        "Journal": "bioRxiv",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "lflwd65h",
+        "Title": "Existing antiviral options against SARS-CoV-2 replication in COVID-19 patients",
+        "First_author": "Ghanbari",
+        "DOI": "10.2217/fmb-2020-0120",
+        "Nation": "Iran",
+        "Publish_time": "2021-01-06",
+        "Journal": "Future microbiology",
+        "Classification": 0
+    },
+    {
+        "Cord_UID": "8br432ri",
+        "Title": "ARIMA modelling & forecasting of COVID-19 in top five affected countries",
+        "First_author": "Sahai",
+        "DOI": "10.1016/j.dsx.2020.07.042",
+        "Nation": "India",
+        "Publish_time": "2020-07-28",
+        "Journal": "Diabetes Metab Syndr",
+        "Classification": 0
+    }
+]
