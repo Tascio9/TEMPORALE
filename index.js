@@ -3,8 +3,8 @@ Promise.all([
   // d3.json("myFirstDatasetCleaned.json"),
   //d3.json("Dataset210203ClassificationCleaned.json"),
   d3.json("Report/Images/210215/TFIDF/Dataset210215ClassificationCleaned_tSNE.json"),
-  d3.json("CovidEuropean_20210309.json")                                   // ---> "The middle"
-  // d3.json("CovidEuropean_20210210.json")                                // ---> "The middle"
+  // d3.json("CovidEuropean_20210309.json")                                   // ---> "The middle"
+  d3.json("CovidEuropean_20210210.json")                                // ---> "The middle"
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json") ---> Original
   // d3.json(https://opendata.ecdc.europa.eu/covid19/nationalcasedeath/json/) ---> Actual
 ]).then(data => {
@@ -634,6 +634,7 @@ Promise.all([
   // IDEA: https://bl.ocks.org/pbeshai/484d6bf04edcdecfc3731e00c062f47e
   function chart(dataset, nation) {
     const dayFormat = d3.timeFormat("%Y-%m-%d")
+    // const dayFormat = d3.timeFormat("%Y-%W")
     const yearValue = d3.select('#selectYear').property('value')
     const formatMonthLabel = d3.timeFormat('%b');
     // console.log({ dataset })
@@ -664,6 +665,15 @@ Promise.all([
     //   // })
     //  }
 
+    // casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => {
+    //   if (e.indicator == 'cases')
+    //     return e.weekly_count
+    // }), function (k) {
+    //   return dayFormat(new Date(moment(k.year_week, 'YYYY-WW')))
+    // })
+
+    console.log({ casesMap })
+
     d3.select('#selectChart').remove()
 
     d3.select('.selectChart-div').append('select')
@@ -680,7 +690,7 @@ Promise.all([
           .attr('value', nation)
           .text(nation)
         d3.select('#selectChart').property('value', nation)
-        casesMap = d3.rollup(data.get(nation.split(" ").join("_")), v => d3.sum(v, e => e.cases_weekly), function (k) {
+        casesMap = d3.rollup(dataset.records, v => d3.sum(v, e => e.cases_weekly), function (k) {
           return dayFormat(new Date(moment(k.dateRep, 'DD/MM/YYYY').format("YYYY-MM-DD")))
         })
       } else {
