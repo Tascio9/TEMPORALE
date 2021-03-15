@@ -1194,8 +1194,9 @@ Promise.all([
     var z = d3.scaleOrdinal()
       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-    const keys = [...new Set(Array.from(dataset, v => v.Classification))]
+    const keys = [...new Set(Array.from(dataset, v => v.Classification))].sort()
     // console.log({ keys })
+
 
     x0.domain(listNation);
     x1.domain(keys).rangeRound([0, x0.bandwidth()]);
