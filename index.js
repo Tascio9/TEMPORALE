@@ -1176,6 +1176,7 @@ Promise.all([
 
     var width = 1000
     var height = 450
+    margin = { top: 20, right: 20, bottom: 30, left: 75 }
 
     d3.select('#barchart').remove()
     d3.select('.barchart-div')
@@ -1188,7 +1189,6 @@ Promise.all([
     // width="550" height="200"
 
     var svg = d3.select("#barchart")
-    margin = { top: 20, right: 20, bottom: 30, left: 75 }
 
     width = +width - margin.left - margin.right
     height = +height - margin.top - margin.bottom
@@ -1212,7 +1212,7 @@ Promise.all([
 
     const keys = [...new Set(Array.from(dataset, v => v.Classification))].sort()
 
-    //console.log({ keys })
+    // console.log({ keys })
 
 
     x0.domain(listNation);
