@@ -132,7 +132,7 @@ Promise.all([
 
   // - Button SETTINGS
   d3.select('#settings').on('click', function () {
-    var modal = document.getElementById("myModal");
+    var modal = document.getElementById("settingsModal");
 
     modal.style.display = "block";
     // Get the <span> element that closes the modal
@@ -153,7 +153,23 @@ Promise.all([
 
   // - Button ABOUT
   d3.select('#about').on('click', function () {
-    window.alert('About')
+    var modal = document.getElementById("aboutModal");
+
+    modal.style.display = "block";
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[1];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+      modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
   })
 
   // - Button RESET
@@ -1159,7 +1175,8 @@ Promise.all([
     }
 
     var width = 1000
-    var height = 400
+    var height = 450
+    margin = { top: 20, right: 20, bottom: 30, left: 75 }
 
     d3.select('#barchart').remove()
     d3.select('.barchart-div')
@@ -1172,7 +1189,6 @@ Promise.all([
     // width="550" height="200"
 
     var svg = d3.select("#barchart")
-    margin = { top: 20, right: 20, bottom: 30, left: 75 }
 
     width = +width - margin.left - margin.right
     height = +height - margin.top - margin.bottom
@@ -1195,6 +1211,7 @@ Promise.all([
       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
     const keys = [...new Set(Array.from(dataset, v => v.Classification))].sort()
+
     // console.log({ keys })
 
 
@@ -1263,6 +1280,16 @@ Promise.all([
       .attr("font-weight", "bold")
       .style("text-anchor", "middle")
       .text("N° Paper");
+
+    svg.append("text")
+      .attr("y", height + margin.top + margin.bottom)
+      .attr("x", (width / 2) + margin.left)
+      .attr("dy", "1em")
+      .attr("fill", "white")
+      .attr("font-size", "1vh")
+      .attr("font-weight", "bold")
+      .style("text-anchor", "middle")
+      .text("States");
 
     g.append("g")
       .attr("class", "y axis")
