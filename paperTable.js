@@ -62,7 +62,7 @@ function Table(dataset) {
                 { data: 'Nation' },
                 { data: 'Publish_time' },
                 { data: 'Journal' },
-                { data: 'Classification' }
+                { data: 'Topic' }
             ],
             pageResize: true,
             scrollResize: true,

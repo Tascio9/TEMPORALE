@@ -2,7 +2,7 @@ Promise.all([
   d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
   // d3.json("myFirstDatasetCleaned.json"),
   //d3.json("Dataset210203ClassificationCleaned.json"),
-  d3.json("Report/Images/210215/TFIDF/Dataset210215ClassificationCleaned_tSNE.json"),
+  d3.json("Dataset210215ClassificationCleaned_tSNE.json"),
   // d3.json("CovidEuropean_20210309.json")                                   // ---> "The middle"
   d3.json("CovidEuropean_20210210.json")                                // ---> "The middle"
   // d3.json("https://opendata.ecdc.europa.eu/covid19/casedistribution/json") ---> Original
@@ -1161,7 +1161,7 @@ Promise.all([
   function barchart(dataset, nation) {
     var listNation = []
 
-    const datasetClass = d3.group(dataset, d => d.Nation, d => d.Classification)
+    const datasetClass = d3.group(dataset, d => d.Nation, d => d.Topic)
     // console.log({ datasetClass })
 
     if (nation === undefined || nation.length == 0) {
@@ -1210,7 +1210,7 @@ Promise.all([
     var z = d3.scaleOrdinal()
       .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-    const keys = [...new Set(Array.from(dataset, v => v.Classification))].sort()
+    const keys = [...new Set(Array.from(dataset, v => v.Topic))].sort()
 
     // console.log({ keys })
 
@@ -1289,7 +1289,7 @@ Promise.all([
       .attr("font-size", "1vh")
       .attr("font-weight", "bold")
       .style("text-anchor", "middle")
-      .text("States");
+      .text("Nations");
 
     g.append("g")
       .attr("class", "y axis")
