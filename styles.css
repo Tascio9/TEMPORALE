@@ -1,13 +1,17 @@
 /* html {
   height: 100%;
 } */
-
 body {
   margin: 0px;
   /* overflow: hidden; */
   background-color: #222222;
   font-family: 'Oxygen', sans-serif;
   /* min-height: 100%; */
+}
+
+#main{
+  height: 100%;
+  width: 100%;
 }
 
 #titleThesis{
@@ -197,6 +201,7 @@ body {
   display: blocks;
   background-color: rgb(220, 220, 220);
   border-radius: 5px;
+  height: 100%;
 }
 
 .numbers {
