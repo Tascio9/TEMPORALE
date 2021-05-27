@@ -20,10 +20,10 @@ Promise.all([
   let scale = d3.select('input[name="scale"]:checked').property('value')
 
 
-  console.log({ colorPalette })
-  console.log({ scale })
-  console.log({ groupByYear })
-  console.log({ groupByMonth })
+  // console.log({ colorPalette })
+  // console.log({ scale })
+  // console.log({ groupByYear })
+  // console.log({ groupByMonth })
 
   const sortedGroupByYear = Array.from(groupByYear.keys()).sort((a, b) => d3.descending(a, b))
 
@@ -101,7 +101,7 @@ Promise.all([
   d3.selectAll('input[name="colorPalette"]').on('change', function () {
     colorPalette = this.value
     yearValue = d3.select('#selectYear').property('value')
-    console.log({ yearValue })
+    // console.log({ yearValue })
     if (yearValue === 'All') {
       colorChartBoolean = false
       colorMap(data[1])
@@ -126,7 +126,7 @@ Promise.all([
 
   // - Resize HTML
   d3.select(window).on('resize', function () {
-    console.log('RESIZE!')
+    // console.log('RESIZE!')
     window.location.reload();
     // window.addEventListener("resize", location.reload());
   })
@@ -175,8 +175,8 @@ Promise.all([
 
   // - Button RESET
   d3.select('#buttonReset').on('click', function () {
-    console.log('RESET')
-    console.log({ yearValue })
+    // console.log('RESET')
+    // console.log({ yearValue })
     chart(data[2], '')
     // selectChart()
     colorChart(groupByYear.get(yearValue))
@@ -191,8 +191,8 @@ Promise.all([
   function palette(dataset) {
     const min = d3.min(Array.from(dataset.values())).length;
     const max = d3.max(Array.from(dataset.values())).length;
-    console.log({ min })
-    console.log({ max })
+    // console.log({ min })
+    // console.log({ max })
     if (colorPalette === 'Viridis') {
       return d3.scaleSequential(d3.interpolateViridis)
         .domain([min, max])
@@ -220,8 +220,8 @@ Promise.all([
     // const heightLegend = document.querySelector('.chart-div').getBoundingClientRect().width; // Original = 300
     // const widthLegend = document.querySelector('.chart-div').getBoundingClientRect().height;  // Original = 100
 
-    console.log({ heightLegend })
-    console.log({ widthLegend })
+    // console.log({ heightLegend })
+    // console.log({ widthLegend })
 
     const marginLegend = { top: 20, right: 80, bottom: 20, left: 2 };
 
@@ -315,7 +315,7 @@ Promise.all([
       .on("end", function filterView(event) {
         // it was .on("brush", ....
         const selection1 = d3.brushSelection(d3.select(".brushLegend").node());
-        console.log({ selection1 })
+        // console.log({ selection1 })
         if (!event.sourceEvent || !selection1) return;
         const selectionLegendNorth = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[1]));
         const selectionLegendSouth = parseInt(legendscaleaxis.invert(d3.brushSelection(d3.select(".brushLegend").node())[0]));
@@ -331,8 +331,8 @@ Promise.all([
             d3.select("#worldMap").select(`path[id='${d[0]}']`).transition().duration(100).style("opacity", "1")
             d3.select("#worldMap").select(`path[id='${d[0]}']`).style("stroke", "orange")
             countriesChart.push(d[0])
-            console.log(d[1])
-            console.log({ countriesChart })
+            // console.log(d[1])
+            // console.log({ countriesChart })
             d[1].forEach(function (e) {
               filterDataset.push(e)
             })
@@ -341,7 +341,7 @@ Promise.all([
         chart(data[2], countriesChart)
         barchart(dataset, countriesChart)
         if (filterDataset.length > 0) {
-          console.log({ filterDataset })
+          // console.log({ filterDataset })
           Table(filterDataset)
         } else {
           alert('No countries available in this range')
@@ -371,6 +371,7 @@ Promise.all([
 
   // -------------------------------------------------------------------------------------------------
   // *IMPROVEMENT* take a look on this: https://www.d3-graph-gallery.com/graph/interactivity_zoom.html
+  // Draw the slider of time according to the dataset
   function sliderTime(dataset) {
     const marginSlider = { top: 10, right: 40, bottom: 10, left: 30 }
     const widthSlider = 100;
@@ -385,7 +386,7 @@ Promise.all([
 
 
     selectedYear = d3.select('#selectYear').node().value
-    console.log({ selectedYear })
+    // console.log({ selectedYear })
 
     d3.select('#slider').remove()
     d3.select('.legend-div').append('svg').attr('id', 'slider')
@@ -570,10 +571,10 @@ Promise.all([
           const [x0, x1] = selection1.map(d => d3.timeMonth.every(1).round(dateScale.invert(d)));
           d3.select(this).transition().call(brush1.move, x1 > x0 ? [x0, x1].map(dateScale) : null);
 
-          console.log(dateScale.invert(selection1[0]))
-          console.log(x0)
-          console.log(moment(dateScale.invert(selection1[1]), 'YYYY-MM-DD').format('YYYY-MM'))
-          console.log(x1)
+          // console.log(dateScale.invert(selection1[0]))
+          // onsole.log(x0)
+          // console.log(moment(dateScale.invert(selection1[1]), 'YYYY-MM-DD').format('YYYY-MM'))
+          // console.log(x1)
 
           const newData = dataset.filter(function (d) {
             return ((new Date(moment(d.Publish_time, 'YYYY-MM').format('YYYY-MM'))) >= new Date(moment(x0, 'YYYY-MM-DD').format('YYYY-MM'))
@@ -698,7 +699,7 @@ Promise.all([
     //   return dayFormat(new Date(moment(k.year_week, 'YYYY-WW')))
     // })
 
-    console.log({ casesMap })
+    // console.log({ casesMap })
 
     d3.select('#selectChart').remove()
 
@@ -1083,12 +1084,12 @@ Promise.all([
       }
 
       const casesArray = Array.from(casesMap)
-      console.log({ casesArray })
+      // console.log({ casesArray })
 
       casesArray.sort((x, y) => d3.ascending(x[0], y[0]))
       // deathsArray.sort((x, y) => d3.ascending(x[0], y[0]))
       const casesFilteredByYear = casesArray.filter(d => new Date(d[0]).getFullYear() == yearValue)
-      console.log({ casesArray })
+      // console.log({ casesArray })
 
       y = d3.scaleLinear()
         .domain([0, d3.max(Array.from(casesFilteredByYear), d => d[1])]).nice()
@@ -1175,8 +1176,8 @@ Promise.all([
   // }
 
   // -----------------------------------------------------------------------------------------------
-  // Given a dataset, draw the barchart
-  // If the is "nation", which is a list of countries, it draws the list of countries inside "nation"
+  // Given a dataset, draw the barchart based on papers and classification
+  // If there is "nation" parameter, which is a list of countries, it draws the list of countries inside "nation"
   function barchart(dataset, nation) {
     var listNation = []
 
@@ -1185,7 +1186,7 @@ Promise.all([
 
     if (nation === undefined || nation.length == 0) {
       const sortDataset = Array.from(d3.group(dataset, d => d.Nation)).sort((x, y) => d3.descending(x[1], y[1]))
-      console.log(sortDataset.slice(0, 5))
+      // console.log(sortDataset.slice(0, 5))
       for (let elem of sortDataset.slice(0, 5)) {
         listNation.push(elem[0])
       }
@@ -1422,16 +1423,16 @@ Promise.all([
         // .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
         // .data(function (d) { return keys.map(function (key) { return { key: key, value: datasetClass.get(d).get(key).length }; }); })
         .data(function (d) {
-          console.log(d) // Italy, Venezuela
+          // console.log(d) // Italy, Venezuela
           return keys.map(function (key) {
-            console.log(key) // 0, 1, 2, 3, 4
+            // console.log(key) // 0, 1, 2, 3, 4
             let value
             try {
               value = datasetClass.get(d).get(key).length
             } catch {
               value = 0
             }
-            console.log(value)
+            // console.log(value)
             return { key: key, value: value };
           });
         })
@@ -1555,7 +1556,7 @@ Promise.all([
         .range([0, 1]);
     }
 
-    //declaration of the tooltipCountry (extra info on over)
+    //Declaration of the tooltipCountry (extra info on over)
     const tooltipCountry = d3.select('body').append('div')
       .style('display', "none")
       .attr('class', 'd3-tip');
@@ -1641,11 +1642,11 @@ Promise.all([
             }
             chosenNation.push(d.properties.name)
             chosenNation.forEach(v, i => {
-              console.log({ i })
-              console.log({ v })
+              // console.log({ i })
+              // console.log({ v })
               const bzz = datasetState.get(i)
-              console.log({ bzz })
-              console.log(typeof (bzz))
+              // console.log({ bzz })
+              // console.log(typeof (bzz))
             })
           }
           multipleChosenNation(chosenNation)
@@ -1653,7 +1654,7 @@ Promise.all([
           chart(data[2], chosenNation)
           barchart(dataset, chosenNation)
         } else if (navigator.appVersion.indexOf("Mac") != -1 && event.metaKey) {
-          console.log("CMD")
+          // console.log("CMD")
           if (chosenNation.includes(d.properties.name)) {
             var removeNationIndex = chosenNation.indexOf(d.properties.name)
             if (removeNationIndex > -1) {
@@ -1666,25 +1667,22 @@ Promise.all([
             chosenNation.push(d.properties.name)
             chosenPapers = []
             chosenNation.forEach(i => {
-              console.log({ i })
-              const bzz = datasetState.get(i)
-              console.log({ bzz })
-              console.log(typeof (bzz))
+              // console.log({ i })
               chosenPapers = chosenPapers.concat(datasetState.get(i))
             })
           }
-          console.log({ chosenPapers })
+          // console.log({ chosenPapers })
           multipleChosenNation(chosenNation)
           // selectChart(chosenNation)
           chart(data[2], chosenNation)
           barchart(dataset, chosenNation)
           Table(chosenPapers)
         } else {
-          console.log("ELSE")
+          // console.log("ELSE")
           // console.log({ datasetState })
           chosenNation = []
           chosenNation.push(this.id)
-          console.log(this.id)
+          // console.log(this.id)
           // var clickedNation = datasetState.get(this.id)
           d3.selectAll('path').style('stroke', 'white')
           d3.selectAll('path').style('stroke-opacity', '0.4');
@@ -1755,7 +1753,7 @@ Promise.all([
   // -------------------------------------
   // Reset of the "handleMouseMoveCountry"
   function handleMouseOutCountryChart(countries) {
-    console.log({ countries })
+    // console.log({ countries })
     d3.select("#worldMap").selectAll("path").transition().duration(150).style("opacity", "0.4");
     countries.forEach(function (d) {
       d3.select("#worldMap").select(`path[id='${d}']`).transition().duration(100).style("opacity", "1")
@@ -1780,25 +1778,19 @@ Promise.all([
 
 }).then(unlockUI)
 
-// function lockUI() {
-//   return new Promise(function () {
-//     console.log("lockUI")
-//   })
-// }
-
 async function lockUI() {
   try {
-    console.log("LockUI")
+    // console.log("LockUI")
     document.getElementById("overlay").style.display = "block";
     document.getElementById("loader").style.display = "block";
 
   } catch (error) {
-    console.log(error)
+    // console.log(error)
   }
 }
 
 function unlockUI() {
-  console.log("UnlockUI")
+  // console.log("UnlockUI")
   document.getElementById("overlay").style.display = "none";
   document.getElementById("loader").style.display = "none";
 }
