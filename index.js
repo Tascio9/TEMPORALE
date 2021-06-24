@@ -1176,6 +1176,7 @@ Promise.all([
   // }
 
   // -----------------------------------------------------------------------------------------------
+  // Starting point: https://observablehq.com/@d3/grouped-bar-chart
   // Given a dataset, draw the barchart based on papers and classification
   // If there is "nation" parameter, which is a list of countries, it draws the list of countries inside "nation"
   function barchart(dataset, nation) {
@@ -1195,7 +1196,7 @@ Promise.all([
     }
 
     var width = 1000
-    var height = 450
+    var height = 470
     margin = { top: 20, right: 20, bottom: 30, left: 75 }
 
     d3.select('#barchart').remove()
@@ -1327,7 +1328,7 @@ Promise.all([
       .attr("font-size", 10)
       .attr("text-anchor", "end")
       .selectAll("g")
-      .data(keys.slice().reverse())
+      .data(keys.slice())           // original: keys.slice().reverse()
       .enter().append("g")
       .attr("transform", function (d, i) { return "translate(0," + i * 20 + ")"; });
 
